@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import type { Project } from "@/lib/projects";
-import { useScrollY } from "@/lib/hooks";
+import { useScrollY } from "@/hooks/useScrollY";
 import { GridCell } from "./GridCell";
 
 type HeroGridProps = {

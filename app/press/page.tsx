@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useReveal } from "@/lib/hooks";
+import { useReveal } from "@/hooks/useReveal";
 
 const AWARDS = [
   {

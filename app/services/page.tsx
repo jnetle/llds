@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import { useReveal } from "@/lib/hooks";
+import { useReveal } from "@/hooks/useReveal";
 
 const ROLE = [
   {
