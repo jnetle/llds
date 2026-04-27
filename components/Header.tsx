@@ -13,12 +13,24 @@ const NAV = [
 
 export function Header() {
   const [scrolled, setScrolled] = useState(false);
+  const [hidden, setHidden] = useState(false);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 30);
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  useEffect(() => {
+    const onSetHidden = (e: Event) => {
+      const detail = (e as CustomEvent<{ hidden: boolean }>).detail;
+      setHidden(Boolean(detail?.hidden));
+    };
+    window.addEventListener("globalHeader:setHidden", onSetHidden);
+    return () => {
+      window.removeEventListener("globalHeader:setHidden", onSetHidden);
+    };
   }, []);
 
   const fg = "#F4F0E8";
@@ -32,7 +44,11 @@ export function Header() {
         right: 0,
         zIndex: 50,
         padding: scrolled ? "18px 36px" : "28px 36px",
-        transition: "padding 0.4s ease",
+        transform: hidden ? "translateY(-100%)" : "translateY(0)",
+        opacity: hidden ? 0 : 1,
+        pointerEvents: hidden ? "none" : "auto",
+        transition:
+          "padding 0.4s ease, transform 0.36s ease, opacity 0.36s ease",
       }}
     >
       <div

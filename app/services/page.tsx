@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useEffect, useRef, useState } from "react";
 import { useReveal } from "@/lib/hooks";
 
 const ROLE = [
@@ -241,6 +242,30 @@ const Dash = () => (
 
 export default function ServicesPage() {
   const [refScope, seenScope] = useReveal<HTMLDivElement>();
+  const sentinelRef = useRef<HTMLDivElement>(null);
+  const [stuck, setStuck] = useState(false);
+
+  useEffect(() => {
+    const node = sentinelRef.current;
+    if (!node) return;
+    const dispatch = (hidden: boolean) =>
+      window.dispatchEvent(
+        new CustomEvent("globalHeader:setHidden", { detail: { hidden } }),
+      );
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        const isStuck = !entry.isIntersecting;
+        setStuck(isStuck);
+        dispatch(isStuck);
+      },
+      { threshold: 0 },
+    );
+    io.observe(node);
+    return () => {
+      io.disconnect();
+      dispatch(false);
+    };
+  }, []);
 
   return (
     <div style={{ background: "var(--bg)", color: "var(--ink)" }}>
@@ -339,17 +364,25 @@ export default function ServicesPage() {
         </div>
       </section>
 
+      {/* Sentinel: flips when the quick-links nav reaches the top */}
+      <div ref={sentinelRef} aria-hidden style={{ height: 1 }} />
+
       {/* Quick links */}
       <nav
         style={{
           position: "sticky",
           top: 0,
           zIndex: 30,
-          background: "rgba(244,240,232,0.92)",
+          background: stuck
+            ? "rgba(244,240,232,0.97)"
+            : "rgba(244,240,232,0.92)",
           backdropFilter: "blur(10px)",
           WebkitBackdropFilter: "blur(10px)",
-          borderBottom: "1px solid var(--hairline)",
+          borderBottom: `1px solid ${stuck ? "var(--ink-soft)" : "var(--hairline)"}`,
+          boxShadow: stuck ? "0 6px 24px rgba(42,46,37,0.06)" : "none",
           padding: "18px 8vw",
+          transition:
+            "background 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease",
         }}
       >
         <ul
