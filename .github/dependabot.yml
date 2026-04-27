@@ -9,24 +9,28 @@ updates:
       next:
         patterns:
           - next
-          - "@next/*"
+          - '@next/*'
           - eslint-config-next
       react:
         patterns:
           - react
           - react-dom
-          - "@types/react"
-          - "@types/react-dom"
+          - '@types/react'
+          - '@types/react-dom'
+      tailwind:
+        patterns:
+          - tailwindcss
+          - '@tailwindcss/*'
       types:
         patterns:
-          - "@types/*"
+          - '@types/*'
         exclude-patterns:
-          - "@types/react"
-          - "@types/react-dom"
+          - '@types/react'
+          - '@types/react-dom'
       eslint:
         patterns:
           - eslint
-          - "@eslint/*"
+          - '@eslint/*'
         exclude-patterns:
           - eslint-config-next
 
