@@ -1,30 +1,38 @@
-import { Wordmark } from "./Wordmark";
+import { Wordmark } from './Wordmark';
 
 const COLUMNS: { h: string; items: { label: string; href?: string }[] }[] = [
   {
-    h: "Studio",
+    h: 'Studio',
     items: [
-      { label: "About", href: "/about" },
-      { label: "Approach", href: "/about" },
-      { label: "Press", href: "/press" },
-      { label: "Awards", href: "/press" },
+      { label: 'About', href: '/about' },
+      { label: 'Services', href: '/services' },
+      { label: 'Press', href: '/press' },
     ],
   },
   {
-    h: "Visit",
+    h: 'Visit',
     items: [
-      { label: "12a Lamb Conduit Pass" },
-      { label: "London WC1N 3LF" },
-      { label: "By appointment" },
+      { label: 'XXXX Street' },
+      { label: 'Augusta, Georgia 12345' },
+      { label: 'Serving Aiken/Augusta area' },
     ],
   },
   {
-    h: "Contact",
+    h: 'Contact',
     items: [
-      { label: "hello@laurelleaf.studio", href: "mailto:hello@laurelleaf.studio" },
-      { label: "+44 (0)20 7946 0119", href: "tel:+442079460119" },
-      { label: "Instagram" },
-      { label: "Journal" },
+      {
+        label: 'hello@laurelleaf.studio',
+        href: 'mailto:hello@laurelleaf.studio',
+      },
+      { label: '111-111-1111', href: 'tel:+1111111111' },
+      {
+        label: 'Instagram',
+        href: 'https://www.instagram.com/laurelleafdesignstudio',
+      },
+      {
+        label: 'Facebook',
+        href: 'https://www.facebook.com/laurelleafdesignstudio',
+      },
     ],
   },
 ];
@@ -33,12 +41,12 @@ export function Footer() {
   return (
     <footer
       style={{
-        borderTop: "1px solid var(--hairline)",
-        padding: "80px 8vw 50px",
-        display: "grid",
-        gridTemplateColumns: "1.4fr 1fr 1fr 1fr",
+        borderTop: '1px solid var(--hairline)',
+        padding: '80px 8vw 50px',
+        display: 'grid',
+        gridTemplateColumns: '1.4fr 1fr 1fr 1fr',
         gap: 60,
-        alignItems: "start",
+        alignItems: 'start',
       }}
     >
       <div>
@@ -48,10 +56,10 @@ export function Footer() {
           style={{
             marginTop: 30,
             fontSize: 22,
-            fontStyle: "italic",
+            fontStyle: 'italic',
             lineHeight: 1.4,
             fontWeight: 300,
-            maxWidth: "24ch",
+            maxWidth: '24ch',
           }}
         >
           Considered interiors for the long view.
@@ -62,11 +70,11 @@ export function Footer() {
           <div className="micro" style={{ marginBottom: 22, opacity: 0.5 }}>
             {col.h}
           </div>
-          <ul style={{ listStyle: "none", display: "grid", gap: 10 }}>
+          <ul style={{ listStyle: 'none', display: 'grid', gap: 10 }}>
             {col.items.map((it) => (
               <li
                 key={it.label}
-                style={{ fontSize: 14, color: "var(--ink-soft)" }}
+                style={{ fontSize: 14, color: 'var(--ink-soft)' }}
               >
                 {it.href ? <a href={it.href}>{it.label}</a> : it.label}
               </li>
@@ -76,21 +84,22 @@ export function Footer() {
       ))}
       <div
         style={{
-          gridColumn: "1 / -1",
+          gridColumn: '1 / -1',
           marginTop: 60,
           paddingTop: 30,
-          borderTop: "1px solid var(--hairline)",
-          display: "flex",
-          justifyContent: "space-between",
-          flexWrap: "wrap",
+          borderTop: '1px solid var(--hairline)',
+          display: 'flex',
+          justifyContent: 'space-between',
+          flexWrap: 'wrap',
           gap: 16,
         }}
       >
         <div className="micro-sm" style={{ opacity: 0.5 }}>
-          © Laurel Leaf Design Limited · MMXXVI
+          ©{new Date().getFullYear()} Laurel Leaf Design Studio · All rights
+          reserved
         </div>
         <div className="micro-sm" style={{ opacity: 0.5 }}>
-          Site designed in-house
+          Site built by jnetle
         </div>
       </div>
     </footer>
