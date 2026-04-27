@@ -1,7 +1,7 @@
 "use client";
 
 import { Fragment } from "react";
-import { useReveal } from "@/lib/hooks";
+import { useReveal } from "@/hooks/useReveal";
 
 const HEADING_PARTS: (string | { italic: string })[] = [
   "We design",

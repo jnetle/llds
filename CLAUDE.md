@@ -22,6 +22,7 @@ Next.js 16.2 App Router project with TypeScript, Tailwind CSS v4, and React 19.2
 - `app/` — App Router: all routes, layouts, and pages live here
 - `app/layout.tsx` — root layout; wraps every page with Geist fonts and base Tailwind classes
 - `app/page.tsx` — home route (`/`)
+- `hooks/` — React hooks, one per file. File name matches the hook name (e.g. `useScrollY.ts` exports `useScrollY`). Import as `@/hooks/useFoo`. Do not bundle multiple hooks into a single file.
 - `public/` — static assets served at `/`
 - Path alias `@/` maps to the repo root
 
