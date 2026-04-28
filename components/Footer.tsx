@@ -6,35 +6,31 @@ const COLUMNS: { h: string; items: { label: string; href?: string }[] }[] = [
     items: [
       { label: 'About', href: '/about' },
       { label: 'Services', href: '/services' },
-      { label: 'Press', href: '/press' },
-    ],
+      { label: 'Press', href: '/press' }
+    ]
   },
   {
     h: 'Visit',
-    items: [
-      { label: 'XXXX Street' },
-      { label: 'Augusta, Georgia 12345' },
-      { label: 'Serving Aiken/Augusta area' },
-    ],
+    items: [{ label: 'XXXX Street' }, { label: 'Augusta, Georgia 12345' }, { label: 'Serving Aiken/Augusta area' }]
   },
   {
     h: 'Contact',
     items: [
       {
         label: 'hello@laurelleaf.studio',
-        href: 'mailto:hello@laurelleaf.studio',
+        href: 'mailto:hello@laurelleaf.studio'
       },
       { label: '111-111-1111', href: 'tel:+1111111111' },
       {
         label: 'Instagram',
-        href: 'https://www.instagram.com/laurelleafdesignstudio',
+        href: 'https://www.instagram.com/laurelleafdesignstudio'
       },
       {
         label: 'Facebook',
-        href: 'https://www.facebook.com/laurelleafdesignstudio',
-      },
-    ],
-  },
+        href: 'https://www.facebook.com/laurelleafdesignstudio'
+      }
+    ]
+  }
 ];
 
 export function Footer() {
@@ -46,9 +42,8 @@ export function Footer() {
         display: 'grid',
         gridTemplateColumns: '1.4fr 1fr 1fr 1fr',
         gap: 60,
-        alignItems: 'start',
-      }}
-    >
+        alignItems: 'start'
+      }}>
       <div>
         <Wordmark />
         <p
@@ -59,23 +54,19 @@ export function Footer() {
             fontStyle: 'italic',
             lineHeight: 1.4,
             fontWeight: 300,
-            maxWidth: '24ch',
-          }}
-        >
+            maxWidth: '24ch'
+          }}>
           Considered interiors for the long view.
         </p>
       </div>
-      {COLUMNS.map((col) => (
+      {COLUMNS.map(col => (
         <div key={col.h}>
           <div className="micro" style={{ marginBottom: 22, opacity: 0.5 }}>
             {col.h}
           </div>
           <ul style={{ listStyle: 'none', display: 'grid', gap: 10 }}>
-            {col.items.map((it) => (
-              <li
-                key={it.label}
-                style={{ fontSize: 14, color: 'var(--ink-soft)' }}
-              >
+            {col.items.map(it => (
+              <li key={it.label} style={{ fontSize: 14, color: 'var(--ink-soft)' }}>
                 {it.href ? <a href={it.href}>{it.label}</a> : it.label}
               </li>
             ))}
@@ -91,12 +82,10 @@ export function Footer() {
           display: 'flex',
           justifyContent: 'space-between',
           flexWrap: 'wrap',
-          gap: 16,
-        }}
-      >
+          gap: 16
+        }}>
         <div className="micro-sm" style={{ opacity: 0.5 }}>
-          ©{new Date().getFullYear()} Laurel Leaf Design Studio · All rights
-          reserved
+          ©{new Date().getFullYear()} Laurel Leaf Design Studio · All rights reserved
         </div>
         <div className="micro-sm" style={{ opacity: 0.5 }}>
           Site built by jnetle
