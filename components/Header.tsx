@@ -1,14 +1,14 @@
-"use client";
+'use client';
 
-import Link from "next/link";
-import { useEffect, useState } from "react";
-import { Wordmark } from "./Wordmark";
+import Link from 'next/link';
+import { useEffect, useState } from 'react';
+import { Wordmark } from './Wordmark';
 
 const NAV = [
-  { label: "About", href: "/about" },
-  { label: "Services", href: "/services" },
-  { label: "Projects", href: "/" },
-  { label: "Press", href: "/press" },
+  { label: 'About', href: '/about' },
+  { label: 'Services', href: '/services' },
+  { label: 'Projects', href: '/' },
+  { label: 'Press', href: '/press' }
 ];
 
 export function Header() {
@@ -18,8 +18,8 @@ export function Header() {
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 30);
     onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
   useEffect(() => {
@@ -27,56 +27,52 @@ export function Header() {
       const detail = (e as CustomEvent<{ hidden: boolean }>).detail;
       setHidden(Boolean(detail?.hidden));
     };
-    window.addEventListener("globalHeader:setHidden", onSetHidden);
+    window.addEventListener('globalHeader:setHidden', onSetHidden);
     return () => {
-      window.removeEventListener("globalHeader:setHidden", onSetHidden);
+      window.removeEventListener('globalHeader:setHidden', onSetHidden);
     };
   }, []);
 
-  const fg = "#F4F0E8";
+  const fg = '#F4F0E8';
 
   return (
     <header
       style={{
-        position: "fixed",
+        position: 'fixed',
         top: 0,
         left: 0,
         right: 0,
         zIndex: 50,
-        padding: scrolled ? "18px 36px" : "28px 36px",
-        transform: hidden ? "translateY(-100%)" : "translateY(0)",
+        padding: scrolled ? '18px 36px' : '28px 36px',
+        transform: hidden ? 'translateY(-100%)' : 'translateY(0)',
         opacity: hidden ? 0 : 1,
-        pointerEvents: hidden ? "none" : "auto",
-        transition:
-          "padding 0.4s ease, transform 0.36s ease, opacity 0.36s ease",
-      }}
-    >
+        pointerEvents: hidden ? 'none' : 'auto',
+        transition: 'padding 0.4s ease, transform 0.36s ease, opacity 0.36s ease'
+      }}>
       <div
         style={{
-          position: "absolute",
+          position: 'absolute',
           top: 0,
           left: 0,
           right: 0,
           height: 140,
-          background:
-            "linear-gradient(180deg, rgba(0,0,0,0.42) 0%, rgba(0,0,0,0.22) 55%, rgba(0,0,0,0) 100%)",
-          pointerEvents: "none",
-          zIndex: 0,
+          background: 'linear-gradient(180deg, rgba(0,0,0,0.42) 0%, rgba(0,0,0,0.22) 55%, rgba(0,0,0,0) 100%)',
+          pointerEvents: 'none',
+          zIndex: 0
         }}
       />
 
       <div
         style={{
-          position: "relative",
+          position: 'relative',
           zIndex: 1,
-          display: "grid",
-          gridTemplateColumns: "1fr auto 1fr",
-          alignItems: "center",
+          display: 'grid',
+          gridTemplateColumns: '1fr auto 1fr',
+          alignItems: 'center',
           color: fg,
-          gap: 24,
-        }}
-      >
-        <div style={{ justifySelf: "start" }}>
+          gap: 24
+        }}>
+        <div style={{ justifySelf: 'start' }}>
           <Link href="/" aria-label="Laurel Leaf Design Studio — Home">
             <Wordmark color={fg} />
           </Link>
@@ -84,18 +80,12 @@ export function Header() {
 
         <nav
           style={{
-            display: "flex",
+            display: 'flex',
             gap: 36,
-            justifySelf: "center",
-          }}
-        >
-          {NAV.map((item) => (
-            <Link
-              key={item.label}
-              href={item.href}
-              className="micro nav-link"
-              style={{ position: "relative", color: fg }}
-            >
+            justifySelf: 'center'
+          }}>
+          {NAV.map(item => (
+            <Link key={item.label} href={item.href} className="micro nav-link" style={{ position: 'relative', color: fg }}>
               {item.label}
               <span className="nav-underline" />
             </Link>
@@ -104,23 +94,21 @@ export function Header() {
 
         <div
           style={{
-            justifySelf: "end",
-            display: "flex",
-            alignItems: "center",
-            gap: 24,
-          }}
-        >
+            justifySelf: 'end',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 24
+          }}>
           <a
             href="mailto:hello@laurelleaf.studio"
             className="micro"
             style={{
-              padding: "9px 18px",
-              border: "1px solid rgba(244,240,232,0.6)",
+              padding: '9px 18px',
+              border: '1px solid rgba(244,240,232,0.6)',
               borderRadius: 100,
-              color: fg,
-            }}
-          >
-            Enquire
+              color: fg
+            }}>
+            Inquire
           </a>
         </div>
       </div>

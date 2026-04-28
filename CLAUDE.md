@@ -7,13 +7,28 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Commands
 
 ```bash
-npm run dev      # Start dev server (Turbopack by default)
-npm run build    # Production build (Turbopack by default)
-npm start        # Start production server
-npm run lint     # Run ESLint (uses eslint CLI directly — not next lint)
+npm run dev          # Start dev server (Turbopack by default)
+npm run build        # Production build (Turbopack by default)
+npm start            # Start production server
+npm run lint         # Run ESLint (uses eslint CLI directly — not next lint)
+npm run format       # Format the repo with Prettier
+npm run format:check # Verify formatting without writing
 ```
 
 There are no tests configured yet.
+
+## Formatting
+
+Prettier is the source of truth for formatting. Config lives in `.prettierrc.json`; ignore list in `.prettierignore`. Run `npm run format` after edits, or `npm run format:check` in CI. Active rules:
+
+- `semi: true` — terminate statements with semicolons
+- `tabWidth: 2`
+- `singleQuote: true` — single quotes in JS/TS (JSX attrs still use double per Prettier defaults)
+- `printWidth: 140`
+- `trailingComma: "none"`
+- `arrowParens: "avoid"` — `x => x` instead of `(x) => x` for single-arg arrows
+- `bracketSameLine: true` — keep `>` of multi-line JSX tags on the last prop line
+- `bracketSpacing: true` — `{ foo }` not `{foo}`
 
 ## Architecture
 
@@ -34,7 +49,7 @@ ESLint uses the flat config format (`eslint.config.mjs`) with `eslint-config-nex
 
 ```ts
 export default async function Page({ params }: { params: Promise<{ slug: string }> }) {
-  const { slug } = await params
+  const { slug } = await params;
 }
 ```
 
@@ -45,6 +60,7 @@ Run `npx next typegen` to generate `PageProps`, `LayoutProps`, and `RouteContext
 **Proxy (formerly Middleware)** — request interception files must be named `proxy.ts` / `proxy.js` and export a function named `proxy`. The `edge` runtime is not supported in proxy; use `middleware.ts` if you need `edge`.
 
 **Caching APIs**
+
 - `revalidateTag(tag)` now requires a second `cacheLife` profile argument: `revalidateTag('posts', 'max')`
 - `unstable_cacheLife` / `unstable_cacheTag` are now stable: import as `cacheLife` / `cacheTag`
 - `updateTag` is new: use it in Server Actions for immediate cache invalidation (read-your-writes semantics)
@@ -53,6 +69,7 @@ Run `npx next typegen` to generate `PageProps`, `LayoutProps`, and `RouteContext
 **Parallel Routes** — all `@slot` directories require an explicit `default.js`/`default.tsx` file or builds will fail.
 
 **Image component**
+
 - `next/legacy/image` is deprecated; use `next/image`
 - `images.domains` is deprecated; use `images.remotePatterns`
 - Local images with query strings require `images.localPatterns.search` config
