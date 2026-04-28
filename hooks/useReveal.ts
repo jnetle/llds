@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from 'react';
 
 export function useReveal<T extends HTMLElement = HTMLDivElement>() {
   const ref = useRef<T | null>(null);
@@ -14,7 +14,7 @@ export function useReveal<T extends HTMLElement = HTMLDivElement>() {
           io.disconnect();
         }
       },
-      { threshold: 0.15 },
+      { threshold: 0.15 }
     );
     io.observe(ref.current);
     return () => io.disconnect();
