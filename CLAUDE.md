@@ -30,6 +30,28 @@ Prettier is the source of truth for formatting. Config lives in `.prettierrc.jso
 - `bracketSameLine: true` — keep `>` of multi-line JSX tags on the last prop line
 - `bracketSpacing: true` — `{ foo }` not `{foo}`
 
+## Deployment
+
+This project deploys to Vercel. Prefer Vercel-compatible patterns: avoid long-running Node processes, use edge-safe APIs where possible, and keep environment variables in Vercel project settings (not committed `.env` files).
+
+## Images
+
+Raster images live in `public/images/` and are served via Vercel's edge CDN at no extra cost. Current Unsplash URLs are **placeholders** — replace with local paths as real assets arrive.
+
+**Directory layout:**
+```
+public/images/
+  projects/<project-slug>/cover.jpg, gallery-1.jpg, …
+  about/hero.jpg
+  press/award-1.jpg, …
+```
+
+**Rules:**
+- Use `next/image` (not CSS `backgroundImage`) — it handles lazy loading, WebP conversion, and responsive `srcSet` automatically
+- Compress images before committing: target ≤ 200 KB per image, max 1600–2400 px wide
+- Prefer `.jpg` for photos; `next/image` will re-serve as WebP on the fly
+- SVGs stay in `public/` (not `public/images/`) as they are now
+
 ## Architecture
 
 Next.js 16.2 App Router project with TypeScript, Tailwind CSS v4, and React 19.2.
