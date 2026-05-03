@@ -1,3 +1,6 @@
+'use client';
+
+import { useCompact } from '@/hooks/useCompact';
 import { Wordmark } from './Wordmark';
 
 const COLUMNS: { h: string; items: { label: string; href?: string }[] }[] = [
@@ -34,14 +37,19 @@ const COLUMNS: { h: string; items: { label: string; href?: string }[] }[] = [
 ];
 
 export function Footer() {
+  const isMobile = useCompact(600);
+  const isTablet = useCompact(1024);
+  const gridTemplateColumns = isMobile ? '1fr' : isTablet ? '1fr 1fr' : '1.4fr 1fr 1fr 1fr';
+  const gap = isMobile ? 28 : isTablet ? 32 : 60;
+
   return (
     <footer
       style={{
         borderTop: '1px solid var(--hairline)',
         padding: '80px 8vw 50px',
         display: 'grid',
-        gridTemplateColumns: '1.4fr 1fr 1fr 1fr',
-        gap: 60,
+        gridTemplateColumns,
+        gap,
         alignItems: 'start'
       }}>
       <div>

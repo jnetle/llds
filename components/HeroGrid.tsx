@@ -1,8 +1,9 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { Project } from '@/lib/projects';
 import { useScrollY } from '@/hooks/useScrollY';
+import { useCompact } from '@/hooks/useCompact';
 import { GridCell } from './GridCell';
 
 type HeroGridProps = {
@@ -12,17 +13,25 @@ type HeroGridProps = {
 
 export function HeroGrid({ projects, onOpen }: HeroGridProps) {
   const scrollY = useScrollY();
-  const [vh, setVh] = useState(0);
+  const isCompact = useCompact();
+
+  const row1Ref = useRef<HTMLDivElement>(null);
+  const row2Ref = useRef<HTMLDivElement>(null);
+  const row3Ref = useRef<HTMLDivElement>(null);
+  const [offsets, setOffsets] = useState({ row1: 0, row2: 0, row3: 0 });
 
   useEffect(() => {
-    const setSize = () => setVh(window.innerHeight);
-    const raf = requestAnimationFrame(setSize);
-    window.addEventListener('resize', setSize);
-    return () => {
-      cancelAnimationFrame(raf);
-      window.removeEventListener('resize', setSize);
+    const measure = () => {
+      setOffsets({
+        row1: row1Ref.current?.offsetTop ?? 0,
+        row2: row2Ref.current?.offsetTop ?? 0,
+        row3: row3Ref.current?.offsetTop ?? 0
+      });
     };
-  }, []);
+    measure();
+    window.addEventListener('resize', measure);
+    return () => window.removeEventListener('resize', measure);
+  }, [isCompact]);
 
   const row1 = projects.slice(0, 2);
   const row2 = projects[2];
@@ -33,6 +42,7 @@ export function HeroGrid({ projects, onOpen }: HeroGridProps) {
 
   const vDiv = (
     <div
+      className="hero-divider"
       style={{
         position: 'absolute',
         left: '50%',
@@ -50,47 +60,52 @@ export function HeroGrid({ projects, onOpen }: HeroGridProps) {
     <section style={{ position: 'relative', width: '100%' }}>
       {/* Row 1 */}
       <div
+        ref={row1Ref}
         style={{
           position: 'relative',
-          height: '100vh',
+          height: isCompact ? 'auto' : '100vh',
           width: '100%',
           display: 'grid',
-          gridTemplateColumns: '1fr 1fr',
+          gridTemplateColumns: isCompact ? '1fr' : '1fr 1fr',
+          gridAutoRows: isCompact ? '60vh' : undefined,
           overflow: 'hidden'
         }}>
         {row1.map((p, i) => (
-          <GridCell key={p.id} project={p} index={i} scrollY={scrollY} rowOffsetTop={0} onOpen={onOpen} />
+          <GridCell key={p.id} project={p} index={i} scrollY={scrollY} rowOffsetTop={offsets.row1} onOpen={onOpen} />
         ))}
-        {vDiv}
+        {!isCompact && vDiv}
       </div>
 
       {/* Row 2 — full width */}
       <div
+        ref={row2Ref}
         style={{
           position: 'relative',
-          height: '100vh',
+          height: isCompact ? '60vh' : '100vh',
           width: '100%',
           overflow: 'hidden',
           display: 'grid',
           gridTemplateColumns: '1fr'
         }}>
-        {row2 && <GridCell project={row2} index={2} scrollY={scrollY} rowOffsetTop={vh} onOpen={onOpen} />}
+        {row2 && <GridCell project={row2} index={2} scrollY={scrollY} rowOffsetTop={offsets.row2} onOpen={onOpen} />}
       </div>
 
       {/* Row 3 */}
       <div
+        ref={row3Ref}
         style={{
           position: 'relative',
-          height: '100vh',
+          height: isCompact ? 'auto' : '100vh',
           width: '100%',
           display: 'grid',
-          gridTemplateColumns: '1fr 1fr',
+          gridTemplateColumns: isCompact ? '1fr' : '1fr 1fr',
+          gridAutoRows: isCompact ? '60vh' : undefined,
           overflow: 'hidden'
         }}>
         {row3.map((p, i) => (
-          <GridCell key={p.id} project={p} index={3 + i} scrollY={scrollY} rowOffsetTop={vh * 2} onOpen={onOpen} />
+          <GridCell key={p.id} project={p} index={3 + i} scrollY={scrollY} rowOffsetTop={offsets.row3} onOpen={onOpen} />
         ))}
-        {vDiv}
+        {!isCompact && vDiv}
 
         <div
           style={{

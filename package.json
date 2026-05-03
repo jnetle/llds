@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint",
+    "lint": "eslint && npm run check:css",
+    "check:css": "node scripts/check-css.mjs",
     "format": "prettier --write .",
     "format:check": "prettier --check ."
   },

@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useReveal } from '@/hooks/useReveal';
+import { useCompact, useCols } from '@/hooks/useCompact';
 
 const AWARDS = [
   {
@@ -48,6 +49,8 @@ const FEATURE_META: [string, string][] = [
 export default function PressPage() {
   const [ref, seen] = useReveal<HTMLDivElement>();
   const [refFeature, seenFeature] = useReveal<HTMLDivElement>();
+  const compact = useCompact();
+  const cols = useCols();
 
   return (
     <div style={{ background: 'var(--bg)', color: 'var(--ink)' }}>
@@ -63,7 +66,7 @@ export default function PressPage() {
         <div
           style={{
             display: 'grid',
-            gridTemplateColumns: '1fr auto 1fr',
+            gridTemplateColumns: cols('1fr auto 1fr'),
             gap: 24,
             alignItems: 'baseline',
             paddingBottom: 22,
@@ -141,8 +144,8 @@ export default function PressPage() {
           style={{
             marginTop: 80,
             display: 'grid',
-            gridTemplateColumns: '1fr 1.6fr 1fr',
-            gap: 60,
+            gridTemplateColumns: compact ? '1fr' : '1fr 1.6fr 1fr',
+            gap: compact ? 24 : 60,
             alignItems: 'start',
             paddingTop: 30,
             borderTop: '1px solid var(--ink)'
@@ -207,7 +210,7 @@ export default function PressPage() {
           ref={ref}
           style={{
             display: 'grid',
-            gridTemplateColumns: '0.9fr 1.6fr',
+            gridTemplateColumns: cols('0.9fr 1.6fr'),
             gap: 80,
             alignItems: 'baseline',
             opacity: seen ? 1 : 0,
@@ -275,7 +278,7 @@ export default function PressPage() {
         <div
           style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(2, 1fr)',
+            gridTemplateColumns: cols('repeat(2, 1fr)'),
             gap: 60
           }}>
           {AWARDS.map(a => (
@@ -346,7 +349,7 @@ export default function PressPage() {
         <div
           style={{
             display: 'grid',
-            gridTemplateColumns: '1.2fr 1fr',
+            gridTemplateColumns: cols('1.2fr 1fr'),
             gap: 80,
             alignItems: 'end',
             marginBottom: 70
@@ -380,7 +383,7 @@ export default function PressPage() {
         <div
           style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(6, 1fr)',
+            gridTemplateColumns: cols('repeat(6, 1fr)'),
             gap: 16,
             gridAutoRows: '180px'
           }}>
@@ -424,7 +427,7 @@ export default function PressPage() {
           ref={refFeature}
           style={{
             display: 'grid',
-            gridTemplateColumns: '1fr 1.2fr',
+            gridTemplateColumns: cols('1fr 1.2fr'),
             gap: 90,
             alignItems: 'center',
             opacity: seenFeature ? 1 : 0,
@@ -582,7 +585,7 @@ export default function PressPage() {
                   key={k}
                   style={{
                     display: 'grid',
-                    gridTemplateColumns: '180px 1fr',
+                    gridTemplateColumns: cols('180px 1fr'),
                     gap: 24,
                     paddingBottom: 14,
                     borderBottom: '1px solid var(--hairline)',

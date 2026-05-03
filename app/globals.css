@@ -21,6 +21,19 @@ html,
 body {
   background: var(--bg);
   color: var(--ink);
+  overflow-x: clip;
+}
+
+body {
+  position: relative;
+  min-width: 0;
+}
+
+body > main,
+body > header,
+body > footer {
+  min-width: 0;
+  max-width: 100%;
 }
 
 body {
@@ -98,4 +111,211 @@ a {
 
 .nav-link:hover .nav-underline {
   transform: scaleX(1);
+}
+
+/* ======================== RESPONSIVE ======================== */
+
+/* TABLET ≤ 1024px */
+@media (max-width: 1024px) {
+  /* Header desktop nav hidden in compact mode (grid columns swapped via JS) */
+  header > div > nav {
+    display: none !important;
+  }
+
+  /* Hero sections that use 2-col grid */
+  section[style*='grid-template-columns: 1fr 1fr'],
+  section[style*='grid-template-columns: 1.1fr 1fr'],
+  section[style*='grid-template-columns: 1fr 1.1fr'],
+  section[style*='grid-template-columns: 1fr 1.3fr'],
+  section[style*='grid-template-columns: 1fr 2fr'] {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Universal: any inline grid-template-columns with 2+ tracks → 1 col.
+     Use bare attribute selectors (no tag) so <section>, <footer>, <div>, etc. all match. */
+  [style*='grid-template-columns: 1fr 1fr'],
+  [style*='grid-template-columns: repeat(2, 1fr)'],
+  [style*='grid-template-columns: 1fr 1.1fr'],
+  [style*='grid-template-columns: 1.1fr 1fr'],
+  [style*='grid-template-columns: 1.2fr 1fr'],
+  [style*='grid-template-columns: 1fr 1.2fr'],
+  [style*='grid-template-columns: 1fr 1.3fr'],
+  [style*='grid-template-columns: 1.3fr 1fr'],
+  [style*='grid-template-columns: 1fr 1.4fr'],
+  [style*='grid-template-columns: 1.4fr 1fr'],
+  [style*='grid-template-columns: 1fr 1.5fr'],
+  [style*='grid-template-columns: 1.5fr 1fr'],
+  [style*='grid-template-columns: 1fr 1.6fr'],
+  [style*='grid-template-columns: 1.6fr 1fr'],
+  [style*='grid-template-columns: 1fr 2fr'],
+  [style*='grid-template-columns: 2fr 1fr'],
+  [style*='grid-template-columns: 0.9fr 1.6fr'],
+  [style*='grid-template-columns: 1fr auto 1fr'],
+  [style*='grid-template-columns: 180px 1fr'],
+  [style*='grid-template-columns: 90px 1fr'],
+  [style*='grid-template-columns: 60px 1fr'],
+  [style*='grid-template-columns: repeat(3, 1fr)'],
+  [style*='grid-template-columns: repeat(4, 1fr)'] {
+    grid-template-columns: 1fr !important;
+    gap: 32px !important;
+  }
+  /* 3-col with center wide → 1 col */
+  [style*='grid-template-columns: 1fr 1.4fr 1fr'],
+  [style*='grid-template-columns: 1fr 1.6fr 1fr'] {
+    grid-template-columns: 1fr !important;
+    gap: 24px !important;
+  }
+  /* Footer's 4-col layout */
+  [style*='grid-template-columns: 1.4fr 1fr 1fr 1fr'] {
+    grid-template-columns: 1fr 1fr !important;
+    gap: 28px !important;
+  }
+}
+
+/* MOBILE ≤ 600px */
+@media (max-width: 600px) {
+  /* Tighten all 8vw padding */
+  section[style*='8vw'] {
+    padding-left: 24px !important;
+    padding-right: 24px !important;
+  }
+  section[style*='padding: 180px 8vw'],
+  section[style*='padding: 160px 8vw'],
+  section[style*='padding: 140px 8vw'],
+  section[style*='padding: 120px 8vw'] {
+    padding-top: 100px !important;
+    padding-bottom: 80px !important;
+  }
+  nav[style*='8vw'] {
+    padding-left: 24px !important;
+    padding-right: 24px !important;
+  }
+
+  /* Header padding */
+  header {
+    padding: 16px 18px !important;
+  }
+  header > div[style*='padding'] {
+    padding: 16px 18px !important;
+  }
+
+  /* Press masthead — break the metadata top rule into single column */
+  section[style*='border-bottom: 2px solid'] > div[style*='grid-template-columns: 1fr auto 1fr'] {
+    grid-template-columns: 1fr !important;
+    text-align: center !important;
+    gap: 8px !important;
+  }
+  section[style*='border-bottom: 2px solid'] > div[style*='grid-template-columns: 1fr auto 1fr'] > div {
+    text-align: center !important;
+  }
+
+  /* Hero grid rows + press award cards: stack 2-col grids */
+  [style*='grid-template-columns: repeat(2, 1fr)'],
+  [style*='grid-template-columns: 1fr 1fr'] {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* 3- and 4-col grids → 1 col on small mobile */
+  [style*='grid-template-columns: repeat(3, 1fr)'],
+  [style*='grid-template-columns: repeat(4, 1fr)'] {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Press gallery — collapse 6-col to 2 cols */
+  [style*='grid-template-columns: repeat(6, 1fr)'] {
+    grid-template-columns: repeat(2, 1fr) !important;
+    grid-auto-rows: 140px !important;
+  }
+  [style*='grid-template-columns: repeat(6, 1fr)'] > div {
+    grid-column: span 2 !important;
+    grid-row: span 1 !important;
+  }
+
+  /* Quick-links sticky nav: allow horizontal scroll */
+  nav[style*='position: sticky'] ul {
+    flex-wrap: nowrap !important;
+    overflow-x: auto !important;
+    justify-content: flex-start !important;
+    gap: 22px !important;
+    padding-bottom: 4px !important;
+  }
+  nav[style*='position: sticky'] ul li {
+    flex-shrink: 0 !important;
+  }
+
+  /* Wordmark — shrink suffix */
+  header .serif span {
+    font-size: 0.85em !important;
+  }
+
+  /* Hero rows — shorter on mobile */
+  div[style*='height: 100vh'][style*='overflow: hidden'] {
+    height: 60vh !important;
+    min-height: 380px !important;
+  }
+  section[style*='height: 100vh'] {
+    height: 70vh !important;
+    min-height: 480px !important;
+  }
+
+  /* Project overlay gallery */
+  div[style*='aspect-ratio: 4 / 5'] {
+    aspect-ratio: 3 / 4 !important;
+  }
+
+  /* Buttons: keep tap target */
+  button {
+    min-height: 36px;
+  }
+  a {
+    min-height: 36px;
+    display: inline-flex;
+    align-items: center;
+  }
+
+  /* Pull-quote dividers and large headings: tighter */
+  h1,
+  h2,
+  h3 {
+    text-wrap: balance;
+  }
+
+  /* Hide hero grid dividers on mobile (rows stack to 1 col anyway) */
+  .hero-divider {
+    display: none !important;
+  }
+}
+
+/* MOBILE NAV — overlay menu */
+.mobile-nav-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  background: rgba(42, 46, 37, 0.96);
+  backdrop-filter: blur(20px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 36px;
+  transition:
+    opacity 0.4s,
+    transform 0.4s;
+}
+.mobile-nav-overlay.open {
+  opacity: 1;
+  transform: translateY(0);
+}
+.mobile-nav-overlay.closed {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-20px);
+}
+.mobile-nav-overlay a,
+.mobile-nav-overlay button {
+  color: #f4f0e8;
+  font-size: 14px;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  padding: 12px 20px;
 }
