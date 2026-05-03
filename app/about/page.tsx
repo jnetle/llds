@@ -36,13 +36,14 @@ export default function AboutPage() {
           gridTemplateColumns: compact ? '1fr' : '1.1fr 1fr'
         }}>
         <div style={{ position: 'relative', overflow: 'hidden' }}>
+          {/* Portraits via `next/image fill`: default objectPosition to 'center 25%' to keep faces in frame as aspect ratios narrow. */}
           <Image
             src="/images/profile/maria39.jpg"
             alt="Maria Rhinehart, founder of Laurel Leaf Design Studio"
             fill
             priority
             sizes="(max-width: 1024px) 100vw, 55vw"
-            style={{ objectFit: 'cover', objectPosition: 'center' }}
+            style={{ objectFit: 'cover', objectPosition: 'center 25%' }}
           />
         </div>
         <div
@@ -95,8 +96,8 @@ export default function AboutPage() {
             opacity: seen ? 1 : 0,
             transform: seen ? 'translateY(0)' : 'translateY(30px)',
             transition: 'all 1s cubic-bezier(.22,.61,.36,1)',
-            position: 'sticky',
-            top: 120
+            position: compact ? 'static' : 'sticky',
+            top: compact ? 'auto' : 120
           }}>
           <div style={{ position: 'relative', aspectRatio: '4/5', overflow: 'hidden' }}>
             <Image
@@ -104,7 +105,7 @@ export default function AboutPage() {
               alt="Maria Rhinehart in the studio"
               fill
               sizes="(max-width: 1024px) 100vw, 40vw"
-              style={{ objectFit: 'cover', objectPosition: 'center' }}
+              style={{ objectFit: 'cover', objectPosition: 'center 30%' }}
             />
           </div>
           <div
@@ -125,7 +126,7 @@ export default function AboutPage() {
               sizes="90px"
               style={{
                 objectFit: 'cover',
-                objectPosition: 'center',
+                objectPosition: 'center 20%',
                 filter: 'grayscale(0.85)'
               }}
             />
