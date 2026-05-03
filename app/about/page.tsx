@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import Link from 'next/link';
 import { useReveal } from '@/hooks/useReveal';
 import { useCompact } from '@/hooks/useCompact';
@@ -19,17 +20,6 @@ const PRINCIPLES = [
   }
 ];
 
-const TIMELINE: [string, string][] = [
-  ['2026', 'House & Garden Top 100 Interior Designers'],
-  ['2025', 'AD PRO Directory — Emerging Talent'],
-  ['2024', 'World of Interiors · featured in the February issue'],
-  ['2023', 'RIBA Regional Award — shortlist, Cotswold Barn'],
-  ['2019', 'Studio expands with Oxfordshire workshop'],
-  ['2016', 'Laurel Leaf Design Studio founded in Bloomsbury'],
-  ['2011', 'Joined Retrouvius as project lead'],
-  ['2008', 'Bartlett School of Architecture, MArch']
-];
-
 export default function AboutPage() {
   const [ref, seen] = useReveal<HTMLElement>();
   const compact = useCompact();
@@ -45,13 +35,16 @@ export default function AboutPage() {
           display: 'grid',
           gridTemplateColumns: compact ? '1fr' : '1.1fr 1fr'
         }}>
-        <div
-          style={{
-            backgroundImage: 'url("https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=1600&q=80")',
-            backgroundSize: 'cover',
-            backgroundPosition: 'center'
-          }}
-        />
+        <div style={{ position: 'relative', overflow: 'hidden' }}>
+          <Image
+            src="/images/profile/maria39.jpg"
+            alt="Maria Rhinehart, founder of Laurel Leaf Design Studio"
+            fill
+            priority
+            sizes="(max-width: 1024px) 100vw, 55vw"
+            style={{ objectFit: 'cover', objectPosition: 'center' }}
+          />
+        </div>
         <div
           style={{
             display: 'flex',
@@ -81,8 +74,8 @@ export default function AboutPage() {
               color: 'var(--ink-soft)',
               maxWidth: '46ch'
             }}>
-            Laurel Leaf Design Studio was founded by Iris Wren in 2016 after a decade working across residential architecture and antique
-            dealing. The studio operates from a small mews in Bloomsbury, with a second workshop in rural Oxfordshire.
+            Laurel Leaf Design Studio was founded by Maria Rhinehart in XXXX after a decade working across residential architecture and
+            antique dealing. The studio operates from a small mews in Bloomsbury, with a second workshop in rural Oxfordshire.
           </p>
         </div>
       </section>
@@ -105,14 +98,15 @@ export default function AboutPage() {
             position: 'sticky',
             top: 120
           }}>
-          <div
-            style={{
-              aspectRatio: '4/5',
-              backgroundImage: 'url("https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?auto=format&fit=crop&w=1400&q=80")',
-              backgroundSize: 'cover',
-              backgroundPosition: 'center'
-            }}
-          />
+          <div style={{ position: 'relative', aspectRatio: '4/5', overflow: 'hidden' }}>
+            <Image
+              src="/images/profile/maria117.jpg"
+              alt="Maria Rhinehart in the studio"
+              fill
+              sizes="(max-width: 1024px) 100vw, 40vw"
+              style={{ objectFit: 'cover', objectPosition: 'center' }}
+            />
+          </div>
           <div
             style={{
               display: 'grid',
@@ -123,13 +117,15 @@ export default function AboutPage() {
               paddingTop: 32,
               borderTop: '1px solid var(--hairline)'
             }}>
-            <div
+            <Image
+              src="/images/profile/maria36.jpg"
+              alt="Maria Rhinehart"
+              width={90}
+              height={110}
+              sizes="90px"
               style={{
-                width: 90,
-                height: 110,
-                backgroundImage: 'url("https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=400&q=80")',
-                backgroundSize: 'cover',
-                backgroundPosition: 'center',
+                objectFit: 'cover',
+                objectPosition: 'center',
                 filter: 'grayscale(0.85)'
               }}
             />
