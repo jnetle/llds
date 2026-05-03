@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
 import { useReveal } from '@/hooks/useReveal';
+import { useCols } from '@/hooks/useCompact';
 
 const ROLE = [
   {
@@ -225,6 +226,7 @@ export default function ServicesPage() {
   const [refScope, seenScope] = useReveal<HTMLDivElement>();
   const sentinelRef = useRef<HTMLDivElement>(null);
   const [stuck, setStuck] = useState(false);
+  const cols = useCols();
 
   useEffect(() => {
     const node = sentinelRef.current;
@@ -406,7 +408,7 @@ export default function ServicesPage() {
         <div
           style={{
             display: 'grid',
-            gridTemplateColumns: '1.2fr 1fr',
+            gridTemplateColumns: cols('1.2fr 1fr'),
             gap: 80,
             alignItems: 'end',
             marginBottom: 90
@@ -454,7 +456,7 @@ export default function ServicesPage() {
         <div
           style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(3, 1fr)',
+            gridTemplateColumns: cols('repeat(3, 1fr)'),
             gap: 0,
             borderTop: '1px solid var(--hairline)'
           }}>
@@ -513,7 +515,7 @@ export default function ServicesPage() {
           ref={refScope}
           style={{
             display: 'grid',
-            gridTemplateColumns: '1.2fr 1fr',
+            gridTemplateColumns: cols('1.2fr 1fr'),
             gap: 80,
             alignItems: 'end',
             marginBottom: 90,
@@ -561,7 +563,7 @@ export default function ServicesPage() {
         <div
           style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(2, 1fr)',
+            gridTemplateColumns: cols('repeat(2, 1fr)'),
             gap: '0 80px'
           }}>
           {SCOPE.map((cat, i) => (
@@ -663,7 +665,7 @@ export default function ServicesPage() {
         <div
           style={{
             display: 'grid',
-            gridTemplateColumns: '1.1fr 1fr',
+            gridTemplateColumns: cols('1.1fr 1fr'),
             gap: 90,
             alignItems: 'start'
           }}>
@@ -676,7 +678,7 @@ export default function ServicesPage() {
                   borderBottom: i === DELIVERABLES.length - 1 ? '1px solid var(--hairline)' : 'none',
                   padding: '32px 0 36px',
                   display: 'grid',
-                  gridTemplateColumns: '60px 1fr',
+                  gridTemplateColumns: cols('60px 1fr'),
                   gap: 30,
                   alignItems: 'start'
                 }}>
@@ -783,7 +785,7 @@ export default function ServicesPage() {
         <div
           style={{
             display: 'grid',
-            gridTemplateColumns: '1fr 1.5fr',
+            gridTemplateColumns: cols('1fr 1.5fr'),
             gap: 80,
             alignItems: 'end',
             marginBottom: 100
@@ -826,7 +828,7 @@ export default function ServicesPage() {
                 borderTop: '1px solid var(--hairline)',
                 padding: '54px 0 60px',
                 display: 'grid',
-                gridTemplateColumns: '160px 1fr 1.4fr',
+                gridTemplateColumns: cols('160px 1fr 1.4fr'),
                 gap: 60,
                 alignItems: 'start'
               }}>
@@ -949,14 +951,14 @@ export default function ServicesPage() {
         <div
           style={{
             display: 'grid',
-            gridTemplateColumns: '1.4fr 1fr',
+            gridTemplateColumns: cols('1.4fr 1fr'),
             gap: 90,
             alignItems: 'start'
           }}>
           <div
             style={{
               display: 'grid',
-              gridTemplateColumns: 'repeat(2, 1fr)',
+              gridTemplateColumns: cols('repeat(2, 1fr)'),
               gap: '0 60px'
             }}>
             {WORKING.map((w, i) => (
@@ -1032,7 +1034,7 @@ export default function ServicesPage() {
         <div
           style={{
             display: 'grid',
-            gridTemplateColumns: '1fr 1fr',
+            gridTemplateColumns: cols('1fr 1fr'),
             gap: 90,
             alignItems: 'start',
             marginBottom: 90
@@ -1095,7 +1097,7 @@ export default function ServicesPage() {
             style={{
               listStyle: 'none',
               display: 'grid',
-              gridTemplateColumns: 'repeat(2, 1fr)',
+              gridTemplateColumns: cols('repeat(2, 1fr)'),
               gap: '20px 56px'
             }}>
             {DIFFERENCE_POINTS.map(p => (
@@ -1130,7 +1132,7 @@ export default function ServicesPage() {
               paddingTop: 36,
               borderTop: '1px solid var(--hairline)',
               display: 'grid',
-              gridTemplateColumns: '1fr 1fr',
+              gridTemplateColumns: cols('1fr 1fr'),
               gap: 50
             }}>
             <div>
@@ -1207,7 +1209,7 @@ export default function ServicesPage() {
         <div
           style={{
             display: 'grid',
-            gridTemplateColumns: '1fr 1.1fr',
+            gridTemplateColumns: cols('1fr 1.1fr'),
             gap: 100,
             alignItems: 'start'
           }}>
@@ -1275,7 +1277,7 @@ export default function ServicesPage() {
           <div
             style={{
               display: 'grid',
-              gridTemplateColumns: '1fr 1fr',
+              gridTemplateColumns: cols('1fr 1fr'),
               gap: 18
             }}>
             <div

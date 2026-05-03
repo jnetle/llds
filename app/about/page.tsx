@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useReveal } from '@/hooks/useReveal';
+import { useCompact } from '@/hooks/useCompact';
 
 const PRINCIPLES = [
   {
@@ -31,6 +32,7 @@ const TIMELINE: [string, string][] = [
 
 export default function AboutPage() {
   const [ref, seen] = useReveal<HTMLElement>();
+  const compact = useCompact();
 
   return (
     <div style={{ background: 'var(--bg)', color: 'var(--ink)' }}>
@@ -41,7 +43,7 @@ export default function AboutPage() {
           height: '100vh',
           overflow: 'hidden',
           display: 'grid',
-          gridTemplateColumns: '1.1fr 1fr'
+          gridTemplateColumns: compact ? '1fr' : '1.1fr 1fr'
         }}>
         <div
           style={{
@@ -91,8 +93,8 @@ export default function AboutPage() {
         style={{
           padding: '160px 8vw',
           display: 'grid',
-          gridTemplateColumns: '1fr 1.3fr',
-          gap: 100,
+          gridTemplateColumns: compact ? '1fr' : '1fr 1.3fr',
+          gap: compact ? 48 : 100,
           alignItems: 'start'
         }}>
         <div
@@ -114,7 +116,7 @@ export default function AboutPage() {
           <div
             style={{
               display: 'grid',
-              gridTemplateColumns: '90px 1fr',
+              gridTemplateColumns: compact ? '1fr' : '90px 1fr',
               gap: 22,
               alignItems: 'center',
               marginTop: 32,
@@ -213,8 +215,8 @@ export default function AboutPage() {
         <div
           style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(3, 1fr)',
-            gap: 60,
+            gridTemplateColumns: compact ? '1fr' : 'repeat(3, 1fr)',
+            gap: compact ? 32 : 60,
             borderTop: '1px solid var(--hairline)',
             paddingTop: 50
           }}>
