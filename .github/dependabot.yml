@@ -5,6 +5,13 @@ updates:
     schedule:
       interval: weekly
     open-pull-requests-limit: 10
+    ignore:
+      # eslint 10 breaks eslint-config-next's bundled eslint-plugin-react
+      # (TypeError: contextOrFilename.getFilename is not a function).
+      # Stay on 9.x until eslint-plugin-react ships ESLint 10 compatibility.
+      - dependency-name: eslint
+        update-types:
+          - version-update:semver-major
     groups:
       next:
         patterns:
