@@ -30,12 +30,17 @@ export default function AboutPage() {
       <section
         style={{
           position: 'relative',
-          height: '100vh',
+          height: compact ? 'auto' : '100vh',
           overflow: 'hidden',
           display: 'grid',
           gridTemplateColumns: compact ? '1fr' : '1.1fr 1fr'
         }}>
-        <div style={{ position: 'relative', overflow: 'hidden' }}>
+        <div
+          style={{
+            position: 'relative',
+            overflow: 'hidden',
+            height: compact ? '82vh' : '100%'
+          }}>
           {/* Portraits via `next/image fill`: default objectPosition to 'center 25%' to keep faces in frame as aspect ratios narrow. */}
           <Image
             src="/images/profile/maria39.jpg"
@@ -45,13 +50,27 @@ export default function AboutPage() {
             sizes="(max-width: 1024px) 100vw, 55vw"
             style={{ objectFit: 'cover', objectPosition: 'center 25%' }}
           />
+          {compact && (
+            <div
+              aria-hidden
+              style={{
+                position: 'absolute',
+                left: 0,
+                right: 0,
+                bottom: 0,
+                height: '38%',
+                background: 'linear-gradient(to bottom, transparent 0%, var(--bg) 92%)',
+                pointerEvents: 'none'
+              }}
+            />
+          )}
         </div>
         <div
           style={{
             display: 'flex',
             flexDirection: 'column',
             justifyContent: 'center',
-            padding: '0 8vw',
+            padding: compact ? '8px 8vw 80px' : '0 8vw',
             gap: 34
           }}>
           <div className="micro" style={{ opacity: 0.55 }}>
