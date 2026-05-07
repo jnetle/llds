@@ -99,6 +99,7 @@ function Chip({ label, active, onClick }: { label: string; active: boolean; onCl
     <button
       type="button"
       onClick={onClick}
+      aria-pressed={active}
       className="micro-sm"
       style={{
         padding: '10px 18px',
@@ -144,6 +145,8 @@ export default function InquirePage() {
   if (submitted) {
     return (
       <div
+        role="status"
+        aria-live="polite"
         style={{
           background: 'var(--bg)',
           color: 'var(--ink)',
@@ -172,8 +175,8 @@ export default function InquirePage() {
             Maria will be in touch within three working days. In the meantime, you may wish to read our{' '}
             <Link href="/projects" style={{ borderBottom: '1px solid currentColor', paddingBottom: 1 }}>
               recent projects
-            </Link>{' '}
-            or browse the studio journal.
+            </Link>
+            .
           </p>
           <Link href="/" className="micro" style={{ borderBottom: '1px solid currentColor', paddingBottom: 4, letterSpacing: '0.28em' }}>
             ↵ Return Home
@@ -299,7 +302,7 @@ export default function InquirePage() {
                     value={opt}
                     checked={form.scope === opt}
                     onChange={() => update('scope', opt)}
-                    style={{ marginTop: 5, accentColor: '#2A2E25' }}
+                    style={{ marginTop: 5, accentColor: 'var(--ink)' }}
                   />
                   <span>{opt}</span>
                 </label>
@@ -380,7 +383,7 @@ export default function InquirePage() {
               type="checkbox"
               checked={form.newsletter}
               onChange={e => update('newsletter', e.target.checked)}
-              style={{ width: 18, height: 18, accentColor: '#2A2E25' }}
+              style={{ width: 18, height: 18, accentColor: 'var(--ink)' }}
             />
             <span style={{ color: 'var(--ink-soft)' }}>
               I&apos;d like to receive the studio&apos;s quarterly journal — new work, references, and recent reading.
