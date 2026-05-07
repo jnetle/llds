@@ -3,7 +3,7 @@
 import { useCompact } from '@/hooks/useCompact';
 import { Wordmark } from './Wordmark';
 
-const COLUMNS: { h: string; items: { label: string; href?: string }[] }[] = [
+const COLUMNS: { h: string; items: { label: string; href?: string; target?: string }[] }[] = [
   {
     h: 'Studio',
     items: [
@@ -26,10 +26,12 @@ const COLUMNS: { h: string; items: { label: string; href?: string }[] }[] = [
       { label: '111-111-1111', href: 'tel:+1111111111' },
       {
         label: 'Instagram',
+        target: '_blank',
         href: 'https://www.instagram.com/laurelleafdesignstudio'
       },
       {
         label: 'Facebook',
+        target: '_blank',
         href: 'https://www.facebook.com/laurelleafdesignstudio'
       }
     ]
@@ -75,7 +77,13 @@ export function Footer() {
           <ul style={{ listStyle: 'none', display: 'grid', gap: 10 }}>
             {col.items.map(it => (
               <li key={it.label} style={{ fontSize: 14, color: 'var(--ink-soft)' }}>
-                {it.href ? <a href={it.href}>{it.label}</a> : it.label}
+                {it.href ? (
+                  <a target={it.target || '_self'} href={it.href}>
+                    {it.label}
+                  </a>
+                ) : (
+                  it.label
+                )}
               </li>
             ))}
           </ul>

@@ -40,7 +40,7 @@ const SCOPE_OPTIONS = [
 
 const TIMELINES = ['Within 3 months', '3 – 6 months', '6 – 12 months', '12+ months', 'Flexible / not yet decided'];
 
-const BUDGETS = ['Under £75k', '£75k – £200k', '£200k – £500k', '£500k – £1m', '£1m+', 'Prefer to discuss'];
+const BUDGETS = ['Under $75k', '$75k – $200k', '$200k – $500k', '$500k – $1m', '$1m+', 'Prefer to discuss'];
 
 const SERVICES = [
   'Concept design',
@@ -219,7 +219,7 @@ export default function InquirePage() {
             maxWidth: '54ch'
           }}>
           Tell us a little about your home and the life you&apos;d like it to hold. The more you share, the more thoughtfully we can
-          respond. Maria reviews each enquiry personally.
+          respond. We review each inquiry personally.
         </p>
       </section>
 
@@ -368,7 +368,6 @@ export default function InquirePage() {
               placeholder="The site, the people who'll live there, what's drawing you to the studio, anything that feels relevant…"
               style={{
                 ...inputStyle,
-                borderBottom: 'none',
                 border: '1px solid var(--hairline)',
                 padding: '14px 16px',
                 resize: 'vertical',
@@ -377,18 +376,6 @@ export default function InquirePage() {
               }}
             />
           </Field>
-
-          <label style={{ display: 'flex', alignItems: 'center', gap: 14, cursor: 'pointer', fontSize: 15 }}>
-            <input
-              type="checkbox"
-              checked={form.newsletter}
-              onChange={e => update('newsletter', e.target.checked)}
-              style={{ width: 18, height: 18, accentColor: 'var(--ink)' }}
-            />
-            <span style={{ color: 'var(--ink-soft)' }}>
-              I&apos;d like to receive the studio&apos;s quarterly journal — new work, references, and recent reading.
-            </span>
-          </label>
         </fieldset>
 
         {/* Submit */}
@@ -424,54 +411,6 @@ export default function InquirePage() {
           </button>
         </div>
       </form>
-
-      {/* Direct contact strip */}
-      <section
-        style={{
-          padding: '60px 8vw 180px',
-          borderTop: '1px solid var(--hairline)',
-          marginTop: 80
-        }}>
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: compact ? '1fr' : 'repeat(3, 1fr)',
-            gap: 48
-          }}>
-          <div>
-            <div className="micro" style={{ opacity: 0.5, marginBottom: 14 }}>
-              By post
-            </div>
-            <p className="serif" style={{ fontSize: 18, fontWeight: 300, lineHeight: 1.5 }}>
-              The Studio
-              <br />
-              24 Hartley Mews
-              <br />
-              London E2 8AB
-            </p>
-          </div>
-          <div>
-            <div className="micro" style={{ opacity: 0.5, marginBottom: 14 }}>
-              By telephone
-            </div>
-            <p className="serif" style={{ fontSize: 18, fontWeight: 300, lineHeight: 1.5 }}>
-              +44 (0)20 7946 0214
-              <br />
-              Mon — Fri · 9 — 5
-            </p>
-          </div>
-          <div>
-            <div className="micro" style={{ opacity: 0.5, marginBottom: 14 }}>
-              By email
-            </div>
-            <p className="serif" style={{ fontSize: 18, fontWeight: 300, lineHeight: 1.5 }}>
-              studio@laurelleaf.co
-              <br />
-              press@laurelleaf.co
-            </p>
-          </div>
-        </div>
-      </section>
     </div>
   );
 }

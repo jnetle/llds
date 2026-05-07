@@ -60,42 +60,9 @@ export default function PressPage() {
           position: 'relative',
           padding: '180px 8vw 90px',
           background: 'var(--bg)',
-          borderBottom: '2px solid var(--ink)',
+          borderBottom: '2px solid var(--hairline)',
           overflow: 'hidden'
         }}>
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: cols('1fr auto 1fr'),
-            gap: 24,
-            alignItems: 'baseline',
-            paddingBottom: 22,
-            borderBottom: '1px solid var(--ink)',
-            marginBottom: 60
-          }}>
-          <div className="micro-sm" style={{ opacity: 0.7, letterSpacing: '0.26em' }}>
-            Vol. I · No. 04
-          </div>
-          <div
-            className="micro-sm"
-            style={{
-              opacity: 0.7,
-              letterSpacing: '0.32em',
-              textAlign: 'center'
-            }}>
-            The Laurel Leaf Bulletin
-          </div>
-          <div
-            className="micro-sm"
-            style={{
-              opacity: 0.7,
-              letterSpacing: '0.26em',
-              textAlign: 'right'
-            }}>
-            Spring 2026 · Free
-          </div>
-        </div>
-
         <div style={{ position: 'relative' }}>
           <h1
             className="serif"
@@ -138,65 +105,6 @@ export default function PressPage() {
             }}>
             recognition
           </h1>
-        </div>
-
-        <div
-          style={{
-            marginTop: 80,
-            display: 'grid',
-            gridTemplateColumns: compact ? '1fr' : '1fr 1.6fr 1fr',
-            gap: compact ? 24 : 60,
-            alignItems: 'start',
-            paddingTop: 30,
-            borderTop: '1px solid var(--ink)'
-          }}>
-          <div
-            className="micro-sm"
-            style={{
-              opacity: 0.65,
-              letterSpacing: '0.26em',
-              lineHeight: 1.7
-            }}>
-            Awards · Editorial
-            <br />
-            Interviews · Features
-          </div>
-          <p
-            className="serif"
-            style={{
-              fontSize: 'clamp(20px, 1.7vw, 26px)',
-              fontWeight: 300,
-              lineHeight: 1.45,
-              letterSpacing: '0.005em',
-              textWrap: 'pretty',
-              maxWidth: '52ch',
-              justifySelf: 'center',
-              textAlign: 'center',
-              fontStyle: 'italic'
-            }}>
-            A small studio, quietly recognised — a record of the awards, articles, and conversations the work has been part of.
-          </p>
-          <div style={{ justifySelf: 'end', textAlign: 'right' }}>
-            <div
-              className="serif"
-              style={{
-                fontSize: 56,
-                fontWeight: 300,
-                lineHeight: 1,
-                fontStyle: 'italic'
-              }}>
-              02
-            </div>
-            <div
-              className="micro-sm"
-              style={{
-                marginTop: 8,
-                opacity: 0.6,
-                letterSpacing: '0.24em'
-              }}>
-              awards · this issue
-            </div>
-          </div>
         </div>
       </section>
 
@@ -417,8 +325,7 @@ export default function PressPage() {
       {/* Magazine feature */}
       <section
         style={{
-          padding: '160px 8vw',
-          borderBottom: '1px solid var(--hairline)'
+          padding: '160px 8vw'
         }}>
         <div className="micro" style={{ opacity: 0.55, marginBottom: 60 }}>
           — Editorial · Forthcoming
@@ -602,39 +509,6 @@ export default function PressPage() {
             </ul>
           </div>
         </div>
-      </section>
-
-      {/* Press contact */}
-      <section style={{ padding: '160px 8vw', textAlign: 'center' }}>
-        <div className="micro" style={{ opacity: 0.55, marginBottom: 30 }}>
-          — Press enquiries
-        </div>
-        <h2
-          className="serif"
-          style={{
-            fontSize: 'clamp(40px, 4.4vw, 68px)',
-            fontWeight: 300,
-            lineHeight: 1.05,
-            letterSpacing: '-0.012em',
-            textWrap: 'balance',
-            marginBottom: 32,
-            maxWidth: '22ch',
-            marginInline: 'auto'
-          }}>
-          For interviews, image requests, or feature consideration —
-        </h2>
-        <a
-          href="mailto:press@laurelleaf.studio"
-          className="serif"
-          style={{
-            fontSize: 'clamp(28px, 2.8vw, 40px)',
-            fontWeight: 300,
-            fontStyle: 'italic',
-            borderBottom: '1px solid currentColor',
-            paddingBottom: 6
-          }}>
-          press@laurelleaf.studio
-        </a>
       </section>
 
       {/* CTA back */}

@@ -1342,8 +1342,8 @@ export default function ServicesPage() {
             flexWrap: 'wrap',
             justifyContent: 'center'
           }}>
-          <a
-            href="mailto:hello@laurelleaf.studio"
+          <Link
+            href="/inquire"
             className="micro"
             style={{
               padding: '14px 26px',
@@ -1351,7 +1351,7 @@ export default function ServicesPage() {
               borderRadius: 100
             }}>
             Schedule an initial meeting
-          </a>
+          </Link>
           <Link href="/" className="micro" style={{ padding: '14px 22px', opacity: 0.6 }}>
             ↵ Back to Projects
           </Link>
