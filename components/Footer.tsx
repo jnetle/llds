@@ -78,7 +78,10 @@ export function Footer() {
             {col.items.map(it => (
               <li key={it.label} style={{ fontSize: 14, color: 'var(--ink-soft)' }}>
                 {it.href ? (
-                  <a target={it.target || '_self'} href={it.href}>
+                  <a
+                    target={it.target || '_self'}
+                    rel={it.target === '_blank' ? 'noopener noreferrer' : undefined}
+                    href={it.href}>
                     {it.label}
                   </a>
                 ) : (

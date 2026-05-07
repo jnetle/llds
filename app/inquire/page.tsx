@@ -17,7 +17,6 @@ type FormState = {
   services: string[];
   discovery: string;
   message: string;
-  newsletter: boolean;
 };
 
 const PROJECT_TYPES = [
@@ -130,8 +129,7 @@ export default function InquirePage() {
     budget: '',
     services: [],
     discovery: '',
-    message: '',
-    newsletter: false
+    message: ''
   });
 
   const update = <K extends keyof FormState>(key: K, value: FormState[K]) => setForm(prev => ({ ...prev, [key]: value }));
