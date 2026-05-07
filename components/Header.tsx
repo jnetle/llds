@@ -128,8 +128,8 @@ export function Header() {
                 alignItems: 'center',
                 gap: 24
               }}>
-              <a
-                href="mailto:hello@laurelleaf.studio"
+              <Link
+                href="/inquire"
                 className="micro"
                 style={{
                   padding: '9px 18px',
@@ -138,7 +138,7 @@ export function Header() {
                   color: fg
                 }}>
                 Inquire
-              </a>
+              </Link>
             </div>
           )}
         </div>
@@ -156,9 +156,9 @@ export function Header() {
             {item.label}
           </Link>
         ))}
-        <a href="mailto:hello@laurelleaf.studio" onClick={() => setMenuOpen(false)}>
+        <Link href="/inquire" onClick={() => setMenuOpen(false)}>
           Inquire
-        </a>
+        </Link>
       </div>
     </>
   );
