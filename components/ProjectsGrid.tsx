@@ -5,28 +5,23 @@ import { useState } from 'react';
 import { PROJECTS, type Project } from '@/lib/projects';
 import { useCompact } from '@/hooks/useCompact';
 import { useReveal } from '@/hooks/useReveal';
+import { Grid } from '@/components/ui/Grid';
+import { motion } from '@/lib/tokens';
 
 export function ProjectsGrid() {
   const compact = useCompact();
 
+  // Bespoke 32px desktop / 20px mobile gutters maximize tile width for the
+  // 2-col project grid. Section's standard 8vw gutters would crop ~165px off
+  // each side on a 1440 viewport, so this stays raw.
   return (
-    <div style={{ background: 'var(--bg)', color: 'var(--ink)' }}>
-      <section style={{ padding: compact ? '120px 20px 80px' : '140px 32px 120px' }}>
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: compact ? '1fr' : 'repeat(2, 1fr)',
-            columnGap: 32,
-            rowGap: compact ? 56 : 96,
-            maxWidth: 1600,
-            margin: '0 auto'
-          }}>
-          {PROJECTS.map((p, i) => (
-            <ProjectsTile key={p.id} project={p} index={i} />
-          ))}
-        </div>
-      </section>
-    </div>
+    <section style={{ padding: compact ? '120px 20px 80px' : '140px 32px 120px' }}>
+      <Grid cols="repeat(2, 1fr)" columnGap={32} rowGap={{ d: 96, m: 56 }} style={{ maxWidth: 1600, margin: '0 auto' }}>
+        {PROJECTS.map((p, i) => (
+          <ProjectsTile key={p.id} project={p} index={i} />
+        ))}
+      </Grid>
+    </section>
   );
 }
 
@@ -43,7 +38,7 @@ function ProjectsTile({ project, index }: { project: Project; index: number }) {
       style={{
         opacity: seen ? 1 : 0,
         transform: seen ? 'translateY(0)' : 'translateY(24px)',
-        transition: `opacity 1.1s cubic-bezier(.22,.61,.36,1) ${delay}, transform 1.1s cubic-bezier(.22,.61,.36,1) ${delay}`
+        transition: `opacity ${motion.durXSlow} ${motion.ease} ${delay}, transform ${motion.durXSlow} ${motion.ease} ${delay}`
       }}>
       <Link href={`/projects/${project.id}`} style={{ display: 'block', color: 'inherit' }}>
         <div
@@ -61,7 +56,7 @@ function ProjectsTile({ project, index }: { project: Project; index: number }) {
               backgroundSize: 'cover',
               backgroundPosition: 'center',
               transform: hovered ? 'scale(1.03)' : 'scale(1)',
-              transition: 'transform 1.4s cubic-bezier(.22,.61,.36,1)'
+              transition: `transform 1.4s ${motion.ease}`
             }}
           />
         </div>

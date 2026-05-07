@@ -4,6 +4,9 @@ import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
 import { useReveal } from '@/hooks/useReveal';
 import { useCols } from '@/hooks/useCompact';
+import { Eyebrow } from '@/components/ui/Eyebrow';
+import { Section } from '@/components/ui/Section';
+import { color, motion, text } from '@/lib/tokens';
 
 const ROLE = [
   {
@@ -216,7 +219,7 @@ const Dash = () => (
       top: '0.85em',
       width: 12,
       height: 1,
-      background: 'var(--ink)',
+      background: color.ink,
       opacity: 0.45
     }}
   />
@@ -248,14 +251,9 @@ export default function ServicesPage() {
   }, []);
 
   return (
-    <div style={{ background: 'var(--bg)', color: 'var(--ink)' }}>
-      {/* Hero */}
-      <section
-        style={{
-          position: 'relative',
-          height: '100vh',
-          overflow: 'hidden'
-        }}>
+    <>
+      {/* Hero — raw <section>: full-bleed, 100vh, absolute-positioned content. */}
+      <section style={{ position: 'relative', height: '100vh', overflow: 'hidden' }}>
         <div
           style={{
             position: 'absolute',
@@ -282,17 +280,11 @@ export default function ServicesPage() {
             flexDirection: 'column',
             justifyContent: 'flex-end',
             paddingBottom: 100,
-            color: '#F4F0E8'
+            color: color.bg
           }}>
-          <div
-            className="micro"
-            style={{
-              opacity: 0.85,
-              marginBottom: 28,
-              letterSpacing: '0.32em'
-            }}>
+          <Eyebrow opacity={0.85} style={{ marginBottom: 28, letterSpacing: '0.32em' }}>
             — Laurel Leaf Design Studio · 2026
-          </div>
+          </Eyebrow>
           <h1
             className="serif"
             style={{
@@ -302,42 +294,25 @@ export default function ServicesPage() {
               letterSpacing: '-0.018em',
               maxWidth: '14ch',
               textWrap: 'balance',
-              textTransform: 'uppercase'
+              textTransform: 'uppercase',
+              margin: 0
             }}>
             New Build <em style={{ fontWeight: 300, textTransform: 'none' }}>&amp;</em> Renovation Design Services
           </h1>
         </div>
 
-        <div
-          className="micro-sm"
-          style={{
-            position: 'absolute',
-            top: 32,
-            right: 36,
-            color: '#F4F0E8',
-            opacity: 0.7,
-            letterSpacing: '0.28em'
-          }}>
+        <Eyebrow size="sm" opacity={0.7} style={{ position: 'absolute', top: 32, right: 36, color: color.bg, letterSpacing: '0.28em' }}>
           Volume I
-        </div>
-        <div
-          className="micro-sm"
-          style={{
-            position: 'absolute',
-            bottom: 28,
-            right: 36,
-            color: '#F4F0E8',
-            opacity: 0.7,
-            letterSpacing: '0.28em'
-          }}>
+        </Eyebrow>
+        <Eyebrow size="sm" opacity={0.7} style={{ position: 'absolute', bottom: 28, right: 36, color: color.bg, letterSpacing: '0.28em' }}>
           Services · 2026
-        </div>
+        </Eyebrow>
       </section>
 
       {/* Sentinel: flips when the quick-links nav reaches the top */}
       <div ref={sentinelRef} aria-hidden style={{ height: 1 }} />
 
-      {/* Quick links */}
+      {/* Quick links — raw <nav>: sticky with custom 18px vertical padding */}
       <nav
         style={{
           position: 'sticky',
@@ -346,20 +321,12 @@ export default function ServicesPage() {
           background: stuck ? 'rgba(244,240,232,0.97)' : 'rgba(244,240,232,0.92)',
           backdropFilter: 'blur(10px)',
           WebkitBackdropFilter: 'blur(10px)',
-          borderBottom: `1px solid ${stuck ? 'var(--ink-soft)' : 'var(--hairline)'}`,
+          borderBottom: `1px solid ${stuck ? color.inkSoft : color.hairline}`,
           boxShadow: stuck ? '0 6px 24px rgba(42,46,37,0.06)' : 'none',
           padding: '18px 8vw',
-          transition: 'background 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease'
+          transition: `background ${motion.durFast} ease, border-color ${motion.durFast} ease, box-shadow ${motion.durFast} ease`
         }}>
-        <ul
-          style={{
-            listStyle: 'none',
-            display: 'flex',
-            gap: 36,
-            flexWrap: 'wrap',
-            justifyContent: 'center',
-            alignItems: 'center'
-          }}>
+        <ul style={{ listStyle: 'none', display: 'flex', gap: 36, flexWrap: 'wrap', justifyContent: 'center', alignItems: 'center' }}>
           {QUICK_LINKS.map(([id, label]) => (
             <li key={id}>
               <a
@@ -376,7 +343,7 @@ export default function ServicesPage() {
                 style={{
                   letterSpacing: '0.22em',
                   textTransform: 'uppercase',
-                  color: 'var(--ink)',
+                  color: color.ink,
                   opacity: 0.7,
                   paddingBottom: 4,
                   borderBottom: '1px solid transparent',
@@ -384,7 +351,7 @@ export default function ServicesPage() {
                 }}
                 onMouseEnter={e => {
                   e.currentTarget.style.opacity = '1';
-                  e.currentTarget.style.borderBottomColor = 'var(--ink)';
+                  e.currentTarget.style.borderBottomColor = color.ink;
                 }}
                 onMouseLeave={e => {
                   e.currentTarget.style.opacity = '0.7';
@@ -398,13 +365,7 @@ export default function ServicesPage() {
       </nav>
 
       {/* Services — Our Role */}
-      <section
-        id="sec-services"
-        style={{
-          padding: '160px 8vw',
-          borderBottom: '1px solid var(--hairline)',
-          scrollMarginTop: 70
-        }}>
+      <Section id="sec-services" padY="lg" style={{ borderBottom: `1px solid ${color.hairline}`, scrollMarginTop: 70 }}>
         <div
           style={{
             display: 'grid',
@@ -414,9 +375,7 @@ export default function ServicesPage() {
             marginBottom: 90
           }}>
           <div>
-            <div className="micro" style={{ opacity: 0.55, marginBottom: 24 }}>
-              — Services
-            </div>
+            <Eyebrow style={{ marginBottom: 24 }}>— Services</Eyebrow>
             <h2
               className="serif"
               style={{
@@ -424,18 +383,12 @@ export default function ServicesPage() {
                 fontWeight: 300,
                 lineHeight: 0.95,
                 letterSpacing: '-0.018em',
-                textTransform: 'uppercase'
+                textTransform: 'uppercase',
+                margin: 0
               }}>
               Services
             </h2>
-            <p
-              style={{
-                marginTop: 38,
-                fontSize: 17,
-                lineHeight: 1.7,
-                color: 'var(--ink-soft)',
-                maxWidth: '54ch'
-              }}>
+            <p style={{ ...text.body, marginTop: 38, maxWidth: '54ch' }}>
               We guide the design of your home from early planning through construction, bringing clarity to each phase from concept to
               completion.
             </p>
@@ -450,22 +403,20 @@ export default function ServicesPage() {
           />
         </div>
 
-        <div className="micro" style={{ marginBottom: 36, opacity: 0.55 }}>
-          — Our role includes
-        </div>
+        <Eyebrow style={{ marginBottom: 36 }}>— Our role includes</Eyebrow>
         <div
           style={{
             display: 'grid',
             gridTemplateColumns: cols('repeat(3, 1fr)'),
             gap: 0,
-            borderTop: '1px solid var(--hairline)'
+            borderTop: `1px solid ${color.hairline}`
           }}>
           {ROLE.map((s, i) => (
             <article
               key={s.num}
               style={{
-                borderBottom: '1px solid var(--hairline)',
-                borderRight: i % 3 !== 2 ? '1px solid var(--hairline)' : 'none',
+                borderBottom: `1px solid ${color.hairline}`,
+                borderRight: i % 3 !== 2 ? `1px solid ${color.hairline}` : 'none',
                 padding: '40px 36px 44px',
                 minHeight: 220,
                 display: 'flex',
@@ -473,9 +424,7 @@ export default function ServicesPage() {
                 justifyContent: 'space-between',
                 gap: 20
               }}>
-              <div className="micro-sm" style={{ opacity: 0.55 }}>
-                {s.num}
-              </div>
+              <Eyebrow size="sm">{s.num}</Eyebrow>
               <div>
                 <h3
                   className="serif"
@@ -485,32 +434,20 @@ export default function ServicesPage() {
                     lineHeight: 1.1,
                     letterSpacing: '-0.005em',
                     textTransform: 'uppercase',
-                    marginBottom: 14
+                    marginBottom: 14,
+                    marginTop: 0
                   }}>
                   {s.title}
                 </h3>
-                <p
-                  style={{
-                    fontSize: 15,
-                    lineHeight: 1.65,
-                    color: 'var(--ink-soft)'
-                  }}>
-                  {s.desc}
-                </p>
+                <p style={{ ...text.bodySm, lineHeight: 1.65 }}>{s.desc}</p>
               </div>
             </article>
           ))}
         </div>
-      </section>
+      </Section>
 
       {/* Scope */}
-      <section
-        id="sec-scope"
-        style={{
-          padding: '160px 8vw',
-          background: 'rgba(42,46,37,0.04)',
-          scrollMarginTop: 90
-        }}>
+      <Section id="sec-scope" padY="lg" style={{ background: 'rgba(42,46,37,0.04)', scrollMarginTop: 90 }}>
         <div
           ref={refScope}
           style={{
@@ -521,12 +458,10 @@ export default function ServicesPage() {
             marginBottom: 90,
             opacity: seenScope ? 1 : 0,
             transform: seenScope ? 'translateY(0)' : 'translateY(30px)',
-            transition: 'all 1s cubic-bezier(.22,.61,.36,1)'
+            transition: `all ${motion.durSlow} ${motion.ease}`
           }}>
           <div>
-            <div className="micro" style={{ opacity: 0.55, marginBottom: 24 }}>
-              — Scope
-            </div>
+            <Eyebrow style={{ marginBottom: 24 }}>— Scope</Eyebrow>
             <h2
               className="serif"
               style={{
@@ -534,18 +469,12 @@ export default function ServicesPage() {
                 fontWeight: 300,
                 lineHeight: 0.95,
                 letterSpacing: '-0.018em',
-                textTransform: 'uppercase'
+                textTransform: 'uppercase',
+                margin: 0
               }}>
               Scope
             </h2>
-            <p
-              style={{
-                marginTop: 38,
-                fontSize: 17,
-                lineHeight: 1.7,
-                color: 'var(--ink-soft)',
-                maxWidth: '54ch'
-              }}>
+            <p style={{ ...text.body, marginTop: 38, maxWidth: '54ch' }}>
               We manage the design details that shape both the aesthetic and the construction of your home, ensuring every element is
               considered, coordinated, and fully resolved.
             </p>
@@ -560,27 +489,16 @@ export default function ServicesPage() {
           />
         </div>
 
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: cols('repeat(2, 1fr)'),
-            gap: '0 80px'
-          }}>
+        <div style={{ display: 'grid', gridTemplateColumns: cols('repeat(2, 1fr)'), gap: '0 80px' }}>
           {SCOPE.map((cat, i) => (
             <div
               key={cat.h}
               style={{
                 padding: '36px 0 40px',
-                borderTop: '1px solid var(--hairline)',
-                borderBottom: i >= SCOPE.length - 2 ? '1px solid var(--hairline)' : 'none'
+                borderTop: `1px solid ${color.hairline}`,
+                borderBottom: i >= SCOPE.length - 2 ? `1px solid ${color.hairline}` : 'none'
               }}>
-              <h3
-                className="micro"
-                style={{
-                  marginBottom: 22,
-                  opacity: 0.85,
-                  letterSpacing: '0.22em'
-                }}>
+              <h3 className="micro" style={{ marginBottom: 22, marginTop: 0, opacity: 0.85, letterSpacing: '0.22em' }}>
                 {cat.h}
               </h3>
               <ul style={{ listStyle: 'none', display: 'grid', gap: 12 }}>
@@ -590,7 +508,7 @@ export default function ServicesPage() {
                     style={{
                       fontSize: 15,
                       lineHeight: 1.55,
-                      color: 'var(--ink)',
+                      color: color.ink,
                       paddingLeft: 22,
                       position: 'relative'
                     }}>
@@ -607,8 +525,8 @@ export default function ServicesPage() {
           style={{
             marginTop: 80,
             padding: '38px 44px',
-            borderTop: '1px solid var(--ink)',
-            borderBottom: '1px solid var(--ink)'
+            borderTop: `1px solid ${color.ink}`,
+            borderBottom: `1px solid ${color.ink}`
           }}>
           <p
             className="serif"
@@ -624,20 +542,12 @@ export default function ServicesPage() {
             intention.
           </p>
         </div>
-      </section>
+      </Section>
 
       {/* Deliverables */}
-      <section
-        id="sec-deliverables"
-        style={{
-          padding: '160px 8vw',
-          borderBottom: '1px solid var(--hairline)',
-          scrollMarginTop: 70
-        }}>
+      <Section id="sec-deliverables" padY="lg" style={{ borderBottom: `1px solid ${color.hairline}`, scrollMarginTop: 70 }}>
         <div style={{ marginBottom: 90 }}>
-          <div className="micro" style={{ opacity: 0.55, marginBottom: 24 }}>
-            — Deliverables
-          </div>
+          <Eyebrow style={{ marginBottom: 24 }}>— Deliverables</Eyebrow>
           <h2
             className="serif"
             style={{
@@ -646,47 +556,36 @@ export default function ServicesPage() {
               lineHeight: 0.95,
               letterSpacing: '-0.018em',
               textTransform: 'uppercase',
-              marginBottom: 38
+              marginBottom: 38,
+              marginTop: 0
             }}>
             Deliverables
           </h2>
-          <p
-            style={{
-              fontSize: 17,
-              lineHeight: 1.7,
-              color: 'var(--ink-soft)',
-              maxWidth: '60ch'
-            }}>
+          <p style={{ ...text.body, maxWidth: '60ch' }}>
             A well-designed project relies on clear, organized documentation. Each client receives a curated set of materials that translate
             design decisions into a format your builder and trades can easily follow and execute.
           </p>
         </div>
 
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: cols('1.1fr 1fr'),
-            gap: 90,
-            alignItems: 'start'
-          }}>
+        <div style={{ display: 'grid', gridTemplateColumns: cols('1.1fr 1fr'), gap: 90, alignItems: 'start' }}>
           <div style={{ display: 'grid', gap: 0 }}>
             {DELIVERABLES.map((d, i) => (
               <div
                 key={d.h}
                 style={{
-                  borderTop: '1px solid var(--hairline)',
-                  borderBottom: i === DELIVERABLES.length - 1 ? '1px solid var(--hairline)' : 'none',
+                  borderTop: `1px solid ${color.hairline}`,
+                  borderBottom: i === DELIVERABLES.length - 1 ? `1px solid ${color.hairline}` : 'none',
                   padding: '32px 0 36px',
                   display: 'grid',
                   gridTemplateColumns: cols('60px 1fr'),
                   gap: 30,
                   alignItems: 'start'
                 }}>
-                <div className="micro-sm" style={{ opacity: 0.55, paddingTop: 6 }}>
+                <Eyebrow size="sm" style={{ paddingTop: 6 }}>
                   0{i + 1}
-                </div>
+                </Eyebrow>
                 <div>
-                  <h3 className="micro" style={{ marginBottom: 18, letterSpacing: '0.22em' }}>
+                  <h3 className="micro" style={{ marginBottom: 18, marginTop: 0, letterSpacing: '0.22em' }}>
                     {d.h}
                   </h3>
                   <ul style={{ listStyle: 'none', display: 'grid', gap: 10 }}>
@@ -696,7 +595,7 @@ export default function ServicesPage() {
                         style={{
                           fontSize: 15.5,
                           lineHeight: 1.55,
-                          color: 'var(--ink)',
+                          color: color.ink,
                           paddingLeft: 22,
                           position: 'relative'
                         }}>
@@ -712,7 +611,7 @@ export default function ServicesPage() {
                         marginTop: 18,
                         fontSize: 16,
                         fontStyle: 'italic',
-                        color: 'var(--ink)',
+                        color: color.ink,
                         lineHeight: 1.55,
                         maxWidth: '50ch'
                       }}>
@@ -724,13 +623,7 @@ export default function ServicesPage() {
             ))}
           </div>
 
-          <div
-            style={{
-              display: 'grid',
-              gap: 24,
-              position: 'sticky',
-              top: 120
-            }}>
+          <div style={{ display: 'grid', gap: 24, position: 'sticky', top: 120 }}>
             <div
               style={{
                 aspectRatio: '4/3',
@@ -750,13 +643,7 @@ export default function ServicesPage() {
           </div>
         </div>
 
-        <div
-          style={{
-            marginTop: 100,
-            paddingTop: 50,
-            borderTop: '1px solid var(--ink)',
-            textAlign: 'center'
-          }}>
+        <div style={{ marginTop: 100, paddingTop: 50, borderTop: `1px solid ${color.ink}`, textAlign: 'center' }}>
           <p
             className="serif"
             style={{
@@ -772,16 +659,10 @@ export default function ServicesPage() {
             Clear documentation allows the design to be executed with accuracy and consistency.
           </p>
         </div>
-      </section>
+      </Section>
 
       {/* Process */}
-      <section
-        id="sec-process"
-        style={{
-          padding: '160px 8vw',
-          background: 'rgba(42,46,37,0.04)',
-          scrollMarginTop: 70
-        }}>
+      <Section id="sec-process" padY="lg" style={{ background: 'rgba(42,46,37,0.04)', scrollMarginTop: 70 }}>
         <div
           style={{
             display: 'grid',
@@ -791,9 +672,7 @@ export default function ServicesPage() {
             marginBottom: 100
           }}>
           <div>
-            <div className="micro" style={{ opacity: 0.55, marginBottom: 22 }}>
-              — Process
-            </div>
+            <Eyebrow style={{ marginBottom: 22 }}>— Process</Eyebrow>
             <h2
               className="serif"
               style={{
@@ -801,20 +680,13 @@ export default function ServicesPage() {
                 fontWeight: 300,
                 lineHeight: 0.95,
                 letterSpacing: '-0.018em',
-                textTransform: 'uppercase'
+                textTransform: 'uppercase',
+                margin: 0
               }}>
               Process
             </h2>
           </div>
-          <p
-            style={{
-              fontSize: 17,
-              lineHeight: 1.7,
-              color: 'var(--ink-soft)',
-              maxWidth: '54ch',
-              justifySelf: 'end',
-              textAlign: 'right'
-            }}>
+          <p style={{ ...text.body, maxWidth: '54ch', justifySelf: 'end', textAlign: 'right' }}>
             Our process is designed to establish direction early, finalize decisions efficiently, and support the project through
             construction with clarity and consistency.
           </p>
@@ -825,7 +697,7 @@ export default function ServicesPage() {
             <article
               key={step.n}
               style={{
-                borderTop: '1px solid var(--hairline)',
+                borderTop: `1px solid ${color.hairline}`,
                 padding: '54px 0 60px',
                 display: 'grid',
                 gridTemplateColumns: cols('160px 1fr 1.4fr'),
@@ -840,7 +712,7 @@ export default function ServicesPage() {
                   fontStyle: 'italic',
                   lineHeight: 0.85,
                   letterSpacing: '-0.02em',
-                  color: 'var(--ink-soft)',
+                  color: color.inkSoft,
                   opacity: 0.45
                 }}>
                 {step.n}
@@ -853,35 +725,22 @@ export default function ServicesPage() {
                     fontWeight: 300,
                     lineHeight: 1.05,
                     letterSpacing: '-0.005em',
-                    textTransform: 'uppercase'
+                    textTransform: 'uppercase',
+                    margin: 0
                   }}>
                   {step.h}
                 </h3>
               </div>
               <div>
-                <p
-                  style={{
-                    fontSize: 16,
-                    lineHeight: 1.7,
-                    color: 'var(--ink-soft)',
-                    marginBottom: 20
-                  }}>
-                  {step.p}
-                </p>
-                <ul
-                  style={{
-                    listStyle: 'none',
-                    display: 'grid',
-                    gap: 8,
-                    marginBottom: step.footnote ? 18 : 0
-                  }}>
+                <p style={{ ...text.body, fontSize: 16, marginBottom: 20 }}>{step.p}</p>
+                <ul style={{ listStyle: 'none', display: 'grid', gap: 8, marginBottom: step.footnote ? 18 : 0 }}>
                   {step.bullets.map(b => (
                     <li
                       key={b}
                       style={{
                         fontSize: 14.5,
                         lineHeight: 1.55,
-                        color: 'var(--ink)',
+                        color: color.ink,
                         paddingLeft: 22,
                         position: 'relative'
                       }}>
@@ -896,7 +755,7 @@ export default function ServicesPage() {
                     style={{
                       fontSize: 16,
                       fontStyle: 'italic',
-                      color: 'var(--ink)',
+                      color: color.ink,
                       lineHeight: 1.55,
                       maxWidth: '52ch'
                     }}>
@@ -906,22 +765,14 @@ export default function ServicesPage() {
               </div>
             </article>
           ))}
-          <div style={{ borderTop: '1px solid var(--hairline)' }} />
+          <div style={{ borderTop: `1px solid ${color.hairline}` }} />
         </div>
-      </section>
+      </Section>
 
       {/* Working Together */}
-      <section
-        id="sec-working"
-        style={{
-          padding: '160px 8vw',
-          borderBottom: '1px solid var(--hairline)',
-          scrollMarginTop: 70
-        }}>
+      <Section id="sec-working" padY="lg" style={{ borderBottom: `1px solid ${color.hairline}`, scrollMarginTop: 70 }}>
         <div style={{ marginBottom: 80 }}>
-          <div className="micro" style={{ opacity: 0.55, marginBottom: 22 }}>
-            — Working Together
-          </div>
+          <Eyebrow style={{ marginBottom: 22 }}>— Working Together</Eyebrow>
           <h2
             className="serif"
             style={{
@@ -931,62 +782,39 @@ export default function ServicesPage() {
               letterSpacing: '-0.018em',
               textTransform: 'uppercase',
               marginBottom: 38,
+              marginTop: 0,
               maxWidth: '14ch',
               textWrap: 'balance'
             }}>
             Working Together
           </h2>
-          <p
-            style={{
-              fontSize: 17,
-              lineHeight: 1.7,
-              color: 'var(--ink-soft)',
-              maxWidth: '58ch'
-            }}>
+          <p style={{ ...text.body, maxWidth: '58ch' }}>
             A clear and structured approach allows the project to move forward efficiently while maintaining alignment between client,
             builder, and design.
           </p>
         </div>
 
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: cols('1.4fr 1fr'),
-            gap: 90,
-            alignItems: 'start'
-          }}>
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns: cols('repeat(2, 1fr)'),
-              gap: '0 60px'
-            }}>
+        <div style={{ display: 'grid', gridTemplateColumns: cols('1.4fr 1fr'), gap: 90, alignItems: 'start' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: cols('repeat(2, 1fr)'), gap: '0 60px' }}>
             {WORKING.map((w, i) => (
               <div
                 key={w.h}
                 style={{
-                  borderTop: '1px solid var(--hairline)',
-                  borderBottom: i >= WORKING.length - 2 ? '1px solid var(--hairline)' : 'none',
+                  borderTop: `1px solid ${color.hairline}`,
+                  borderBottom: i >= WORKING.length - 2 ? `1px solid ${color.hairline}` : 'none',
                   padding: '28px 0 32px'
                 }}>
-                <h3 className="micro" style={{ marginBottom: 16, letterSpacing: '0.22em' }}>
+                <h3 className="micro" style={{ marginBottom: 16, marginTop: 0, letterSpacing: '0.22em' }}>
                   {w.h}
                 </h3>
-                <p
-                  style={{
-                    fontSize: 15,
-                    lineHeight: 1.65,
-                    color: 'var(--ink-soft)'
-                  }}>
-                  {w.p}
-                </p>
+                <p style={{ ...text.bodySm, lineHeight: 1.65 }}>{w.p}</p>
                 {w.note && (
                   <p
                     style={{
                       marginTop: 12,
                       fontSize: 14,
                       fontWeight: 500,
-                      color: 'var(--ink)',
+                      color: color.ink,
                       lineHeight: 1.6
                     }}>
                     — {w.note}
@@ -996,13 +824,7 @@ export default function ServicesPage() {
             ))}
           </div>
 
-          <div
-            style={{
-              display: 'grid',
-              gap: 22,
-              position: 'sticky',
-              top: 120
-            }}>
+          <div style={{ display: 'grid', gap: 22, position: 'sticky', top: 120 }}>
             <div
               style={{
                 aspectRatio: '4/5',
@@ -1021,16 +843,10 @@ export default function ServicesPage() {
             />
           </div>
         </div>
-      </section>
+      </Section>
 
       {/* The Difference */}
-      <section
-        id="sec-difference"
-        style={{
-          padding: '160px 8vw',
-          background: 'rgba(42,46,37,0.04)',
-          scrollMarginTop: 70
-        }}>
+      <Section id="sec-difference" padY="lg" style={{ background: 'rgba(42,46,37,0.04)', scrollMarginTop: 70 }}>
         <div
           style={{
             display: 'grid',
@@ -1040,9 +856,7 @@ export default function ServicesPage() {
             marginBottom: 90
           }}>
           <div>
-            <div className="micro" style={{ opacity: 0.55, marginBottom: 22 }}>
-              — The Difference
-            </div>
+            <Eyebrow style={{ marginBottom: 22 }}>— The Difference</Eyebrow>
             <h2
               className="serif"
               style={{
@@ -1051,19 +865,12 @@ export default function ServicesPage() {
                 lineHeight: 0.95,
                 letterSpacing: '-0.018em',
                 textTransform: 'uppercase',
-                marginBottom: 40
+                marginBottom: 40,
+                marginTop: 0
               }}>
               The Difference
             </h2>
-            <div
-              style={{
-                display: 'grid',
-                gap: 20,
-                fontSize: 16.5,
-                lineHeight: 1.75,
-                color: 'var(--ink-soft)',
-                maxWidth: '46ch'
-              }}>
+            <div style={{ display: 'grid', gap: 20, fontSize: 16.5, lineHeight: 1.75, color: color.inkSoft, maxWidth: '46ch' }}>
               <p>
                 A home is more than the sum of its selections, it&apos;s the result of thoughtful decisions made with intention and care.
               </p>
@@ -1084,13 +891,8 @@ export default function ServicesPage() {
           />
         </div>
 
-        <div
-          style={{
-            padding: '54px 56px',
-            background: 'var(--bg)',
-            border: '1px solid var(--hairline)'
-          }}>
-          <h3 className="micro" style={{ marginBottom: 32, letterSpacing: '0.22em' }}>
+        <div style={{ padding: '54px 56px', background: color.bg, border: `1px solid ${color.hairline}` }}>
+          <h3 className="micro" style={{ marginBottom: 32, marginTop: 0, letterSpacing: '0.22em' }}>
             What Sets Our Process Apart
           </h3>
           <ul
@@ -1106,7 +908,7 @@ export default function ServicesPage() {
                 style={{
                   fontSize: 16,
                   lineHeight: 1.6,
-                  color: 'var(--ink)',
+                  color: color.ink,
                   paddingLeft: 28,
                   position: 'relative'
                 }}>
@@ -1117,7 +919,7 @@ export default function ServicesPage() {
                     top: '0.7em',
                     width: 16,
                     height: 1,
-                    background: 'var(--ink)',
+                    background: color.ink,
                     opacity: 0.55
                   }}
                 />
@@ -1130,47 +932,31 @@ export default function ServicesPage() {
             style={{
               marginTop: 50,
               paddingTop: 36,
-              borderTop: '1px solid var(--hairline)',
+              borderTop: `1px solid ${color.hairline}`,
               display: 'grid',
               gridTemplateColumns: cols('1fr 1fr'),
               gap: 50
             }}>
             <div>
-              <h4 className="micro" style={{ marginBottom: 16, letterSpacing: '0.22em' }}>
+              <h4 className="micro" style={{ marginBottom: 16, marginTop: 0, letterSpacing: '0.22em' }}>
                 The Result
               </h4>
-              <p
-                style={{
-                  fontSize: 15.5,
-                  lineHeight: 1.7,
-                  color: 'var(--ink-soft)'
-                }}>
+              <p style={{ ...text.bodySm, fontSize: 15.5, lineHeight: 1.7 }}>
                 A home that feels collected, intentional, and distinctly yours, rooted in how you live and what you love.
               </p>
             </div>
             <div>
-              <h4 className="micro" style={{ marginBottom: 16, letterSpacing: '0.22em' }}>
+              <h4 className="micro" style={{ marginBottom: 16, marginTop: 0, letterSpacing: '0.22em' }}>
                 The Experience
               </h4>
-              <p
-                style={{
-                  fontSize: 15.5,
-                  lineHeight: 1.7,
-                  color: 'var(--ink-soft)'
-                }}>
+              <p style={{ ...text.bodySm, fontSize: 15.5, lineHeight: 1.7 }}>
                 A process that feels guided, organized, and thoughtfully handled from beginning to end.
               </p>
             </div>
           </div>
         </div>
 
-        <div
-          style={{
-            marginTop: 80,
-            paddingTop: 50,
-            borderTop: '1px solid var(--ink)',
-            textAlign: 'center'
-          }}>
+        <div style={{ marginTop: 80, paddingTop: 50, borderTop: `1px solid ${color.ink}`, textAlign: 'center' }}>
           <p
             className="serif"
             style={{
@@ -1186,13 +972,11 @@ export default function ServicesPage() {
             Thoughtful design. Clear direction. A home that feels entirely your own.
           </p>
         </div>
-      </section>
+      </Section>
 
       {/* Next Steps */}
-      <section id="sec-next" style={{ padding: '160px 8vw 0', scrollMarginTop: 70 }}>
-        <div className="micro" style={{ opacity: 0.55, marginBottom: 24 }}>
-          — Next Steps
-        </div>
+      <Section id="sec-next" padTop="lg" padBottom="none" style={{ scrollMarginTop: 70 }}>
+        <Eyebrow style={{ marginBottom: 24 }}>— Next Steps</Eyebrow>
         <h2
           className="serif"
           style={{
@@ -1201,40 +985,22 @@ export default function ServicesPage() {
             lineHeight: 0.95,
             letterSpacing: '-0.018em',
             textTransform: 'uppercase',
-            marginBottom: 70
+            marginBottom: 70,
+            marginTop: 0
           }}>
           Next Steps
         </h2>
 
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: cols('1fr 1.1fr'),
-            gap: 100,
-            alignItems: 'start'
-          }}>
-          <div
-            style={{
-              display: 'grid',
-              gap: 22,
-              fontSize: 17,
-              lineHeight: 1.75,
-              color: 'var(--ink-soft)',
-              maxWidth: '46ch'
-            }}>
+        <div style={{ display: 'grid', gridTemplateColumns: cols('1fr 1.1fr'), gap: 100, alignItems: 'start' }}>
+          <div style={{ display: 'grid', gap: 22, fontSize: 17, lineHeight: 1.75, color: color.inkSoft, maxWidth: '46ch' }}>
             <p>Creating a home is a thoughtful process, one that should feel both inspired and well guided from the very beginning.</p>
             <p>
               At Laurel Leaf Design Studio, we work closely with you and your builder to bring clarity to each decision, ensuring your home
               is not only beautiful, but fully considered and ready to be built.
             </p>
 
-            <div
-              style={{
-                marginTop: 24,
-                paddingTop: 30,
-                borderTop: '1px solid var(--hairline)'
-              }}>
-              <h3 className="micro" style={{ marginBottom: 22, letterSpacing: '0.22em' }}>
+            <div style={{ marginTop: 24, paddingTop: 30, borderTop: `1px solid ${color.hairline}` }}>
+              <h3 className="micro" style={{ marginBottom: 22, marginTop: 0, letterSpacing: '0.22em' }}>
                 Next Steps
               </h3>
               <ul style={{ listStyle: 'none', display: 'grid', gap: 14 }}>
@@ -1252,7 +1018,7 @@ export default function ServicesPage() {
                       lineHeight: 1.4,
                       paddingLeft: 28,
                       position: 'relative',
-                      color: 'var(--ink)'
+                      color: color.ink
                     }}>
                     <span
                       style={{
@@ -1261,7 +1027,7 @@ export default function ServicesPage() {
                         top: '0.65em',
                         width: 18,
                         height: 1,
-                        background: 'var(--ink)'
+                        background: color.ink
                       }}
                     />
                     <span className="micro-sm" style={{ marginRight: 14, opacity: 0.55 }}>
@@ -1274,12 +1040,7 @@ export default function ServicesPage() {
             </div>
           </div>
 
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns: cols('1fr 1fr'),
-              gap: 18
-            }}>
+          <div style={{ display: 'grid', gridTemplateColumns: cols('1fr 1fr'), gap: 18 }}>
             <div
               style={{
                 aspectRatio: '4/5',
@@ -1299,16 +1060,10 @@ export default function ServicesPage() {
             />
           </div>
         </div>
-      </section>
+      </Section>
 
       {/* CTA */}
-      <section
-        style={{
-          padding: '140px 8vw 180px',
-          textAlign: 'center',
-          marginTop: 80,
-          borderTop: '1px solid var(--hairline)'
-        }}>
+      <Section padTop="md" padBottom="xl" style={{ textAlign: 'center', marginTop: 80, borderTop: `1px solid ${color.hairline}` }}>
         <div
           className="serif"
           style={{
@@ -1334,29 +1089,15 @@ export default function ServicesPage() {
           }}>
           Thoughtful design, <em style={{ fontWeight: 300, textTransform: 'none' }}>carried through to completion.</em>
         </h2>
-        <div
-          style={{
-            display: 'inline-flex',
-            gap: 14,
-            alignItems: 'center',
-            flexWrap: 'wrap',
-            justifyContent: 'center'
-          }}>
-          <Link
-            href="/inquire"
-            className="micro"
-            style={{
-              padding: '14px 26px',
-              border: '1px solid var(--ink)',
-              borderRadius: 100
-            }}>
+        <div style={{ display: 'inline-flex', gap: 14, alignItems: 'center', flexWrap: 'wrap', justifyContent: 'center' }}>
+          <Link href="/inquire" className="micro" style={{ padding: '14px 26px', border: `1px solid ${color.ink}`, borderRadius: 100 }}>
             Schedule an initial meeting
           </Link>
           <Link href="/" className="micro" style={{ padding: '14px 22px', opacity: 0.6 }}>
             ↵ Back to Projects
           </Link>
         </div>
-      </section>
-    </div>
+      </Section>
+    </>
   );
 }

@@ -3,6 +3,12 @@
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { PROJECTS, type Project } from '@/lib/projects';
+import { Container } from '@/components/ui/Container';
+import { Eyebrow } from '@/components/ui/Eyebrow';
+import { Grid } from '@/components/ui/Grid';
+import { Heading } from '@/components/ui/Heading';
+import { Section } from '@/components/ui/Section';
+import { color, motion, text } from '@/lib/tokens';
 
 type Props = {
   project: Project;
@@ -24,27 +30,24 @@ export function ProjectDetail({ project }: Props) {
   return (
     <div
       style={{
-        background: 'var(--bg)',
-        color: 'var(--ink)',
         opacity: opening ? 0 : 1,
-        transition: 'opacity 0.5s ease'
+        transition: `opacity ${motion.durMed} ease`
       }}>
-      {/* Top bar — sits below the fixed global header */}
+      {/* Top bar — sits below the fixed global header. Bespoke 36px gutter to
+          align tightly with the global header's content rhythm. */}
       <div
         style={{
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
           padding: '110px 36px 24px',
-          borderBottom: '1px solid var(--hairline)',
+          borderBottom: `1px solid ${color.hairline}`,
           gap: 16
         }}>
         <Link href="/projects" className="micro" style={{ display: 'flex', alignItems: 'center', gap: 10, color: 'inherit' }}>
           <span style={{ fontSize: 14, lineHeight: 1 }}>←</span> All Projects
         </Link>
-        <div className="micro" style={{ opacity: 0.6 }}>
-          {project.discipline}
-        </div>
+        <Eyebrow opacity={0.6}>{project.discipline}</Eyebrow>
         <Link href={`/projects/${next.id}`} className="micro" style={{ display: 'flex', alignItems: 'center', gap: 10, color: 'inherit' }}>
           Next:{' '}
           <span style={{ fontStyle: 'italic' }} className="serif">
@@ -62,82 +65,45 @@ export function ProjectDetail({ project }: Props) {
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           transform: opening ? 'scale(1.05)' : 'scale(1)',
-          transition: 'transform 1.2s cubic-bezier(.22,.61,.36,1)'
+          transition: `transform ${motion.durXSlow} ${motion.ease}`
         }}
       />
 
       {/* Title block */}
-      <div style={{ padding: '100px 8vw', maxWidth: 1400, margin: '0 auto' }}>
-        <div className="micro" style={{ opacity: 0.55, marginBottom: 28 }}>
-          {project.location} · {project.year}
-        </div>
-        <h1
-          className="serif"
-          style={{
-            fontSize: 'clamp(48px, 7vw, 110px)',
-            fontWeight: 300,
-            fontStyle: 'italic',
-            lineHeight: 0.98,
-            letterSpacing: '-0.012em',
-            maxWidth: '14ch',
-            margin: 0
-          }}>
-          {project.title}
-        </h1>
-        <p
-          style={{
-            marginTop: 60,
-            fontSize: 19,
-            lineHeight: 1.7,
-            color: 'var(--ink-soft)',
-            maxWidth: '52ch'
-          }}>
-          {project.intro}
-        </p>
-      </div>
+      <Section padY="xs">
+        <Container maxWidth={1400} align="center">
+          <Eyebrow style={{ marginBottom: 28 }}>
+            {project.location} · {project.year}
+          </Eyebrow>
+          <Heading
+            level="display"
+            italic
+            style={{ fontSize: 'clamp(48px, 7vw, 110px)', lineHeight: 0.98, letterSpacing: '-0.012em', maxWidth: '14ch' }}>
+            {project.title}
+          </Heading>
+          <p style={{ ...text.body, fontSize: 19, marginTop: 60, maxWidth: '52ch' }}>{project.intro}</p>
+        </Container>
+      </Section>
 
       {/* Material palette */}
-      <div
-        style={{
-          padding: '0 8vw 80px',
-          display: 'flex',
-          alignItems: 'center',
-          gap: 40,
-          flexWrap: 'wrap'
-        }}>
-        <div className="micro" style={{ opacity: 0.5 }}>
-          Material Palette
-        </div>
+      <Section padTop="none" padBottom="xs" style={{ display: 'flex', alignItems: 'center', gap: 40, flexWrap: 'wrap' }}>
+        <Eyebrow opacity={0.5}>Material Palette</Eyebrow>
         <div style={{ display: 'flex', gap: 16 }}>
           {project.palette.map(c => (
-            <div
-              key={c}
-              style={{
-                width: 64,
-                height: 64,
-                background: c,
-                borderRadius: '50%'
-              }}
-            />
+            <div key={c} style={{ width: 64, height: 64, background: c, borderRadius: '50%' }} />
           ))}
         </div>
-      </div>
+      </Section>
 
       {/* Gallery */}
-      <div style={{ padding: '0 8vw 120px', display: 'grid', gap: 24 }}>
+      <Section padTop="none" padBottom="sm" style={{ display: 'grid', gap: 24 }}>
         {project.gallery.map((src, i) => (
           <button
             key={src + i}
             onClick={() => setImgIndex(i)}
             aria-label={`View plate ${i + 1} of ${project.title}`}
             aria-pressed={imgIndex === i}
-            style={{
-              cursor: 'pointer',
-              textAlign: 'left',
-              padding: 0,
-              background: 'none',
-              border: 'none'
-            }}>
+            style={{ cursor: 'pointer', textAlign: 'left', padding: 0, background: 'none', border: 'none' }}>
             <div
               style={{
                 height: i === 1 ? '60vh' : '80vh',
@@ -146,22 +112,22 @@ export function ProjectDetail({ project }: Props) {
                 backgroundPosition: 'center'
               }}
             />
-            <div className="micro-sm" style={{ marginTop: 12, opacity: 0.5 }}>
+            <Eyebrow size="sm" opacity={0.5} style={{ marginTop: 12 }}>
               Plate 0{i + 1} · {project.title}
-            </div>
+            </Eyebrow>
           </button>
         ))}
-      </div>
+      </Section>
 
-      {/* Footer nav between projects */}
-      <div
+      {/* Footer nav between projects — bespoke 36px gutter to align with top bar.
+          Grid collapses to 1-col at ≤1024 via the cols-string default. */}
+      <Grid
+        cols="1fr 1fr 1fr"
+        gap={32}
+        alignItems="center"
         style={{
-          borderTop: '1px solid var(--hairline)',
-          padding: '60px 36px',
-          display: 'grid',
-          gridTemplateColumns: '1fr 1fr 1fr',
-          gap: 32,
-          alignItems: 'center'
+          borderTop: `1px solid ${color.hairline}`,
+          padding: '60px 36px'
         }}>
         <Link
           href={`/projects/${prev.id}`}
@@ -178,7 +144,7 @@ export function ProjectDetail({ project }: Props) {
         <Link
           href="/projects"
           className="micro"
-          style={{ justifySelf: 'center', borderBottom: '1px solid var(--ink)', paddingBottom: 4, color: 'inherit' }}>
+          style={{ justifySelf: 'center', borderBottom: `1px solid ${color.ink}`, paddingBottom: 4, color: 'inherit' }}>
           All Projects
         </Link>
         <Link
@@ -193,7 +159,7 @@ export function ProjectDetail({ project }: Props) {
           </span>
           <span style={{ fontSize: 14 }}>→</span>
         </Link>
-      </div>
+      </Grid>
     </div>
   );
 }

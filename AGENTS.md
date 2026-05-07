@@ -55,24 +55,54 @@ public/images/
 
 ## Architecture
 
-Next.js 16.2 App Router project with TypeScript, Tailwind CSS v4, and React 19.2.
+Next.js 16.2 App Router project with TypeScript and React 19.2. Tailwind CSS v4 is installed and configured, but utility-class usage is limited to a handful of shell utilities in `app/layout.tsx` (`min-h-full`, `flex`, `flex-col`, `flex-1`). The rest of the codebase uses the design system below — do not migrate inline styles to Tailwind utilities.
 
 - `app/` — App Router: all routes, layouts, and pages live here
-- `app/layout.tsx` — root layout; wraps every page with Geist fonts and base Tailwind classes
+- `app/layout.tsx` — root layout; loads Cormorant Garamond (serif) and Inter (sans) via `next/font/google` and exposes them as the `--font-cormorant` / `--font-inter` CSS vars
 - `app/page.tsx` — home route (`/`)
+- `components/ui/` — design system primitives (`Section`, `Grid`, `Container`, `Heading`, `Eyebrow`)
+- `components/` — feature components (`Header`, `Footer`, `HeroGrid`, `GridCell`, `ProjectsGrid`, `ProjectDetail`, `StatementSection`, `ProjectStrip`, `Wordmark`, `HomeShell`)
 - `hooks/` — React hooks, one per file. File name matches the hook name (e.g. `useScrollY.ts` exports `useScrollY`). Import as `@/hooks/useFoo`. Do not bundle multiple hooks into a single file.
+- `lib/tokens.ts` — single source of truth for color, spacing, typography, motion tokens
 - `public/` — static assets served at `/`
 - Path alias `@/` maps to the repo root
 
 ESLint uses the flat config format (`eslint.config.mjs`) with `eslint-config-next/core-web-vitals` and `eslint-config-next/typescript`. The legacy `.eslintrc` format is not used.
+
+## Design system
+
+The codebase has a small, opinionated design system. Prefer it over new CSS or ad-hoc inline styles. Spacing changes should be one-line edits — to a token in `lib/tokens.ts` or a prop on a primitive. If you're reaching for new CSS rules to fix spacing, something is wrong.
+
+**Tokens — `lib/tokens.ts`:**
+
+- `color` — `{ bg, ink, inkSoft, hairline, divider }`. All resolve via CSS vars (`var(--bg)` etc.).
+- `text` — `{ display, section, card, body, bodySm }`. Spread into a style: `style={{ ...text.body }}`.
+- `motion` — `{ ease, durFast, durMed, durSlow, durXSlow }`. Compose into transitions: `` transition: `opacity ${motion.durMed} ${motion.ease}` ``.
+- `sectionPadY` — `{ none, xxs, xs, sm, md, lg, xl, '2xl' }`, each `{ d, m }`. Desktop values are 0/60/80/120/140/160/180/200; mobile values follow ~40% ratio (0/24/32/48/56/64/72/80). Consumed by `<Section>` — rarely used directly.
+- `gutter` — `{ d: '8vw', m: '24px' }`. Consumed by `<Section>` and `<Grid>`.
+- `space` — px scale (4, 8, 14, 22, 32, 48, 60, 80, 100, 140, 180). Use for one-off spacing.
+
+**Primitives — `components/ui/`:**
+
+- `<Section>` — page section wrapper. Owns vertical padding (preset `padY` or `padTop`/`padBottom`), horizontal gutter, optional `topBorder`, and the desktop/mobile padding split via `useCompact(600)`. `as` accepts `'section' | 'div' | 'article' | 'header' | 'footer' | 'form'`. Forwards `ref` and inherits `HTMLAttributes` (so `onSubmit`, `aria-*`, `id`, etc. flow through).
+- `<Grid>` — responsive grid. `cols` accepts a string (auto-collapses to `'1fr'` at ≤1024px, like the `useCols` pattern) or `{ d, t?, m }` for explicit per-tier control where `t` falls back to `m`. `gap`/`rowGap`/`columnGap` take the same form. Replaces inline `gridTemplateColumns: cols(...)` patterns.
+- `<Container>` — max-width content wrapper with optional `align: 'left' | 'center'`. Used inside `<Section>` for capped editorial widths (e.g. `maxWidth={1100}` or `1400`).
+- `<Heading>` — `level: 'display' | 'section' | 'card'` drives the typography token. `as` overrides the rendered tag (defaults: display→h1, section→h2, card→h3). `italic` and `serif` (default `true`) handle common variants. Style overrides win over level defaults.
+- `<Eyebrow>` — wraps the `.micro` / `.micro-sm` + opacity pattern (used 40+ times across the site). `size: 'sm' | 'md'`, `opacity` defaults to 0.55.
+
+**When to use raw elements instead of primitives:**
+
+- **Bespoke poster typography** (e.g. Press hero h1 at `clamp(96px, 16vw, 280px)`, Services hero at 132px). Forcing through `<Heading>` with style overrides for every property defeats the point. Use raw `<h1 className="serif" style={{ ..., margin: 0 }}>`.
+- **Bespoke gutters** (`ProjectsGrid` uses 32px desktop / 20px mobile to maximize tile width; `ProjectDetail`'s top-bar and footer-nav use 36px to align with the global header). `<Section>`'s `8vw` desktop gutter would crop content too tightly. Use a raw `<section>` / `<div>` and apply tokens for color/motion.
+- **Full-bleed heroes** (Services hero at `100vh` with absolute-positioned content). `<Section>` is for padded content blocks, not edge-to-edge layout.
 
 ## CSS pitfalls (regression-guarded)
 
 - **Never** apply `overflow: hidden` (or `overflow-x` / `overflow-y: hidden`) to `html`, `body`, or `:root`. It creates a scroll container and silently disables `position: sticky` on every descendant. The Services page quick-links nav (`app/services/page.tsx`) is the canary — if it stops sticking, suspect this rule first. `npm run lint` enforces this via `scripts/check-css.mjs`.
 - To suppress horizontal overflow at the root, use `overflow-x: clip` instead. Per spec, `clip` hides overflowing content without becoming a scroll container, so sticky positioning of descendants still works. `body { overflow-x: clip }` is the current setup in `globals.css` and is intentional.
 - If a specific component (not the root) is overflowing, prefer fixing the source: `width: 100%`, `min-width: 0`, `flex-basis: min(<px>, <vw>)`, or scoped `overflow: hidden` on a container that is not an ancestor of any sticky element.
-- Layout responsiveness is JS-driven via `hooks/useCompact.ts` (matches `(max-width: 1024px)`) for components built from inline styles (`Footer`, `HeroGrid`, `Header`, and the `app/about`, `app/press`, `app/services` pages). CSS attribute selectors against inline styles also exist in `app/globals.css` as a secondary safety net — but for anything load-bearing (especially `gridTemplateColumns`), use the JS hook.
-- Gotcha: `[style*='grid-template-columns: 1fr 1fr']` does **not** match `1.4fr 1fr 1fr 1fr` because the property name is followed by `1.4fr`, not `1fr` — the substring must appear immediately after `grid-template-columns: `. Substring-style attribute selectors are easy to miswrite and brittle to React's serialization. The page/component pattern is `const cols = (desktop) => compact ? '1fr' : desktop;` then `gridTemplateColumns: cols('1.4fr 1fr 1fr 1fr')` — single source of truth, matches at runtime.
+- Layout responsiveness is fully JS-driven. Use `useCompact()` (default `(max-width: 1024px)`) and the `useCols()` helper from `hooks/useCompact.ts` to switch grid templates between desktop and tablet/mobile values. Section vertical padding and gutter are owned by the `<Section>` primitive (`components/ui/Section.tsx`) which uses `useCompact(600)` for the desktop/mobile split. Token presets live in `lib/tokens.ts` (`sectionPadY`, `gutter`, `text`, `motion`, `color`).
+- A handful of mobile-only CSS rules remain in `app/globals.css` (≤600px): hero height clamps for `section[style*='height: 100vh']`, the services quick-links sticky nav scroll behaviour, header padding, the `header > div > nav { display: none }` rule that's load-bearing for the compact Header layout, and a few accessibility/typography defaults. Anything relying on inline-style attribute selectors for grids or padding has been removed — those concerns now live in the design system primitives.
 
 ## Next.js 16 Breaking Changes to Know
 
