@@ -62,7 +62,7 @@ export function ProjectDetail({ project }: Props) {
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           transform: opening ? 'scale(1.05)' : 'scale(1)',
-          transition: 'transform 1.2s cubic-bezier(.22,.61,.36,1), background-image 0.6s ease'
+          transition: 'transform 1.2s cubic-bezier(.22,.61,.36,1)'
         }}
       />
 
@@ -129,6 +129,8 @@ export function ProjectDetail({ project }: Props) {
           <button
             key={src + i}
             onClick={() => setImgIndex(i)}
+            aria-label={`View plate ${i + 1} of ${project.title}`}
+            aria-pressed={imgIndex === i}
             style={{
               cursor: 'pointer',
               textAlign: 'left',
