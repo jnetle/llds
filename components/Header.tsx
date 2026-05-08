@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { useCompact } from '@/hooks/useCompact';
+import { color } from '@/lib/tokens';
 import { Wordmark } from './Wordmark';
 
 const NAV = [
@@ -44,7 +45,9 @@ export function Header() {
     };
   }, [menuOpen]);
 
-  const fg = '#F4F0E8';
+  // Foreground for the fixed header — light text (bg color) sits over the
+  // dark gradient overlay below so it reads on imagery-heavy pages.
+  const fg = color.bg;
 
   return (
     <>

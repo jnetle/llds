@@ -4,6 +4,10 @@ import Link from 'next/link';
 import { useState, type CSSProperties, type ReactNode } from 'react';
 import { useReveal } from '@/hooks/useReveal';
 import { useCompact } from '@/hooks/useCompact';
+import { Eyebrow } from '@/components/ui/Eyebrow';
+import { Heading } from '@/components/ui/Heading';
+import { Section } from '@/components/ui/Section';
+import { color, motion, text } from '@/lib/tokens';
 
 type FormState = {
   name: string;
@@ -57,10 +61,10 @@ const DISCOVERY = ['Press / magazine', 'Instagram', 'Referral', 'Stellar Awards'
 const inputStyle: CSSProperties = {
   background: 'transparent',
   border: 'none',
-  borderBottom: '1px solid var(--hairline)',
+  borderBottom: `1px solid ${color.hairline}`,
   padding: '12px 0',
   fontSize: 17,
-  color: 'var(--ink)',
+  color: color.ink,
   fontFamily: 'inherit',
   outline: 'none',
   transition: 'border-color 0.3s'
@@ -84,10 +88,10 @@ const fieldsetStyle: CSSProperties = {
 function Field({ label, required, children }: { label: string; required?: boolean; children: ReactNode }) {
   return (
     <label style={{ display: 'grid', gap: 10 }}>
-      <span className="micro-sm" style={{ opacity: 0.6 }}>
+      <Eyebrow as="span" size="sm" opacity={0.6}>
         {label}
         {required && <span style={{ marginLeft: 6, opacity: 0.5 }}>*</span>}
-      </span>
+      </Eyebrow>
       {children}
     </label>
   );
@@ -103,9 +107,9 @@ function Chip({ label, active, onClick }: { label: string; active: boolean; onCl
       style={{
         padding: '10px 18px',
         borderRadius: 100,
-        border: '1px solid ' + (active ? 'var(--ink)' : 'var(--hairline)'),
-        background: active ? 'var(--ink)' : 'transparent',
-        color: active ? 'var(--bg)' : 'var(--ink)',
+        border: '1px solid ' + (active ? color.ink : color.hairline),
+        background: active ? color.ink : 'transparent',
+        color: active ? color.bg : color.ink,
         cursor: 'pointer',
         transition: 'all 0.25s'
       }}>
@@ -146,8 +150,6 @@ export default function InquirePage() {
         role="status"
         aria-live="polite"
         style={{
-          background: 'var(--bg)',
-          color: 'var(--ink)',
           minHeight: '100vh',
           display: 'grid',
           placeItems: 'center',
@@ -155,21 +157,13 @@ export default function InquirePage() {
           textAlign: 'center'
         }}>
         <div style={{ maxWidth: 640 }}>
-          <div className="micro" style={{ opacity: 0.55, marginBottom: 24 }}>
-            — Thank You
-          </div>
-          <h1
-            className="serif"
-            style={{
-              fontSize: 'clamp(48px, 7vw, 96px)',
-              fontWeight: 300,
-              lineHeight: 1,
-              letterSpacing: '-0.015em',
-              marginBottom: 32
-            }}>
+          <Eyebrow style={{ marginBottom: 24 }}>— Thank You</Eyebrow>
+          <Heading
+            level="display"
+            style={{ fontSize: 'clamp(48px, 7vw, 96px)', lineHeight: 1, letterSpacing: '-0.015em', marginBottom: 32 }}>
             Your inquiry is <span style={{ fontStyle: 'italic' }}>received</span>.
-          </h1>
-          <p style={{ fontSize: 18, lineHeight: 1.7, color: 'var(--ink-soft)', marginBottom: 48 }}>
+          </Heading>
+          <p style={{ ...text.body, fontSize: 18, marginBottom: 48 }}>
             Maria will be in touch within three working days. In the meantime, you may wish to read our{' '}
             <Link href="/projects" style={{ borderBottom: '1px solid currentColor', paddingBottom: 1 }}>
               recent projects
@@ -191,53 +185,40 @@ export default function InquirePage() {
   };
 
   return (
-    <div style={{ background: 'var(--bg)', color: 'var(--ink)' }}>
+    <>
       {/* Hero */}
-      <section style={{ padding: '180px 8vw 60px', borderBottom: '1px solid var(--hairline)' }}>
-        <div className="micro" style={{ opacity: 0.55, marginBottom: 28 }}>
-          — New Inquiries
-        </div>
-        <h1
-          className="serif"
-          style={{
-            fontSize: 'clamp(56px, 8vw, 140px)',
-            fontWeight: 300,
-            lineHeight: 0.96,
-            letterSpacing: '-0.018em',
-            maxWidth: '14ch'
-          }}>
+      <Section padTop="xl" padBottom="xxs" style={{ borderBottom: `1px solid ${color.hairline}` }}>
+        <Eyebrow style={{ marginBottom: 28 }}>— New Inquiries</Eyebrow>
+        <Heading
+          level="display"
+          style={{ fontSize: 'clamp(56px, 8vw, 140px)', lineHeight: 0.96, letterSpacing: '-0.018em', maxWidth: '14ch' }}>
           Begin a <span style={{ fontStyle: 'italic' }}>conversation</span>.
-        </h1>
-        <p
-          style={{
-            marginTop: 40,
-            fontSize: 18,
-            lineHeight: 1.7,
-            color: 'var(--ink-soft)',
-            maxWidth: '54ch'
-          }}>
+        </Heading>
+        <p style={{ ...text.body, fontSize: 18, marginTop: 40, maxWidth: '54ch' }}>
           Tell us a little about your home and the life you&apos;d like it to hold. The more you share, the more thoughtfully we can
           respond. We review each inquiry personally.
         </p>
-      </section>
+      </Section>
 
       {/* Form */}
-      <form
+      <Section
+        as="form"
         ref={ref}
+        padTop="xs"
+        padBottom="xxs"
         onSubmit={e => {
           e.preventDefault();
           setSubmitted(true);
           window.scrollTo({ top: 0, behavior: 'smooth' });
         }}
         style={{
-          padding: '100px 8vw 60px',
           display: 'grid',
           gap: 80,
           maxWidth: 1100,
           margin: '0 auto',
           opacity: seen ? 1 : 0,
           transform: seen ? 'translateY(0)' : 'translateY(24px)',
-          transition: 'all 1.1s cubic-bezier(.22,.61,.36,1)'
+          transition: `all ${motion.durXSlow} ${motion.ease}`
         }}>
         {/* About you */}
         <fieldset style={fieldsetStyle}>
@@ -300,7 +281,7 @@ export default function InquirePage() {
                     value={opt}
                     checked={form.scope === opt}
                     onChange={() => update('scope', opt)}
-                    style={{ marginTop: 5, accentColor: 'var(--ink)' }}
+                    style={{ marginTop: 5, accentColor: color.ink }}
                   />
                   <span>{opt}</span>
                 </label>
@@ -366,7 +347,7 @@ export default function InquirePage() {
               placeholder="The site, the people who'll live there, what's drawing you to the studio, anything that feels relevant…"
               style={{
                 ...inputStyle,
-                border: '1px solid var(--hairline)',
+                border: `1px solid ${color.hairline}`,
                 padding: '14px 16px',
                 resize: 'vertical',
                 minHeight: 140,
@@ -382,21 +363,21 @@ export default function InquirePage() {
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center',
-            borderTop: '1px solid var(--hairline)',
+            borderTop: `1px solid ${color.hairline}`,
             paddingTop: 40,
             gap: 24,
             flexWrap: 'wrap'
           }}>
-          <p className="micro-sm" style={{ opacity: 0.55, maxWidth: '46ch', lineHeight: 1.6 }}>
+          <Eyebrow size="sm" opacity={0.55} style={{ maxWidth: '46ch', lineHeight: 1.6 }} as="p">
             By submitting, you agree to be contacted regarding your project. Your details remain private and are never shared with third
             parties.
-          </p>
+          </Eyebrow>
           <button
             type="submit"
             style={{
               padding: '16px 40px',
-              background: 'var(--ink)',
-              color: 'var(--bg)',
+              background: color.ink,
+              color: color.bg,
               border: 'none',
               borderRadius: 100,
               cursor: 'pointer',
@@ -408,7 +389,7 @@ export default function InquirePage() {
             Send Inquiry
           </button>
         </div>
-      </form>
-    </div>
+      </Section>
+    </>
   );
 }

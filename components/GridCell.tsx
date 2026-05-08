@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import type { Project } from '@/lib/projects';
+import { color, motion } from '@/lib/tokens';
 
 type GridCellProps = {
   project: Project;
@@ -37,7 +38,7 @@ export function GridCell({ project, index, scrollY, rowOffsetTop, onOpen }: Grid
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           transform: `${imgTransform} translateY(${-parallaxOffset}px)`,
-          transition: 'transform 0.9s cubic-bezier(.22,.61,.36,1), filter 0.6s ease'
+          transition: `transform ${motion.durSlow} ${motion.ease}, filter ${motion.durMed} ease`
         }}
       />
 
@@ -56,10 +57,10 @@ export function GridCell({ project, index, scrollY, rowOffsetTop, onOpen }: Grid
           left: 32,
           right: 32,
           bottom: 64,
-          color: '#F4F0E8',
+          color: color.bg,
           transform: hovered ? 'translateY(0)' : 'translateY(20px)',
           opacity: hovered ? 1 : 0.85,
-          transition: 'transform 0.6s cubic-bezier(.22,.61,.36,1), opacity 0.6s ease',
+          transition: `transform ${motion.durMed} ${motion.ease}, opacity ${motion.durMed} ease`,
           pointerEvents: 'none'
         }}>
         <div className="micro-sm" style={{ opacity: 0.75, marginBottom: 10 }}>
@@ -85,13 +86,13 @@ export function GridCell({ project, index, scrollY, rowOffsetTop, onOpen }: Grid
             gap: 14,
             opacity: hovered ? 1 : 0,
             transform: hovered ? 'translateY(0)' : 'translateY(8px)',
-            transition: 'transform 0.5s ease 0.1s, opacity 0.5s ease 0.1s'
+            transition: `transform ${motion.durMed} ease 0.1s, opacity ${motion.durMed} ease 0.1s`
           }}>
           <span className="micro" style={{ fontSize: 10 }}>
             View Project
           </span>
           <svg width="32" height="8" viewBox="0 0 32 8" fill="none">
-            <path d="M0 4 H30 M26 1 L30 4 L26 7" stroke="#F4F0E8" strokeWidth="0.8" />
+            <path d="M0 4 H30 M26 1 L30 4 L26 7" style={{ stroke: color.bg }} strokeWidth="0.8" />
           </svg>
         </div>
       </div>

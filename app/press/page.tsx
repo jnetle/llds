@@ -2,7 +2,10 @@
 
 import Link from 'next/link';
 import { useReveal } from '@/hooks/useReveal';
-import { useCompact, useCols } from '@/hooks/useCompact';
+import { useCols } from '@/hooks/useCompact';
+import { Eyebrow } from '@/components/ui/Eyebrow';
+import { Section } from '@/components/ui/Section';
+import { color, motion, text } from '@/lib/tokens';
 
 const AWARDS = [
   {
@@ -49,18 +52,17 @@ const FEATURE_META: [string, string][] = [
 export default function PressPage() {
   const [ref, seen] = useReveal<HTMLDivElement>();
   const [refFeature, seenFeature] = useReveal<HTMLDivElement>();
-  const compact = useCompact();
   const cols = useCols();
 
   return (
-    <div style={{ background: 'var(--bg)', color: 'var(--ink)' }}>
+    <>
       {/* Hero — broadsheet masthead */}
-      <section
+      <Section
+        padTop="xl"
+        padBottom="xs"
         style={{
           position: 'relative',
-          padding: '180px 8vw 90px',
-          background: 'var(--bg)',
-          borderBottom: '2px solid var(--hairline)',
+          borderBottom: `2px solid ${color.hairline}`,
           overflow: 'hidden'
         }}>
         <div style={{ position: 'relative' }}>
@@ -72,12 +74,14 @@ export default function PressPage() {
               lineHeight: 0.82,
               letterSpacing: '-0.035em',
               textTransform: 'uppercase',
-              textWrap: 'balance'
+              textWrap: 'balance',
+              margin: 0
             }}>
             Press
           </h1>
           <div
             className="serif"
+            aria-hidden
             style={{
               position: 'absolute',
               right: '6%',
@@ -86,7 +90,7 @@ export default function PressPage() {
               fontWeight: 300,
               fontStyle: 'italic',
               lineHeight: 1,
-              color: 'var(--ink)',
+              color: color.ink,
               opacity: 0.12,
               pointerEvents: 'none'
             }}>
@@ -101,19 +105,16 @@ export default function PressPage() {
               fontStyle: 'italic',
               letterSpacing: '-0.025em',
               marginTop: 4,
+              marginBottom: 0,
               marginLeft: '0.4em'
             }}>
             recognition
           </h1>
         </div>
-      </section>
+      </Section>
 
       {/* Stellar Awards intro */}
-      <section
-        style={{
-          padding: '140px 8vw 100px',
-          borderBottom: '1px solid var(--hairline)'
-        }}>
+      <Section padTop="md" padBottom="xs" style={{ borderBottom: `1px solid ${color.hairline}` }}>
         <div
           ref={ref}
           style={{
@@ -123,30 +124,16 @@ export default function PressPage() {
             alignItems: 'baseline',
             opacity: seen ? 1 : 0,
             transform: seen ? 'translateY(0)' : 'translateY(28px)',
-            transition: 'all 1s cubic-bezier(.22,.61,.36,1)'
+            transition: `all ${motion.durXSlow} ${motion.ease}`
           }}>
           <div>
-            <div
-              className="micro"
-              style={{
-                opacity: 0.55,
-                marginBottom: 22,
-                letterSpacing: '0.26em'
-              }}>
-              — Lead Story
-            </div>
-            <div
-              className="micro-sm"
-              style={{
-                opacity: 0.65,
-                letterSpacing: '0.26em',
-                marginBottom: 14
-              }}>
+            <Eyebrow style={{ marginBottom: 22, letterSpacing: '0.26em' }}>— Lead Story</Eyebrow>
+            <Eyebrow size="sm" opacity={0.65} style={{ letterSpacing: '0.26em', marginBottom: 14 }}>
               2026 · Stellar Awards
-            </div>
-            <div className="micro-sm" style={{ opacity: 0.55, letterSpacing: '0.22em' }}>
+            </Eyebrow>
+            <Eyebrow size="sm" opacity={0.55} style={{ letterSpacing: '0.22em' }}>
               Custom Built Spec Home
-            </div>
+            </Eyebrow>
           </div>
           <div>
             <h2
@@ -157,38 +144,24 @@ export default function PressPage() {
                 lineHeight: 1.18,
                 letterSpacing: '-0.005em',
                 textWrap: 'pretty',
-                marginBottom: 32
+                marginBottom: 32,
+                marginTop: 0
               }}>
               Laurel Leaf Design Studio was honoured at the <em style={{ fontWeight: 300 }}>Stellar Awards</em> with two recognitions in the
               Custom Built Spec Home category — <em style={{ fontWeight: 300 }}>Best Curb Appeal</em> and{' '}
               <em style={{ fontWeight: 300 }}>Best Kitchen</em>.
             </h2>
-            <p
-              style={{
-                fontSize: 17,
-                lineHeight: 1.7,
-                color: 'var(--ink-soft)',
-                maxWidth: '58ch'
-              }}>
+            <p style={{ ...text.body, maxWidth: '58ch' }}>
               The awards recognise homes built on speculation that nonetheless arrive with the considered detail of a bespoke commission.
               Both honours were given for a single project — a four-bedroom new build completed late last year, photographed below.
             </p>
           </div>
         </div>
-      </section>
+      </Section>
 
       {/* Award cards */}
-      <section
-        style={{
-          padding: '120px 8vw',
-          borderBottom: '1px solid var(--hairline)'
-        }}>
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: cols('repeat(2, 1fr)'),
-            gap: 60
-          }}>
+      <Section padY="sm" style={{ borderBottom: `1px solid ${color.hairline}` }}>
+        <div style={{ display: 'grid', gridTemplateColumns: cols('repeat(2, 1fr)'), gap: 60 }}>
           {AWARDS.map(a => (
             <article key={a.category} style={{ display: 'flex', flexDirection: 'column' }}>
               <div
@@ -200,17 +173,11 @@ export default function PressPage() {
                   backgroundPosition: 'center'
                 }}
               />
-              <div
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 14,
-                  marginBottom: 18
-                }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 18 }}>
                 <span style={{ fontSize: 22, lineHeight: 1 }}>★</span>
-                <div className="micro-sm" style={{ opacity: 0.6, letterSpacing: '0.24em' }}>
+                <Eyebrow size="sm" opacity={0.6} style={{ letterSpacing: '0.24em' }}>
                   Stellar Awards · {a.year}
-                </div>
+                </Eyebrow>
               </div>
               <h3
                 className="serif"
@@ -220,39 +187,26 @@ export default function PressPage() {
                   lineHeight: 1.0,
                   letterSpacing: '-0.012em',
                   textTransform: 'uppercase',
-                  marginBottom: 20
+                  marginBottom: 20,
+                  marginTop: 0
                 }}>
                 {a.category}
               </h3>
-              <div
-                className="micro"
-                style={{
-                  opacity: 0.65,
-                  marginBottom: 22,
-                  letterSpacing: '0.18em'
-                }}>
+              <Eyebrow opacity={0.65} style={{ marginBottom: 22, letterSpacing: '0.18em' }}>
                 {a.subcategory}
-              </div>
-              <p
-                style={{
-                  fontSize: 15.5,
-                  lineHeight: 1.65,
-                  color: 'var(--ink-soft)',
-                  maxWidth: '42ch'
-                }}>
-                {a.caption}
-              </p>
+              </Eyebrow>
+              <p style={{ ...text.bodySm, fontSize: 15.5, lineHeight: 1.65, maxWidth: '42ch' }}>{a.caption}</p>
             </article>
           ))}
         </div>
-      </section>
+      </Section>
 
       {/* Project gallery */}
-      <section
+      <Section
+        padY="lg"
         style={{
-          padding: '160px 8vw',
           background: 'rgba(42,46,37,0.04)',
-          borderBottom: '1px solid var(--hairline)'
+          borderBottom: `1px solid ${color.hairline}`
         }}>
         <div
           style={{
@@ -263,9 +217,7 @@ export default function PressPage() {
             marginBottom: 70
           }}>
           <div>
-            <div className="micro" style={{ opacity: 0.55, marginBottom: 22 }}>
-              — Project · The award-winning home
-            </div>
+            <Eyebrow style={{ marginBottom: 22 }}>— Project · The award-winning home</Eyebrow>
             <h2
               className="serif"
               style={{
@@ -273,28 +225,17 @@ export default function PressPage() {
                 fontWeight: 300,
                 lineHeight: 0.98,
                 letterSpacing: '-0.018em',
-                textTransform: 'uppercase'
+                textTransform: 'uppercase',
+                margin: 0
               }}>
               From the shoot
             </h2>
           </div>
-          <p
-            style={{
-              fontSize: 16.5,
-              lineHeight: 1.7,
-              color: 'var(--ink-soft)',
-              maxWidth: '46ch'
-            }}>
+          <p style={{ ...text.body, fontSize: 16.5, maxWidth: '46ch' }}>
             A small selection from the project&apos;s editorial photography. Full case study coming to the journal this autumn.
           </p>
         </div>
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: cols('repeat(6, 1fr)'),
-            gap: 16,
-            gridAutoRows: '180px'
-          }}>
+        <div style={{ display: 'grid', gridTemplateColumns: cols('repeat(6, 1fr)'), gap: 16, gridAutoRows: '180px' }}>
           {GALLERY.map((src, i) => {
             const l = GALLERY_LAYOUTS[i] ?? { col: 'span 2', row: 'span 1' };
             return (
@@ -311,25 +252,14 @@ export default function PressPage() {
             );
           })}
         </div>
-        <div
-          className="micro-sm"
-          style={{
-            marginTop: 32,
-            opacity: 0.55,
-            letterSpacing: '0.22em'
-          }}>
+        <Eyebrow size="sm" style={{ marginTop: 32, letterSpacing: '0.22em' }}>
           Photography: Studio archive · published on @laurelleaf.studio
-        </div>
-      </section>
+        </Eyebrow>
+      </Section>
 
       {/* Magazine feature */}
-      <section
-        style={{
-          padding: '160px 8vw'
-        }}>
-        <div className="micro" style={{ opacity: 0.55, marginBottom: 60 }}>
-          — Editorial · Forthcoming
-        </div>
+      <Section padY="lg">
+        <Eyebrow style={{ marginBottom: 60 }}>— Editorial · Forthcoming</Eyebrow>
         <div
           ref={refFeature}
           style={{
@@ -339,7 +269,7 @@ export default function PressPage() {
             alignItems: 'center',
             opacity: seenFeature ? 1 : 0,
             transform: seenFeature ? 'translateY(0)' : 'translateY(28px)',
-            transition: 'all 1s cubic-bezier(.22,.61,.36,1)'
+            transition: `all ${motion.durXSlow} ${motion.ease}`
           }}>
           <div style={{ position: 'relative' }}>
             <div
@@ -366,39 +296,19 @@ export default function PressPage() {
                   display: 'flex',
                   justifyContent: 'space-between',
                   alignItems: 'baseline',
-                  color: '#2A2E25'
+                  color: color.ink
                 }}>
-                <div
-                  className="serif"
-                  style={{
-                    fontSize: 36,
-                    fontWeight: 400,
-                    letterSpacing: '-0.01em',
-                    fontStyle: 'italic'
-                  }}>
+                <div className="serif" style={{ fontSize: 36, fontWeight: 400, letterSpacing: '-0.01em', fontStyle: 'italic' }}>
                   Magazine
                 </div>
-                <div className="micro-sm" style={{ opacity: 0.7, letterSpacing: '0.22em' }}>
+                <Eyebrow size="sm" opacity={0.7} style={{ letterSpacing: '0.22em' }}>
                   ISSUE TBC
-                </div>
+                </Eyebrow>
               </div>
-              <div
-                style={{
-                  position: 'absolute',
-                  left: 36,
-                  right: 36,
-                  bottom: 44,
-                  color: '#2A2E25'
-                }}>
-                <div
-                  className="micro-sm"
-                  style={{
-                    opacity: 0.65,
-                    letterSpacing: '0.26em',
-                    marginBottom: 14
-                  }}>
+              <div style={{ position: 'absolute', left: 36, right: 36, bottom: 44, color: color.ink }}>
+                <Eyebrow size="sm" opacity={0.65} style={{ letterSpacing: '0.26em', marginBottom: 14 }}>
                   COVER STORY · TBA
-                </div>
+                </Eyebrow>
                 <div
                   className="serif"
                   style={{
@@ -419,42 +329,20 @@ export default function PressPage() {
                   display: 'grid',
                   placeItems: 'center'
                 }}>
-                <div
-                  className="micro-sm"
-                  style={{
-                    opacity: 0.55,
-                    letterSpacing: '0.28em',
-                    textAlign: 'center',
-                    color: '#2A2E25'
-                  }}>
+                <Eyebrow size="sm" style={{ letterSpacing: '0.28em', textAlign: 'center', color: color.ink }}>
                   Image
                   <br />
                   placeholder
-                </div>
+                </Eyebrow>
               </div>
             </div>
-            <div
-              className="micro-sm"
-              style={{
-                marginTop: 18,
-                opacity: 0.55,
-                letterSpacing: '0.24em',
-                textAlign: 'center'
-              }}>
+            <Eyebrow size="sm" style={{ marginTop: 18, letterSpacing: '0.24em', textAlign: 'center' }}>
               [ Awaiting publication artwork ]
-            </div>
+            </Eyebrow>
           </div>
 
           <div>
-            <div
-              className="micro"
-              style={{
-                opacity: 0.55,
-                marginBottom: 24,
-                letterSpacing: '0.26em'
-              }}>
-              Magazine feature · placeholder
-            </div>
+            <Eyebrow style={{ marginBottom: 24, letterSpacing: '0.26em' }}>Magazine feature · placeholder</Eyebrow>
             <h2
               className="serif"
               style={{
@@ -463,18 +351,12 @@ export default function PressPage() {
                 lineHeight: 1.05,
                 letterSpacing: '-0.012em',
                 textWrap: 'balance',
-                marginBottom: 32
+                marginBottom: 32,
+                marginTop: 0
               }}>
               An <em style={{ fontWeight: 300 }}>upcoming feature</em> with a national interiors title.
             </h2>
-            <p
-              style={{
-                fontSize: 17,
-                lineHeight: 1.7,
-                color: 'var(--ink-soft)',
-                maxWidth: '52ch',
-                marginBottom: 28
-              }}>
+            <p style={{ ...text.body, maxWidth: '52ch', marginBottom: 28 }}>
               Details, cover artwork, and the full editorial spread will be added here once embargo lifts. The piece focuses on the
               studio&apos;s approach to spec homes that read as bespoke — and how restraint, rather than flourish, carried both
               award-winning rooms.
@@ -484,7 +366,7 @@ export default function PressPage() {
                 listStyle: 'none',
                 display: 'grid',
                 gap: 14,
-                borderTop: '1px solid var(--hairline)',
+                borderTop: `1px solid ${color.hairline}`,
                 paddingTop: 22
               }}>
               {FEATURE_META.map(([k, v]) => (
@@ -495,12 +377,12 @@ export default function PressPage() {
                     gridTemplateColumns: cols('180px 1fr'),
                     gap: 24,
                     paddingBottom: 14,
-                    borderBottom: '1px solid var(--hairline)',
+                    borderBottom: `1px solid ${color.hairline}`,
                     alignItems: 'baseline'
                   }}>
-                  <span className="micro-sm" style={{ opacity: 0.6, letterSpacing: '0.22em' }}>
+                  <Eyebrow as="span" size="sm" opacity={0.6} style={{ letterSpacing: '0.22em' }}>
                     {k}
-                  </span>
+                  </Eyebrow>
                   <span className="serif" style={{ fontSize: 19, fontWeight: 300 }}>
                     {v}
                   </span>
@@ -509,21 +391,14 @@ export default function PressPage() {
             </ul>
           </div>
         </div>
-      </section>
+      </Section>
 
       {/* CTA back */}
-      <section style={{ padding: '0 8vw 180px', textAlign: 'center' }}>
-        <Link
-          href="/"
-          className="micro"
-          style={{
-            borderBottom: '1px solid currentColor',
-            paddingBottom: 6,
-            letterSpacing: '0.28em'
-          }}>
+      <Section padTop="none" padBottom="xl" style={{ textAlign: 'center' }}>
+        <Link href="/" className="micro" style={{ borderBottom: '1px solid currentColor', paddingBottom: 6, letterSpacing: '0.28em' }}>
           ↵ Return to Projects
         </Link>
-      </section>
-    </div>
+      </Section>
+    </>
   );
 }

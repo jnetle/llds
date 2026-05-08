@@ -4,6 +4,10 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useReveal } from '@/hooks/useReveal';
 import { useCompact } from '@/hooks/useCompact';
+import { Section } from '@/components/ui/Section';
+import { Eyebrow } from '@/components/ui/Eyebrow';
+import { Heading } from '@/components/ui/Heading';
+import { color, motion, text } from '@/lib/tokens';
 
 const PRINCIPLES = [
   {
@@ -21,12 +25,12 @@ const PRINCIPLES = [
 ];
 
 export default function AboutPage() {
-  const [ref, seen] = useReveal<HTMLElement>();
+  const [ref, seen] = useReveal<HTMLDivElement>();
   const compact = useCompact();
 
   return (
-    <div style={{ background: 'var(--bg)', color: 'var(--ink)' }}>
-      {/* Hero */}
+    <>
+      {/* Hero — full-bleed, no Section wrapper (atypical layout) */}
       <section
         style={{
           position: 'relative',
@@ -35,13 +39,7 @@ export default function AboutPage() {
           display: 'grid',
           gridTemplateColumns: compact ? '1fr' : '1.1fr 1fr'
         }}>
-        <div
-          style={{
-            position: 'relative',
-            overflow: 'hidden',
-            height: compact ? '82vh' : '100%'
-          }}>
-          {/* Portraits via `next/image fill`: default objectPosition to 'center 25%' to keep faces in frame as aspect ratios narrow. */}
+        <div style={{ position: 'relative', overflow: 'hidden', height: compact ? '82vh' : '100%' }}>
           <Image
             src="/images/profile/maria39.jpg"
             alt="Maria Rhinehart, founder of Laurel Leaf Design Studio"
@@ -59,7 +57,7 @@ export default function AboutPage() {
                 right: 0,
                 bottom: 0,
                 height: '38%',
-                background: 'linear-gradient(to bottom, transparent 0%, var(--bg) 92%)',
+                background: `linear-gradient(to bottom, transparent 0%, ${color.bg} 92%)`,
                 pointerEvents: 'none'
               }}
             />
@@ -70,30 +68,15 @@ export default function AboutPage() {
             display: 'flex',
             flexDirection: 'column',
             justifyContent: 'center',
-            padding: compact ? '8px 8vw 80px' : '0 8vw',
+            padding: compact ? '0 var(--gutter) 40px' : '0 var(--gutter)',
+            marginTop: compact ? -32 : 0,
             gap: 34
           }}>
-          <div className="micro" style={{ opacity: 0.55 }}>
-            — The Studio
-          </div>
-          <h1
-            className="serif"
-            style={{
-              fontSize: 'clamp(44px, 5.2vw, 84px)',
-              lineHeight: 1.02,
-              fontWeight: 300,
-              letterSpacing: '-0.012em',
-              textWrap: 'balance'
-            }}>
+          <Eyebrow>— The Studio</Eyebrow>
+          <Heading level="display">
             An unhurried practice <em style={{ fontWeight: 300 }}>rooted</em> in the English countryside.
-          </h1>
-          <p
-            style={{
-              fontSize: 17,
-              lineHeight: 1.7,
-              color: 'var(--ink-soft)',
-              maxWidth: '46ch'
-            }}>
+          </Heading>
+          <p style={{ ...text.body, maxWidth: '46ch' }}>
             Laurel Leaf Design Studio was founded by Maria Rhinehart in XXXX after a decade working across residential architecture and
             antique dealing. The studio operates from a small mews in Bloomsbury, with a second workshop in rural Oxfordshire.
           </p>
@@ -101,10 +84,11 @@ export default function AboutPage() {
       </section>
 
       {/* Portrait + Approach */}
-      <section
-        ref={ref}
+      <Section
+        as="section"
+        padTop="xs"
+        padBottom="lg"
         style={{
-          padding: '160px 8vw',
           display: 'grid',
           gridTemplateColumns: compact ? '1fr' : '1fr 1.3fr',
           gap: compact ? 48 : 100,
@@ -114,7 +98,7 @@ export default function AboutPage() {
           style={{
             opacity: seen ? 1 : 0,
             transform: seen ? 'translateY(0)' : 'translateY(30px)',
-            transition: 'all 1s cubic-bezier(.22,.61,.36,1)',
+            transition: `all ${motion.durXSlow} ${motion.ease}`,
             position: compact ? 'static' : 'sticky',
             top: compact ? 'auto' : 120
           }}>
@@ -135,7 +119,7 @@ export default function AboutPage() {
               alignItems: 'center',
               marginTop: 32,
               paddingTop: 32,
-              borderTop: '1px solid var(--hairline)'
+              borderTop: `1px solid ${color.hairline}`
             }}>
             <Image
               src="/images/profile/maria36.jpg"
@@ -143,60 +127,31 @@ export default function AboutPage() {
               width={90}
               height={110}
               sizes="90px"
-              style={{
-                objectFit: 'cover',
-                objectPosition: 'center 20%',
-                filter: 'grayscale(0.85)'
-              }}
+              style={{ objectFit: 'cover', objectPosition: 'center 20%', filter: 'grayscale(0.85)' }}
             />
             <div>
-              <div
-                className="serif"
-                style={{
-                  fontSize: 26,
-                  fontWeight: 300,
-                  fontStyle: 'italic',
-                  letterSpacing: '0.01em'
-                }}>
+              <div className="serif" style={{ fontSize: 26, fontWeight: 300, fontStyle: 'italic', letterSpacing: '0.01em' }}>
                 Maria Rhinehart
               </div>
-              <div className="micro-sm" style={{ marginTop: 8, opacity: 0.6 }}>
+              <Eyebrow size="sm" opacity={0.6} style={{ marginTop: 8 }}>
                 Founder &amp; Interior Designer
-              </div>
+              </Eyebrow>
             </div>
           </div>
         </div>
         <div
+          ref={ref}
           style={{
             opacity: seen ? 1 : 0,
             transform: seen ? 'translateY(0)' : 'translateY(30px)',
-            transition: 'all 1s cubic-bezier(.22,.61,.36,1) 0.15s'
+            transition: `all ${motion.durXSlow} ${motion.ease} 0.15s`
           }}>
-          <div className="micro" style={{ marginBottom: 30, opacity: 0.55 }}>
-            — Approach
-          </div>
-          <h2
-            className="serif"
-            style={{
-              fontSize: 'clamp(30px, 3vw, 44px)',
-              fontWeight: 300,
-              lineHeight: 1.2,
-              letterSpacing: '-0.005em',
-              marginBottom: 36,
-              textWrap: 'pretty'
-            }}>
+          <Eyebrow style={{ marginBottom: 30 }}>— Approach</Eyebrow>
+          <Heading level="section" style={{ marginBottom: 36 }}>
             A home is more than a collection of finishes — it is shaped by how we live, what we value, and the places that have left an
             impression on us.
-          </h2>
-          <div
-            style={{
-              display: 'grid',
-              gap: 22,
-              fontSize: 17,
-              lineHeight: 1.75,
-              color: 'var(--ink-soft)',
-              maxWidth: '58ch'
-            }}>
+          </Heading>
+          <div style={{ display: 'grid', gap: 22, maxWidth: '58ch', ...text.body, lineHeight: 1.75 }}>
             <p>Every project begins with understanding not just how a space should look, but how it should feel.</p>
             <p>
               The architecture, the surroundings, the way light moves through a room, the scale of a space in relation to how it&apos;s
@@ -221,60 +176,36 @@ export default function AboutPage() {
             </p>
           </div>
         </div>
-      </section>
+      </Section>
 
       {/* Principles */}
-      <section style={{ padding: '0 8vw 160px' }}>
-        <div className="micro" style={{ marginBottom: 60, opacity: 0.55 }}>
-          — Principles
-        </div>
+      <Section padTop="none" padBottom="lg">
+        <Eyebrow style={{ marginBottom: 60 }}>— Principles</Eyebrow>
         <div
           style={{
             display: 'grid',
             gridTemplateColumns: compact ? '1fr' : 'repeat(3, 1fr)',
             gap: compact ? 32 : 60,
-            borderTop: '1px solid var(--hairline)',
+            borderTop: `1px solid ${color.hairline}`,
             paddingTop: 50
           }}>
           {PRINCIPLES.map(v => (
             <div key={v.h}>
-              <h3
-                className="serif"
-                style={{
-                  fontSize: 26,
-                  fontWeight: 300,
-                  fontStyle: 'italic',
-                  marginBottom: 18,
-                  lineHeight: 1.2
-                }}>
+              <Heading level="card" italic style={{ marginBottom: 18 }}>
                 {v.h}
-              </h3>
-              <p
-                style={{
-                  fontSize: 15,
-                  lineHeight: 1.7,
-                  color: 'var(--ink-soft)'
-                }}>
-                {v.p}
-              </p>
+              </Heading>
+              <p style={text.bodySm}>{v.p}</p>
             </div>
           ))}
         </div>
-      </section>
+      </Section>
 
       {/* CTA back */}
-      <section style={{ padding: '0 8vw 180px', textAlign: 'center' }}>
-        <Link
-          href="/"
-          className="micro"
-          style={{
-            borderBottom: '1px solid currentColor',
-            paddingBottom: 6,
-            letterSpacing: '0.28em'
-          }}>
+      <Section padTop="none" padBottom="xl" style={{ textAlign: 'center' }}>
+        <Link href="/" className="micro" style={{ borderBottom: '1px solid currentColor', paddingBottom: 6, letterSpacing: '0.28em' }}>
           ↵ Return to Projects
         </Link>
-      </section>
-    </div>
+      </Section>
+    </>
   );
 }
