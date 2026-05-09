@@ -6,7 +6,6 @@ import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties }
 import { useForm, Controller, useWatch } from 'react-hook-form';
 import { ShowWhen } from './ShowWhen';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useReveal } from '@/hooks/useReveal';
 import { Eyebrow } from '@/components/ui/Eyebrow';
 import { Heading } from '@/components/ui/Heading';
 import { Section } from '@/components/ui/Section';
@@ -138,7 +137,6 @@ const defaultValues: InquiryInput = {
 };
 
 export default function InquirePage() {
-  const [ref, seen] = useReveal<HTMLFormElement>();
   const [submitted, setSubmitted] = useState(false);
   const [serverError, setServerError] = useState<string | null>(null);
   const [attempted, setAttempted] = useState(false);
@@ -173,6 +171,11 @@ export default function InquirePage() {
   const priorities = useWatch({ control, name: 'priorities' });
 
   // Reveal-on-scroll for form bands. Re-arms when `submitted` flips back.
+  // threshold is a fraction of the *target's* size — for bands taller than the
+  // viewport, intersectionRatio caps at viewport/target and may never reach a
+  // fixed threshold, leaving the band stuck at opacity 0 (the bug seen on
+  // refresh). Use threshold 0 + rootMargin so reveal fires the moment any
+  // part of the band enters view.
   useEffect(() => {
     if (submitted) return;
     const bands = document.querySelectorAll('.form-band');
@@ -186,7 +189,7 @@ export default function InquirePage() {
           }
         });
       },
-      { threshold: 0.18, rootMargin: '0px 0px -10% 0px' }
+      { threshold: 0, rootMargin: '0px 0px -10% 0px' }
     );
     bands.forEach(b => io.observe(b));
     return () => io.disconnect();
@@ -289,17 +292,16 @@ export default function InquirePage() {
         </p>
       </Section>
 
-      {/* Form */}
+      {/* Form — always visible. Previously hidden behind a useReveal IO that
+          could fail on refresh/scroll-restoration, leaving the entire form
+          at opacity 0 with no recovery path. Per-band entrance fades had the
+          same problem and were removed in globals.css. */}
       <form
-        ref={ref}
         onSubmit={onSubmit}
         style={{
           padding: 0,
           display: 'grid',
-          gap: 0,
-          opacity: seen ? 1 : 0,
-          transform: seen ? 'translateY(0)' : 'translateY(24px)',
-          transition: `all ${motion.durXSlow} ${motion.ease}`
+          gap: 0
         }}>
         {/* Honeypot — bots fill, humans don't */}
         <input {...register('website')} type="text" tabIndex={-1} autoComplete="off" aria-hidden="true" style={honeypotStyle} />
