@@ -1,11 +1,5 @@
 import type { CSSProperties } from 'react';
 
-const bandLabelColStyle: CSSProperties = {
-  position: 'sticky',
-  top: 110,
-  alignSelf: 'start'
-};
-
 const bandNumeralStyle: CSSProperties = { fontSize: 'clamp(80px, 9vw, 140px)' };
 
 const bandLabelTextStyle: CSSProperties = {
@@ -19,7 +13,7 @@ const bandLabelTextStyle: CSSProperties = {
 
 export function BandHeader({ numeral, label }: { numeral: string; label: string }) {
   return (
-    <div style={bandLabelColStyle}>
+    <div className="form-band-header">
       <div className="form-band-numeral" style={bandNumeralStyle}>
         {numeral}
       </div>
