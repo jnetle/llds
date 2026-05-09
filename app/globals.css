@@ -5,6 +5,7 @@
   --bg: #f4f0e8;
   --ink: #2a2e25;
   --ink-soft: rgba(42, 46, 37, 0.65);
+  --ink-error: #8b3a2e;
   --hairline: rgba(42, 46, 37, 0.18);
   --divider-color: rgba(244, 240, 232, 0.85);
 
@@ -122,6 +123,71 @@ a {
 
 .nav-link:hover .nav-underline {
   transform: scaleX(1);
+}
+
+/* Inquire form — band reveal + numeral underline (used by app/inquire/page.tsx) */
+.form-band {
+  position: relative;
+  opacity: 0;
+  transform: translateY(28px);
+  transition:
+    opacity 1.1s cubic-bezier(0.22, 0.61, 0.36, 1),
+    transform 1.1s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+.form-band.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+.form-band-numeral {
+  font-family: var(--font-cormorant), Georgia, serif;
+  font-style: italic;
+  font-weight: 300;
+  line-height: 0.85;
+  letter-spacing: -0.03em;
+  color: var(--ink);
+  opacity: 0;
+  transform: translateY(18px);
+  transition:
+    opacity 1.6s cubic-bezier(0.22, 0.61, 0.36, 1) 0.15s,
+    transform 1.6s cubic-bezier(0.22, 0.61, 0.36, 1) 0.15s;
+}
+.form-band.is-visible .form-band-numeral {
+  opacity: 0.16;
+  transform: translateY(0);
+}
+.form-band-label {
+  display: inline-block;
+  position: relative;
+  padding-bottom: 10px;
+}
+.form-band-label::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 1px;
+  background: var(--ink);
+  width: 0;
+  transition: width 1.2s cubic-bezier(0.22, 0.61, 0.36, 1) 0.35s;
+}
+.form-band.is-visible .form-band-label::after {
+  width: 36px;
+}
+@keyframes errorIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@media (max-width: 900px) {
+  .form-band {
+    grid-template-columns: 1fr !important;
+    gap: 28px !important;
+  }
 }
 
 /* ======================== RESPONSIVE ======================== */

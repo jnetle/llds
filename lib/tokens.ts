@@ -10,6 +10,7 @@ export const color = {
   bg: 'var(--bg)',
   ink: 'var(--ink)',
   inkSoft: 'var(--ink-soft)',
+  error: 'var(--ink-error)',
   hairline: 'var(--hairline)',
   divider: 'var(--divider-color)'
 } as const;
