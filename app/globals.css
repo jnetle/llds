@@ -125,23 +125,20 @@ a {
   transform: scaleX(1);
 }
 
-/* Inquire form — band reveal + numeral underline (used by app/inquire/page.tsx) */
+/* Inquire form — numeral + label underline reveal (used by app/inquire/page.tsx).
+   The band content itself is always visible — the form-level useReveal handles
+   the single entrance fade. We previously hid each band behind opacity:0 and
+   only restored it via an IntersectionObserver, which made the entire form
+   contents disappear whenever the IO failed to fire (scroll restoration on
+   refresh, tall bands, etc.). Only the decorative numeral + underline now
+   depend on `.is-visible`, so a missed IO callback is purely cosmetic. */
 .form-band {
   position: relative;
-  opacity: 0;
-  transform: translateY(28px);
-  transition:
-    opacity 1.1s cubic-bezier(0.22, 0.61, 0.36, 1),
-    transform 1.1s cubic-bezier(0.22, 0.61, 0.36, 1);
 }
 .form-band-header {
   position: sticky;
   top: 110px;
   align-self: start;
-}
-.form-band.is-visible {
-  opacity: 1;
-  transform: translateY(0);
 }
 .form-band-numeral {
   font-family: var(--font-cormorant), Georgia, serif;
