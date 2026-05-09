@@ -146,13 +146,14 @@ export default function InquirePage() {
 
   // One stable ref setter per known field name. Pre-built once so React
   // doesn't see a new function (and re-bind the ref) on every render.
+  // Typed against InquiryInput so a `refSetters.adress` typo is a compile error.
   const refSetters = useMemo(() => {
-    const setters: Record<string, (el: HTMLLabelElement | null) => void> = {};
-    for (const name of Object.keys(defaultValues)) {
+    const setters = {} as Record<keyof InquiryInput, (el: HTMLLabelElement | null) => void>;
+    (Object.keys(defaultValues) as Array<keyof InquiryInput>).forEach(name => {
       setters[name] = el => {
-        fieldRefs.current[name] = el;
+        fieldRefs.current[name as string] = el;
       };
-    }
+    });
     return setters;
   }, []);
 
