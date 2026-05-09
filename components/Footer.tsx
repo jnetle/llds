@@ -23,7 +23,6 @@ const COLUMNS: { h: string; items: { label: string; href?: string; target?: stri
     h: 'Contact',
     items: [
       { label: 'hello@laurelleaf.studio', href: 'mailto:hello@laurelleaf.studio' },
-      { label: '111-111-1111', href: 'tel:+1111111111' },
       { label: 'Instagram', target: '_blank', href: 'https://www.instagram.com/laurelleafdesignstudio' },
       { label: 'Facebook', target: '_blank', href: 'https://www.facebook.com/laurelleafdesignstudio' }
     ]
