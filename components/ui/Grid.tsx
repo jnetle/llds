@@ -38,20 +38,21 @@ export function Grid({ cols, gap, rowGap, columnGap, alignItems, as = 'div', ref
   const isTablet = useCompact(1024);
   const Tag = as as ElementType;
 
+  const gapValue = pickSize(gap, isMobile, isTablet);
+  const rowGapValue = pickSize(rowGap, isMobile, isTablet);
+  const columnGapValue = pickSize(columnGap, isMobile, isTablet);
+
+  const gridStyle: CSSProperties = {
+    display: 'grid',
+    gridTemplateColumns: pickCols(cols, isMobile, isTablet),
+    alignItems
+  };
+  if (gapValue !== undefined) gridStyle.gap = gapValue;
+  if (rowGapValue !== undefined) gridStyle.rowGap = rowGapValue;
+  if (columnGapValue !== undefined) gridStyle.columnGap = columnGapValue;
+
   return (
-    <Tag
-      ref={ref}
-      className={className}
-      style={{
-        display: 'grid',
-        gridTemplateColumns: pickCols(cols, isMobile, isTablet),
-        gap: pickSize(gap, isMobile, isTablet),
-        rowGap: pickSize(rowGap, isMobile, isTablet),
-        columnGap: pickSize(columnGap, isMobile, isTablet),
-        alignItems,
-        ...style
-      }}
-      {...rest}>
+    <Tag ref={ref} className={className} style={{ ...gridStyle, ...style }} {...rest}>
       {children}
     </Tag>
   );
