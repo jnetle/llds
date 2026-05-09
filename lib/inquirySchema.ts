@@ -70,9 +70,9 @@ export const inquirySchema = z.object({
 
   // 02 — Project Overview
   address: z.string().trim().min(1, 'Please share the project address.'),
-  projectType: z.array(z.string()).min(1, 'Please choose at least one project type.'),
+  projectType: z.array(z.enum(PROJECT_TYPES)).min(1, 'Please choose at least one project type.'),
   projectTypeOther: z.string().trim().max(120),
-  areas: z.array(z.string()).min(1, 'Please tell us which areas are included.'),
+  areas: z.array(z.enum(AREAS)).min(1, 'Please tell us which areas are included.'),
   size: z.string().trim().max(160),
   description: z
     .string()
@@ -115,7 +115,7 @@ export const inquirySchema = z.object({
   // 09 — Style + Priorities
   style: z.string().trim().min(1, 'A few words on your style, please.'),
   priorities: z
-    .array(z.string())
+    .array(z.enum(PRIORITIES))
     .min(1, 'Please choose at least one priority (up to three).')
     .max(PRIORITIES_MAX, `Please choose up to ${PRIORITIES_MAX} priorities.`),
 

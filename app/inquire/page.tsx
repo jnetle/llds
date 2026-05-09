@@ -2,8 +2,9 @@
 
 import * as React from 'react';
 import Link from 'next/link';
-import { useCallback, useEffect, useRef, useState, type CSSProperties } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
 import { useForm, Controller, useWatch } from 'react-hook-form';
+import { ShowWhen } from './ShowWhen';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useReveal } from '@/hooks/useReveal';
 import { Eyebrow } from '@/components/ui/Eyebrow';
@@ -94,6 +95,9 @@ const fieldsetStyle: CSSProperties = {
   minWidth: 0
 };
 
+// Mirror of every field in inquirySchema. When a field is added to the schema,
+// add it here too — useForm needs an explicit default for every key, otherwise
+// react-hook-form treats the missing field as uncontrolled.
 const defaultValues: InquiryInput = {
   name: '',
   email: '',
@@ -140,6 +144,18 @@ export default function InquirePage() {
   const [attempted, setAttempted] = useState(false);
   const fieldRefs = useRef<Record<string, HTMLLabelElement | null>>({});
 
+  // One stable ref setter per known field name. Pre-built once so React
+  // doesn't see a new function (and re-bind the ref) on every render.
+  const refSetters = useMemo(() => {
+    const setters: Record<string, (el: HTMLLabelElement | null) => void> = {};
+    for (const name of Object.keys(defaultValues)) {
+      setters[name] = el => {
+        fieldRefs.current[name] = el;
+      };
+    }
+    return setters;
+  }, []);
+
   const {
     register,
     control,
@@ -150,10 +166,9 @@ export default function InquirePage() {
     defaultValues
   });
 
-  const builder = useWatch({ control, name: 'builder' });
-  const builtBefore = useWatch({ control, name: 'builtBefore' });
-  const workedDesigner = useWatch({ control, name: 'workedDesigner' });
-  const projectType = useWatch({ control, name: 'projectType' });
+  // Only fields whose value is read directly during render need a top-level watch.
+  // Conditional show/hide gates use the ShowWhen helper, which subscribes locally
+  // so the rest of the form doesn't re-render on every chip click.
   const priorities = useWatch({ control, name: 'priorities' });
 
   // Reveal-on-scroll for form bands. Re-arms when `submitted` flips back.
@@ -194,6 +209,7 @@ export default function InquirePage() {
         const result = await submitInquiry(values);
         if (result.ok) {
           setSubmitted(true);
+          setAttempted(false);
           window.scrollTo({ top: 0, behavior: 'smooth' });
         } else {
           setServerError(result.error);
@@ -292,24 +308,10 @@ export default function InquirePage() {
           <BandHeader numeral="01" label="Contact Information" />
           <fieldset style={fieldsetStyle}>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 36 }}>
-              <Field
-                label="Full name"
-                required
-                name="name"
-                error={errors.name?.message}
-                registerRef={el => {
-                  fieldRefs.current.name = el;
-                }}>
+              <Field label="Full name" required name="name" error={errors.name?.message} registerRef={refSetters.name}>
                 <input {...register('name')} aria-invalid={!!errors.name} style={{ ...inputStyle, ...errInputBorder('name') }} />
               </Field>
-              <Field
-                label="Email address"
-                required
-                name="email"
-                error={errors.email?.message}
-                registerRef={el => {
-                  fieldRefs.current.email = el;
-                }}>
+              <Field label="Email address" required name="email" error={errors.email?.message} registerRef={refSetters.email}>
                 <input
                   {...register('email')}
                   type="email"
@@ -317,14 +319,7 @@ export default function InquirePage() {
                   style={{ ...inputStyle, ...errInputBorder('email') }}
                 />
               </Field>
-              <Field
-                label="Phone number"
-                required
-                name="phone"
-                error={errors.phone?.message}
-                registerRef={el => {
-                  fieldRefs.current.phone = el;
-                }}>
+              <Field label="Phone number" required name="phone" error={errors.phone?.message} registerRef={refSetters.phone}>
                 <input {...register('phone')} aria-invalid={!!errors.phone} style={{ ...inputStyle, ...errInputBorder('phone') }} />
               </Field>
             </div>
@@ -335,14 +330,7 @@ export default function InquirePage() {
         <section className="form-band" style={bandSectionStyle}>
           <BandHeader numeral="02" label="Project Overview" />
           <fieldset style={fieldsetStyle}>
-            <Field
-              label="Project address"
-              required
-              name="address"
-              error={errors.address?.message}
-              registerRef={el => {
-                fieldRefs.current.address = el;
-              }}>
+            <Field label="Project address" required name="address" error={errors.address?.message} registerRef={refSetters.address}>
               <input
                 {...register('address')}
                 placeholder="Street, city, state / postcode"
@@ -356,9 +344,7 @@ export default function InquirePage() {
               required
               name="projectType"
               error={errors.projectType?.message}
-              registerRef={el => {
-                fieldRefs.current.projectType = el;
-              }}>
+              registerRef={refSetters.projectType}>
               <Controller
                 control={control}
                 name="projectType"
@@ -375,9 +361,9 @@ export default function InquirePage() {
                   </div>
                 )}
               />
-              {projectType.length > 0 && (
+              <ShowWhen control={control} name="projectType" when={v => v.length > 0}>
                 <input {...register('projectTypeOther')} placeholder="Other (optional)" style={{ ...inputStyle, marginTop: 14 }} />
-              )}
+              </ShowWhen>
             </Field>
 
             <Field
@@ -385,9 +371,7 @@ export default function InquirePage() {
               required
               name="areas"
               error={errors.areas?.message}
-              registerRef={el => {
-                fieldRefs.current.areas = el;
-              }}>
+              registerRef={refSetters.areas}>
               <Controller
                 control={control}
                 name="areas"
@@ -419,9 +403,7 @@ export default function InquirePage() {
               required
               name="description"
               error={errors.description?.message}
-              registerRef={el => {
-                fieldRefs.current.description = el;
-              }}>
+              registerRef={refSetters.description}>
               <textarea
                 {...register('description')}
                 rows={5}
@@ -446,9 +428,7 @@ export default function InquirePage() {
               required
               name="builder"
               error={errors.builder?.message}
-              registerRef={el => {
-                fieldRefs.current.builder = el;
-              }}>
+              registerRef={refSetters.builder}>
               <Controller
                 control={control}
                 name="builder"
@@ -458,20 +438,18 @@ export default function InquirePage() {
               />
             </Field>
 
-            {builder === 'Yes' && (
+            <ShowWhen control={control} name="builder" when={v => v === 'Yes'}>
               <Field label="If yes, who are you working with?">
                 <input {...register('builderName')} style={inputStyle} />
               </Field>
-            )}
+            </ShowWhen>
 
             <Field
               label="Are architectural plans completed?"
               required
               name="plans"
               error={errors.plans?.message}
-              registerRef={el => {
-                fieldRefs.current.plans = el;
-              }}>
+              registerRef={refSetters.plans}>
               <Controller
                 control={control}
                 name="plans"
@@ -492,9 +470,7 @@ export default function InquirePage() {
               required
               name="beginTime"
               error={errors.beginTime?.message}
-              registerRef={el => {
-                fieldRefs.current.beginTime = el;
-              }}>
+              registerRef={refSetters.beginTime}>
               <Controller
                 control={control}
                 name="beginTime"
@@ -509,9 +485,7 @@ export default function InquirePage() {
               required
               name="completion"
               error={errors.completion?.message}
-              registerRef={el => {
-                fieldRefs.current.completion = el;
-              }}>
+              registerRef={refSetters.completion}>
               <Controller
                 control={control}
                 name="completion"
@@ -526,9 +500,7 @@ export default function InquirePage() {
               required
               name="deadlines"
               error={errors.deadlines?.message}
-              registerRef={el => {
-                fieldRefs.current.deadlines = el;
-              }}>
+              registerRef={refSetters.deadlines}>
               <input
                 {...register('deadlines')}
                 placeholder='Move-in date, holiday, sale completion — or write "none"'
@@ -548,9 +520,7 @@ export default function InquirePage() {
               required
               name="builtBefore"
               error={errors.builtBefore?.message}
-              registerRef={el => {
-                fieldRefs.current.builtBefore = el;
-              }}>
+              registerRef={refSetters.builtBefore}>
               <Controller
                 control={control}
                 name="builtBefore"
@@ -560,20 +530,18 @@ export default function InquirePage() {
               />
             </Field>
 
-            {builtBefore === 'Yes' && (
+            <ShowWhen control={control} name="builtBefore" when={v => v === 'Yes'}>
               <Field label="If yes, how would you describe that experience?">
                 <textarea {...register('builtBeforeNote')} rows={3} style={{ ...textareaBaseStyle, minHeight: 96 }} />
               </Field>
-            )}
+            </ShowWhen>
 
             <Field
               label="Have you worked with a designer before?"
               required
               name="workedDesigner"
               error={errors.workedDesigner?.message}
-              registerRef={el => {
-                fieldRefs.current.workedDesigner = el;
-              }}>
+              registerRef={refSetters.workedDesigner}>
               <Controller
                 control={control}
                 name="workedDesigner"
@@ -583,11 +551,11 @@ export default function InquirePage() {
               />
             </Field>
 
-            {workedDesigner === 'Yes' && (
+            <ShowWhen control={control} name="workedDesigner" when={v => v === 'Yes'}>
               <Field label="If yes, how would you describe that experience?">
                 <textarea {...register('workedDesignerNote')} rows={3} style={{ ...textareaBaseStyle, minHeight: 96 }} />
               </Field>
-            )}
+            </ShowWhen>
           </fieldset>
         </section>
 
@@ -605,9 +573,7 @@ export default function InquirePage() {
               required
               name="investment"
               error={errors.investment?.message}
-              registerRef={el => {
-                fieldRefs.current.investment = el;
-              }}>
+              registerRef={refSetters.investment}>
               <select
                 {...register('investment')}
                 aria-invalid={!!errors.investment}
@@ -624,9 +590,7 @@ export default function InquirePage() {
               required
               name="designBudgetAllocated"
               error={errors.designBudgetAllocated?.message}
-              registerRef={el => {
-                fieldRefs.current.designBudgetAllocated = el;
-              }}>
+              registerRef={refSetters.designBudgetAllocated}>
               <Controller
                 control={control}
                 name="designBudgetAllocated"
@@ -646,9 +610,7 @@ export default function InquirePage() {
               required
               name="designInvestment"
               error={errors.designInvestment?.message}
-              registerRef={el => {
-                fieldRefs.current.designInvestment = el;
-              }}>
+              registerRef={refSetters.designInvestment}>
               <Controller
                 control={control}
                 name="designInvestment"
@@ -675,9 +637,7 @@ export default function InquirePage() {
               required
               name="builderApproach"
               error={errors.builderApproach?.message}
-              registerRef={el => {
-                fieldRefs.current.builderApproach = el;
-              }}>
+              registerRef={refSetters.builderApproach}>
               <Controller
                 control={control}
                 name="builderApproach"
@@ -698,9 +658,7 @@ export default function InquirePage() {
               required
               name="designSupport"
               error={errors.designSupport?.message}
-              registerRef={el => {
-                fieldRefs.current.designSupport = el;
-              }}>
+              registerRef={refSetters.designSupport}>
               <Controller
                 control={control}
                 name="designSupport"
@@ -727,9 +685,7 @@ export default function InquirePage() {
               required
               name="decisionMaker"
               error={errors.decisionMaker?.message}
-              registerRef={el => {
-                fieldRefs.current.decisionMaker = el;
-              }}>
+              registerRef={refSetters.decisionMaker}>
               <Controller
                 control={control}
                 name="decisionMaker"
@@ -749,9 +705,7 @@ export default function InquirePage() {
               required
               name="decisionComfort"
               error={errors.decisionComfort?.message}
-              registerRef={el => {
-                fieldRefs.current.decisionComfort = el;
-              }}>
+              registerRef={refSetters.decisionComfort}>
               <Controller
                 control={control}
                 name="decisionComfort"
@@ -771,9 +725,7 @@ export default function InquirePage() {
               required
               name="openToRecs"
               error={errors.openToRecs?.message}
-              registerRef={el => {
-                fieldRefs.current.openToRecs = el;
-              }}>
+              registerRef={refSetters.openToRecs}>
               <Controller
                 control={control}
                 name="openToRecs"
@@ -788,9 +740,7 @@ export default function InquirePage() {
               required
               name="involvement"
               error={errors.involvement?.message}
-              registerRef={el => {
-                fieldRefs.current.involvement = el;
-              }}>
+              registerRef={refSetters.involvement}>
               <Controller
                 control={control}
                 name="involvement"
@@ -821,9 +771,7 @@ export default function InquirePage() {
               required
               name="style"
               error={errors.style?.message}
-              registerRef={el => {
-                fieldRefs.current.style = el;
-              }}>
+              registerRef={refSetters.style}>
               <textarea
                 {...register('style')}
                 rows={3}
@@ -842,9 +790,7 @@ export default function InquirePage() {
               required
               name="priorities"
               error={errors.priorities?.message}
-              registerRef={el => {
-                fieldRefs.current.priorities = el;
-              }}>
+              registerRef={refSetters.priorities}>
               <Controller
                 control={control}
                 name="priorities"
@@ -887,9 +833,7 @@ export default function InquirePage() {
               required
               name="structuredComm"
               error={errors.structuredComm?.message}
-              registerRef={el => {
-                fieldRefs.current.structuredComm = el;
-              }}>
+              registerRef={refSetters.structuredComm}>
               <Controller
                 control={control}
                 name="structuredComm"
@@ -915,9 +859,7 @@ export default function InquirePage() {
               required
               name="anythingElse"
               error={errors.anythingElse?.message}
-              registerRef={el => {
-                fieldRefs.current.anythingElse = el;
-              }}>
+              registerRef={refSetters.anythingElse}>
               <textarea
                 {...register('anythingElse')}
                 rows={4}
@@ -936,9 +878,7 @@ export default function InquirePage() {
               required
               name="howHeard"
               error={errors.howHeard?.message}
-              registerRef={el => {
-                fieldRefs.current.howHeard = el;
-              }}>
+              registerRef={refSetters.howHeard}>
               <input
                 {...register('howHeard')}
                 placeholder="Press, Instagram, a referral, online search…"

@@ -21,43 +21,49 @@ export async function submitInquiry(raw: unknown): Promise<SubmitResult> {
     return { ok: false, error: 'Inquiry system is not configured. Please email us directly.' };
   }
 
-  const {
-    name,
-    email,
-    phone,
-    address,
-    projectType,
-    projectTypeOther,
-    areas,
-    size,
-    description,
-    builder,
-    builderName,
-    plans,
-    beginTime,
-    completion,
-    deadlines,
-    builtBefore,
-    builtBeforeNote,
-    workedDesigner,
-    workedDesignerNote,
-    investment,
-    designBudgetAllocated,
-    designInvestment,
-    builderApproach,
-    designSupport,
-    decisionMaker,
-    decisionComfort,
-    openToRecs,
-    involvement,
-    changesApproach,
-    style,
-    priorities,
-    structuredComm,
-    anythingElse,
-    howHeard,
-    newsletter
-  } = parsed.data;
+  const data = parsed.data;
+
+  // Strip orphaned conditional-field values: if a gate field isn't in the revealing
+  // state, don't ship the dependent field's stored value.
+  const payload = {
+    name: data.name,
+    email: data.email,
+    phone: data.phone,
+    address: data.address,
+    projectType: data.projectType,
+    projectTypeOther: data.projectType.length > 0 ? data.projectTypeOther : '',
+    areas: data.areas,
+    size: data.size,
+    description: data.description,
+    builder: data.builder,
+    builderName: data.builder === 'Yes' ? data.builderName : '',
+    plans: data.plans,
+    beginTime: data.beginTime,
+    completion: data.completion,
+    deadlines: data.deadlines,
+    builtBefore: data.builtBefore,
+    builtBeforeNote: data.builtBefore === 'Yes' ? data.builtBeforeNote : '',
+    workedDesigner: data.workedDesigner,
+    workedDesignerNote: data.workedDesigner === 'Yes' ? data.workedDesignerNote : '',
+    investment: data.investment,
+    designBudgetAllocated: data.designBudgetAllocated,
+    designInvestment: data.designInvestment,
+    builderApproach: data.builderApproach,
+    designSupport: data.designSupport,
+    decisionMaker: data.decisionMaker,
+    decisionComfort: data.decisionComfort,
+    openToRecs: data.openToRecs,
+    involvement: data.involvement,
+    changesApproach: data.changesApproach,
+    style: data.style,
+    priorities: data.priorities,
+    structuredComm: data.structuredComm,
+    anythingElse: data.anythingElse,
+    howHeard: data.howHeard,
+    newsletter: data.newsletter,
+    submittedAt: new Date().toISOString(),
+    __secret: secret
+  };
 
   try {
     const res = await fetch(url, {
@@ -65,46 +71,8 @@ export async function submitInquiry(raw: unknown): Promise<SubmitResult> {
       headers: { 'content-type': 'application/json' },
       // Apps Script Web Apps cannot read arbitrary HTTP headers; the shared
       // secret travels inside the body and is checked server-side there.
-      body: JSON.stringify({
-        name,
-        email,
-        phone,
-        address,
-        projectType,
-        projectTypeOther,
-        areas,
-        size,
-        description,
-        builder,
-        builderName,
-        plans,
-        beginTime,
-        completion,
-        deadlines,
-        builtBefore,
-        builtBeforeNote,
-        workedDesigner,
-        workedDesignerNote,
-        investment,
-        designBudgetAllocated,
-        designInvestment,
-        builderApproach,
-        designSupport,
-        decisionMaker,
-        decisionComfort,
-        openToRecs,
-        involvement,
-        changesApproach,
-        style,
-        priorities,
-        structuredComm,
-        anythingElse,
-        howHeard,
-        newsletter,
-        submittedAt: new Date().toISOString(),
-        __secret: secret
-      }),
-      signal: AbortSignal.timeout(5000)
+      body: JSON.stringify(payload),
+      signal: AbortSignal.timeout(10000)
     });
     if (!res.ok) {
       console.error('Apps Script webhook returned status', res.status);

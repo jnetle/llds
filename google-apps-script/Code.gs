@@ -5,8 +5,11 @@
  *   1. Open the "Laurel Leaf Inquiries" Google Sheet → Extensions → Apps Script.
  *   2. Paste this file's contents into Code.gs and Save.
  *   3. Project Settings → Script properties → add:
- *        SHARED_SECRET  — long random string (must match Vercel env INQUIRY_SHARED_SECRET)
- *        OWNER_EMAIL    — address that should receive new-inquiry notifications
+ *        SHARED_SECRET   — long random string (must match Vercel env INQUIRY_SHARED_SECRET)
+ *        OWNER_EMAIL     — address that should receive new-inquiry notifications
+ *        REPLY_TEMPLATE  — (optional) override the "Reply to selected lead" body. Use
+ *                          {{firstName}} as a placeholder. If unset, the default below
+ *                          is used.
  *   4. Deploy → New deployment → Web app
  *        Execute as: Me
  *        Who has access: Anyone
@@ -15,11 +18,10 @@
  *
  * Sheet columns (row 1, in COLUMNS order — see below).
  *
- * IMPORTANT: ensureHeaderRow() only writes headers when row 1 is empty.
- * If you are upgrading from the previous (smaller) column set, either:
- *   (a) clear row 1 in the Sheet so the script writes the new headers on the
- *       next submission, or
- *   (b) add the new headers manually to match COLUMNS exactly.
+ * Drift protection: doPost() refuses to write a row when the sheet's existing
+ * header row has a different column count than COLUMNS. Either clear row 1 (the
+ * script repopulates headers on the next submission) or align the headers
+ * manually before re-deploying after a column change.
  *
  * Recommended: data-validate the Status column with values
  *   New, Contacted, Qualified, Proposal Sent, Won, Lost
@@ -67,6 +69,17 @@ const COLUMNS = [
   'Newsletter'
 ];
 
+const DEFAULT_REPLY_TEMPLATE = [
+  'Hi {{firstName}},',
+  '',
+  'Thank you for reaching out about your project. We have read your inquiry carefully and would love to discuss next steps.',
+  '',
+  '',
+  '',
+  'Warmly,',
+  'The Laurel Leaf studio'
+].join('\n');
+
 function joinList(value) {
   if (Array.isArray(value)) return value.join(', ');
   return value || '';
@@ -85,7 +98,25 @@ function doPost(e) {
     }
 
     const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheets()[0];
-    ensureHeaderRow(sheet);
+
+    // Drift guard: if row 1 already has headers but the column count doesn't
+    // match COLUMNS, refuse to write to avoid silently mis-mapping fields.
+    const firstCell = sheet.getRange(HEADER_ROW, 1).getValue();
+    if (firstCell) {
+      const lastCol = sheet.getLastColumn();
+      if (lastCol !== COLUMNS.length) {
+        const msg =
+          'sheet_columns_mismatch: header row has ' +
+          lastCol +
+          ' column(s), but COLUMNS expects ' +
+          COLUMNS.length +
+          '. Clear row 1 or update headers manually before submitting again.';
+        console.error(msg);
+        return jsonResponse({ ok: false, error: msg });
+      }
+    } else {
+      ensureHeaderRow(sheet);
+    }
 
     const submittedAt = body.submittedAt || new Date().toISOString();
     const row = [
@@ -125,7 +156,7 @@ function doPost(e) {
       body.structuredComm || '',
       body.anythingElse || '',
       body.howHeard || '',
-      body.newsletter ? 'Yes' : 'No'
+      body.newsletter === true
     ];
     sheet.appendRow(row);
 
@@ -164,11 +195,8 @@ function doPost(e) {
 }
 
 function ensureHeaderRow(sheet) {
-  const firstCell = sheet.getRange(HEADER_ROW, 1).getValue();
-  if (!firstCell) {
-    sheet.getRange(HEADER_ROW, 1, 1, COLUMNS.length).setValues([COLUMNS]);
-    sheet.setFrozenRows(1);
-  }
+  sheet.getRange(HEADER_ROW, 1, 1, COLUMNS.length).setValues([COLUMNS]);
+  sheet.setFrozenRows(1);
 }
 
 function jsonResponse(body) {
@@ -204,16 +232,8 @@ function replyToSelectedLead() {
 
   const firstName = String(record['Name'] || '').split(' ')[0] || 'there';
   const subject = 'Re: your inquiry to Laurel Leaf';
-  const body = [
-    'Hi ' + firstName + ',',
-    '',
-    'Thank you for reaching out about your project. We have read your inquiry carefully and would love to discuss next steps.',
-    '',
-    '',
-    '',
-    'Warmly,',
-    'The Laurel Leaf studio'
-  ].join('\n');
+  const template = PropertiesService.getScriptProperties().getProperty('REPLY_TEMPLATE') || DEFAULT_REPLY_TEMPLATE;
+  const body = template.replace(/{{firstName}}/g, firstName);
 
   const draft = GmailApp.createDraft(record['Email'], subject, body);
   const draftUrl = 'https://mail.google.com/mail/u/0/#drafts/' + draft.getId();
