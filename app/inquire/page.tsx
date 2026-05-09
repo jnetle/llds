@@ -82,7 +82,7 @@ const bandSectionStyle: CSSProperties = {
   display: 'grid',
   gridTemplateColumns: 'minmax(220px, 280px) minmax(0, 1fr)',
   gap: 80,
-  padding: '88px 8vw 96px',
+  padding: '64px 8vw 72px',
   alignItems: 'start'
 };
 
