@@ -978,44 +978,6 @@ export default function InquirePage() {
           </div>
         </div>
       </form>
-
-      {/* Direct contact strip */}
-      <section style={{ padding: '60px 8vw 180px', borderTop: `1px solid ${color.hairline}`, marginTop: 80 }}>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 48 }}>
-          <div>
-            <Eyebrow size="sm" opacity={0.5} style={{ marginBottom: 14 }}>
-              By post
-            </Eyebrow>
-            <p className="serif" style={{ fontSize: 18, fontWeight: 300, lineHeight: 1.5, margin: 0 }}>
-              The Studio
-              <br />
-              24 Hartley Mews
-              <br />
-              London E2 8AB
-            </p>
-          </div>
-          <div>
-            <Eyebrow size="sm" opacity={0.5} style={{ marginBottom: 14 }}>
-              By telephone
-            </Eyebrow>
-            <p className="serif" style={{ fontSize: 18, fontWeight: 300, lineHeight: 1.5, margin: 0 }}>
-              +44 (0)20 7946 0214
-              <br />
-              Mon — Fri · 9 — 5
-            </p>
-          </div>
-          <div>
-            <Eyebrow size="sm" opacity={0.5} style={{ marginBottom: 14 }}>
-              By email
-            </Eyebrow>
-            <p className="serif" style={{ fontSize: 18, fontWeight: 300, lineHeight: 1.5, margin: 0 }}>
-              studio@laurelleaf.co
-              <br />
-              press@laurelleaf.co
-            </p>
-          </div>
-        </div>
-      </section>
     </>
   );
 }
