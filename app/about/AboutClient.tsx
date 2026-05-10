@@ -23,7 +23,7 @@ const PRINCIPLES = [
   }
 ];
 
-export default function AboutPage() {
+export default function AboutClient() {
   const [ref, seen] = useReveal<HTMLDivElement>();
   const compact = useCompact();
 

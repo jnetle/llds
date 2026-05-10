@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import AboutPage from './AboutPage';
+import AboutClient from './AboutClient';
 
 export const metadata: Metadata = {
   title: 'About — Laurel Leaf Design Studio',
@@ -13,5 +13,5 @@ export const metadata: Metadata = {
 };
 
 export default function Page() {
-  return <AboutPage />;
+  return <AboutClient />;
 }
