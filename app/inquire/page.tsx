@@ -14,6 +14,7 @@ import { Chip } from '@/components/ui/Chip';
 import { RadioPills } from '@/components/ui/RadioPills';
 import { RadioStack } from '@/components/ui/RadioStack';
 import { BandHeader } from './BandHeader';
+import { useCompact } from '@/hooks/useCompact';
 import { color, motion, text } from '@/lib/tokens';
 import {
   inquirySchema,
@@ -141,6 +142,7 @@ export default function InquirePage() {
   const [serverError, setServerError] = useState<string | null>(null);
   const [attempted, setAttempted] = useState(false);
   const fieldRefs = useRef<Record<string, HTMLLabelElement | null>>({});
+  const heroStack = useCompact(900);
 
   // One stable ref setter per known field name. Pre-built once so React
   // doesn't see a new function (and re-bind the ref) on every render.
@@ -272,24 +274,39 @@ export default function InquirePage() {
   return (
     <>
       {/* Hero */}
-      <Section padTop="xl" padBottom="xxs" style={{ borderBottom: `1px solid ${color.hairline}` }}>
-        <Eyebrow style={{ marginBottom: 28 }}>— New Inquiries</Eyebrow>
-        <Heading
-          level="display"
-          style={{ fontSize: 'clamp(56px, 8vw, 140px)', lineHeight: 0.96, letterSpacing: '-0.018em', maxWidth: '14ch' }}>
-          Begin a <span style={{ fontStyle: 'italic' }}>conversation</span>.
-        </Heading>
-        <p style={{ ...text.body, fontSize: 17, marginTop: 40, maxWidth: '60ch' }}>
-          Creating a home is a thoughtful and detailed process. This form is designed to help us understand your project, priorities, and
-          timeline so we can determine the best way to work together.
-        </p>
-        <p style={{ ...text.body, fontSize: 17, marginTop: 18, maxWidth: '60ch' }}>
-          Due to the level of detail and involvement required, we take on a limited number of projects at a time and prioritise those with
-          clearly defined scope, timeline, and investment. Please complete the following so we can thoughtfully review your project.
-        </p>
-        <p className="micro-sm" style={{ marginTop: 32, opacity: 0.5 }}>
-          ∗ Indicates a required field
-        </p>
+      <Section padTop="md" padBottom="sm" style={{ borderBottom: `1px solid ${color.hairline}` }}>
+        <Eyebrow style={{ marginBottom: 24 }}>— New Inquiries</Eyebrow>
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: heroStack ? '1fr' : 'minmax(0, 1.05fr) minmax(0, 1fr)',
+            gap: heroStack ? 28 : 80,
+            alignItems: 'end'
+          }}>
+          <Heading
+            level="display"
+            style={{
+              fontSize: 'clamp(44px, 5.6vw, 92px)',
+              lineHeight: 0.98,
+              letterSpacing: '-0.018em',
+              maxWidth: '12ch'
+            }}>
+            Begin a <span style={{ fontStyle: 'italic' }}>conversation</span>.
+          </Heading>
+          <div style={{ maxWidth: '54ch' }}>
+            <p style={{ ...text.body, fontSize: 17, margin: 0 }}>
+              Creating a home is a thoughtful and detailed process. This form is designed to help us understand your project, priorities,
+              and timeline so we can determine the best way to work together.
+            </p>
+            <p style={{ ...text.body, fontSize: 17, marginTop: 18, marginBottom: 0 }}>
+              Due to the level of detail and involvement required, we take on a limited number of projects at a time and prioritise those
+              with clearly defined scope, timeline, and investment.
+            </p>
+            <p className="micro-sm" style={{ marginTop: 24, marginBottom: 0, opacity: 0.5 }}>
+              ∗ Indicates a required field
+            </p>
+          </div>
+        </div>
       </Section>
 
       {/* Form — always visible. Previously hidden behind a useReveal IO that
