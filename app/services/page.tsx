@@ -252,8 +252,8 @@ export default function ServicesPage() {
 
   return (
     <>
-      {/* Hero — raw <section>: full-bleed, 100vh, absolute-positioned content. */}
-      <section style={{ position: 'relative', height: '100vh', overflow: 'hidden' }}>
+      {/* Hero — raw <section>: full-bleed, compressed height, absolute-positioned content. */}
+      <section style={{ position: 'relative', height: 'min(62vh, 620px)', overflow: 'hidden' }}>
         <div
           style={{
             position: 'absolute',
@@ -279,7 +279,7 @@ export default function ServicesPage() {
             display: 'flex',
             flexDirection: 'column',
             justifyContent: 'flex-end',
-            paddingBottom: 100,
+            paddingBottom: 72,
             color: color.bg
           }}>
           <Eyebrow opacity={0.85} style={{ marginBottom: 28, letterSpacing: '0.32em' }}>
@@ -288,7 +288,7 @@ export default function ServicesPage() {
           <h1
             className="serif"
             style={{
-              fontSize: 'clamp(56px, 8vw, 132px)',
+              fontSize: 'clamp(44px, 6vw, 96px)',
               lineHeight: 0.95,
               fontWeight: 300,
               letterSpacing: '-0.018em',
@@ -300,14 +300,26 @@ export default function ServicesPage() {
             New Build <em style={{ fontWeight: 300, textTransform: 'none' }}>&amp;</em> Renovation Design Services
           </h1>
         </div>
-
-        <Eyebrow size="sm" opacity={0.7} style={{ position: 'absolute', top: 32, right: 36, color: color.bg, letterSpacing: '0.28em' }}>
-          Volume I
-        </Eyebrow>
-        <Eyebrow size="sm" opacity={0.7} style={{ position: 'absolute', bottom: 28, right: 36, color: color.bg, letterSpacing: '0.28em' }}>
-          Services · 2026
-        </Eyebrow>
       </section>
+
+      {/* Bridge band — italic intro between hero and sticky nav */}
+      <div style={{ padding: '46px 8vw 38px', background: color.bg, borderBottom: `1px solid ${color.hairline}` }}>
+        <p
+          className="serif"
+          style={{
+            fontSize: 'clamp(22px, 2.4vw, 30px)',
+            fontWeight: 300,
+            fontStyle: 'italic',
+            lineHeight: 1.35,
+            letterSpacing: '-0.005em',
+            color: color.ink,
+            maxWidth: '46ch',
+            margin: 0
+          }}>
+          A measured guide to how we work — the role we play, the scope we hold, and the rhythm that carries a project from concept through
+          completion.
+        </p>
+      </div>
 
       {/* Sentinel: flips when the quick-links nav reaches the top */}
       <div ref={sentinelRef} aria-hidden style={{ height: 1 }} />
@@ -365,7 +377,7 @@ export default function ServicesPage() {
       </nav>
 
       {/* Services — Our Role */}
-      <Section id="sec-services" padY="lg" style={{ borderBottom: `1px solid ${color.hairline}`, scrollMarginTop: 70 }}>
+      <Section id="sec-services" padY="sm" style={{ borderBottom: `1px solid ${color.hairline}`, scrollMarginTop: 70 }}>
         <div
           style={{
             display: 'grid',
@@ -447,14 +459,14 @@ export default function ServicesPage() {
       </Section>
 
       {/* Scope */}
-      <Section id="sec-scope" padY="lg" style={{ background: 'rgba(42,46,37,0.04)', scrollMarginTop: 90 }}>
+      <Section id="sec-scope" padY="sm" style={{ background: 'rgba(42,46,37,0.04)', scrollMarginTop: 90 }}>
         <div
           ref={refScope}
           style={{
             display: 'grid',
             gridTemplateColumns: cols('1.2fr 1fr'),
             gap: 80,
-            alignItems: 'end',
+            alignItems: 'start',
             marginBottom: 90,
             opacity: seenScope ? 1 : 0,
             transform: seenScope ? 'translateY(0)' : 'translateY(30px)',
@@ -482,7 +494,7 @@ export default function ServicesPage() {
           <div
             style={{
               aspectRatio: '4/3',
-              backgroundImage: 'url("https://images.unsplash.com/photo-1611288875785-f5d5edcc1adc?auto=format&fit=crop&w=1400&q=80")',
+              backgroundImage: 'url("https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?auto=format&fit=crop&w=1400&q=80")',
               backgroundSize: 'cover',
               backgroundPosition: 'center'
             }}
@@ -545,7 +557,7 @@ export default function ServicesPage() {
       </Section>
 
       {/* Deliverables */}
-      <Section id="sec-deliverables" padY="lg" style={{ borderBottom: `1px solid ${color.hairline}`, scrollMarginTop: 70 }}>
+      <Section id="sec-deliverables" padY="sm" style={{ borderBottom: `1px solid ${color.hairline}`, scrollMarginTop: 70 }}>
         <div style={{ marginBottom: 90 }}>
           <Eyebrow style={{ marginBottom: 24 }}>— Deliverables</Eyebrow>
           <h2
@@ -662,7 +674,7 @@ export default function ServicesPage() {
       </Section>
 
       {/* Process */}
-      <Section id="sec-process" padY="lg" style={{ background: 'rgba(42,46,37,0.04)', scrollMarginTop: 70 }}>
+      <Section id="sec-process" padY="sm" style={{ background: 'rgba(42,46,37,0.04)', scrollMarginTop: 70 }}>
         <div
           style={{
             display: 'grid',
@@ -770,7 +782,7 @@ export default function ServicesPage() {
       </Section>
 
       {/* Working Together */}
-      <Section id="sec-working" padY="lg" style={{ borderBottom: `1px solid ${color.hairline}`, scrollMarginTop: 70 }}>
+      <Section id="sec-working" padY="sm" style={{ borderBottom: `1px solid ${color.hairline}`, scrollMarginTop: 70 }}>
         <div style={{ marginBottom: 80 }}>
           <Eyebrow style={{ marginBottom: 22 }}>— Working Together</Eyebrow>
           <h2
@@ -846,7 +858,7 @@ export default function ServicesPage() {
       </Section>
 
       {/* The Difference */}
-      <Section id="sec-difference" padY="lg" style={{ background: 'rgba(42,46,37,0.04)', scrollMarginTop: 70 }}>
+      <Section id="sec-difference" padY="sm" style={{ background: 'rgba(42,46,37,0.04)', scrollMarginTop: 70 }}>
         <div
           style={{
             display: 'grid',
@@ -975,7 +987,7 @@ export default function ServicesPage() {
       </Section>
 
       {/* Next Steps */}
-      <Section id="sec-next" padTop="lg" padBottom="none" style={{ scrollMarginTop: 70 }}>
+      <Section id="sec-next" padTop="sm" padBottom="none" style={{ scrollMarginTop: 70 }}>
         <Eyebrow style={{ marginBottom: 24 }}>— Next Steps</Eyebrow>
         <h2
           className="serif"
