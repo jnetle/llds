@@ -59,9 +59,9 @@ export function StatementSection() {
             transition: 'all 1s ease 0.5s'
           }}>
           <p style={{ ...text.body, maxWidth: '40ch' }}>
-            Founded in 2016 by Iris Wren, Laurel Leaf Design Studio is a London-based practice working across residential and small
-            commercial commissions. Our approach is unhurried: we begin with the architecture, the light, and the way a household actually
-            moves through a day.
+            Founded in 2020 by Maria Rhinehart, Laurel Leaf Design Studio works across residential and small commercial projects in the
+            Augusta/Aiken region. Our approach is unhurried — we begin with the architecture, the light, and the rhythms of how a household
+            actually lives.
           </p>
           <div>
             <Eyebrow opacity={0.5} style={{ marginBottom: 24 }}>
