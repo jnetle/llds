@@ -282,9 +282,6 @@ export default function ServicesPage() {
             paddingBottom: 72,
             color: color.bg
           }}>
-          <Eyebrow opacity={0.85} style={{ marginBottom: 28, letterSpacing: '0.32em' }}>
-            — Laurel Leaf Design Studio · 2026
-          </Eyebrow>
           <h1
             className="serif"
             style={{
