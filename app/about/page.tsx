@@ -1,7 +1,6 @@
 'use client';
 
 import Image from 'next/image';
-import Link from 'next/link';
 import { useReveal } from '@/hooks/useReveal';
 import { useCompact } from '@/hooks/useCompact';
 import { Section } from '@/components/ui/Section';
@@ -74,11 +73,12 @@ export default function AboutPage() {
           }}>
           <Eyebrow>— The Studio</Eyebrow>
           <Heading level="display">
-            An unhurried practice <em style={{ fontWeight: 300 }}>rooted</em> in the English countryside.
+            A measured, <em style={{ fontWeight: 300 }}>intentional</em> approach to the spaces we call home.
           </Heading>
           <p style={{ ...text.body, maxWidth: '46ch' }}>
-            Laurel Leaf Design Studio was founded by Maria Rhinehart in XXXX after a decade working across residential architecture and
-            antique dealing. The studio operates from a small mews in Bloomsbury, with a second workshop in rural Oxfordshire.
+            Laurel Leaf Design Studio was founded by Maria Rhinehart in 2020. The studio is based in the Augusta, Georgia and Aiken, South
+            Carolina area, bringing a carefully considered approach to each home — one that honors both the architecture and the people who
+            live in it.
           </p>
         </div>
       </section>
