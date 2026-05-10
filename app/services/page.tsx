@@ -241,7 +241,11 @@ export default function ServicesPage() {
         setStuck(isStuck);
         dispatch(isStuck);
       },
-      { threshold: 0 }
+      // Negative top margin trips the "stuck" state ~90px before the sentinel
+      // actually clears the viewport. The first quick link ("Services") scrolls
+      // to `section - 70px`, which would otherwise leave the sentinel just
+      // inside the viewport and keep the global header visible.
+      { threshold: 0, rootMargin: '-90px 0px 0px 0px' }
     );
     io.observe(node);
     return () => {
