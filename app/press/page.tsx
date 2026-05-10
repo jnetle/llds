@@ -56,22 +56,21 @@ export default function PressPage() {
 
   return (
     <>
-      {/* Hero — broadsheet masthead */}
+      {/* Hero — title stack + lead-story preview */}
       <Section
-        padTop="xl"
-        padBottom="xs"
+        padTop="md"
+        padBottom="none"
         style={{
           position: 'relative',
-          borderBottom: `2px solid ${color.hairline}`,
           overflow: 'hidden'
         }}>
         <div style={{ position: 'relative' }}>
           <h1
             className="serif"
             style={{
-              fontSize: 'clamp(96px, 16vw, 280px)',
+              fontSize: 'clamp(72px, 11vw, 184px)',
               fontWeight: 300,
-              lineHeight: 0.82,
+              lineHeight: 0.84,
               letterSpacing: '-0.035em',
               textTransform: 'uppercase',
               textWrap: 'balance',
@@ -84,9 +83,9 @@ export default function PressPage() {
             aria-hidden
             style={{
               position: 'absolute',
-              right: '6%',
-              top: '8%',
-              fontSize: 'clamp(160px, 22vw, 380px)',
+              right: '4%',
+              top: '-2%',
+              fontSize: 'clamp(120px, 16vw, 240px)',
               fontWeight: 300,
               fontStyle: 'italic',
               lineHeight: 1,
@@ -99,9 +98,9 @@ export default function PressPage() {
           <h1
             className="serif"
             style={{
-              fontSize: 'clamp(80px, 13vw, 230px)',
+              fontSize: 'clamp(58px, 9vw, 148px)',
               fontWeight: 300,
-              lineHeight: 0.82,
+              lineHeight: 0.84,
               fontStyle: 'italic',
               letterSpacing: '-0.025em',
               marginTop: 4,
@@ -111,10 +110,98 @@ export default function PressPage() {
             recognition
           </h1>
         </div>
+
+        {/* Lower deck: standfirst + clickable lead-story preview card */}
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: cols('1fr 1fr'),
+            gap: 56,
+            paddingTop: 28,
+            paddingBottom: 36,
+            borderTop: `1px solid ${color.ink}`,
+            marginTop: 96
+          }}>
+          <div>
+            <Eyebrow size="sm" opacity={0.65} style={{ letterSpacing: '0.26em', marginBottom: 18 }}>
+              Awards · Editorial · Interviews · Features
+            </Eyebrow>
+            <p
+              className="serif"
+              style={{
+                fontSize: 'clamp(20px, 1.7vw, 26px)',
+                fontWeight: 300,
+                fontStyle: 'italic',
+                lineHeight: 1.45,
+                letterSpacing: '0.005em',
+                textWrap: 'pretty',
+                maxWidth: '38ch',
+                margin: 0
+              }}>
+              A small studio, quietly recognised — a record of the awards, articles, and conversations the work has been part of.
+            </p>
+          </div>
+
+          <a
+            href="#sec-stellar"
+            onClick={e => {
+              e.preventDefault();
+              const el = document.getElementById('sec-stellar');
+              if (el) {
+                const top = el.getBoundingClientRect().top + window.scrollY - 24;
+                window.scrollTo({ top, behavior: 'smooth' });
+              }
+            }}
+            style={{
+              display: 'grid',
+              gridTemplateColumns: cols('1fr 1.2fr'),
+              gap: 24,
+              borderTop: `1px solid ${color.hairline}`,
+              borderBottom: `1px solid ${color.hairline}`,
+              padding: '20px 0',
+              color: color.ink,
+              textDecoration: 'none'
+            }}>
+            <div
+              style={{
+                aspectRatio: '4/5',
+                minHeight: 180,
+                backgroundImage: `url("${AWARDS[0].img}")`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center'
+              }}
+            />
+            <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+              <div>
+                <Eyebrow size="sm" opacity={0.6} style={{ letterSpacing: '0.26em', marginBottom: 12 }}>
+                  Lead Story · p. 02
+                </Eyebrow>
+                <div
+                  className="serif"
+                  style={{
+                    fontSize: 'clamp(22px, 2vw, 32px)',
+                    fontWeight: 300,
+                    lineHeight: 1.05,
+                    letterSpacing: '-0.005em',
+                    textTransform: 'uppercase',
+                    textWrap: 'balance'
+                  }}>
+                  Two Stellar Awards <em style={{ fontWeight: 300, textTransform: 'none' }}>for a single project</em>
+                </div>
+                <Eyebrow size="sm" opacity={0.55} style={{ letterSpacing: '0.22em', marginTop: 14 }}>
+                  Best Curb Appeal · Best Kitchen
+                </Eyebrow>
+              </div>
+              <Eyebrow size="sm" opacity={0.7} style={{ letterSpacing: '0.26em', marginTop: 12 }}>
+                Continue reading →
+              </Eyebrow>
+            </div>
+          </a>
+        </div>
       </Section>
 
       {/* Stellar Awards intro */}
-      <Section padTop="md" padBottom="xs" style={{ borderBottom: `1px solid ${color.hairline}` }}>
+      <Section id="sec-stellar" padTop="md" padBottom="xs" style={{ borderBottom: `1px solid ${color.hairline}`, scrollMarginTop: 24 }}>
         <div
           ref={ref}
           style={{
