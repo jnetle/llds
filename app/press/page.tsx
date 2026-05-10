@@ -479,13 +479,6 @@ export default function PressPage() {
           </div>
         </div>
       </Section>
-
-      {/* CTA back */}
-      <Section padTop="none" padBottom="xl" style={{ textAlign: 'center' }}>
-        <Link href="/" className="micro" style={{ borderBottom: '1px solid currentColor', paddingBottom: 6, letterSpacing: '0.28em' }}>
-          ↵ Return to Projects
-        </Link>
-      </Section>
     </>
   );
 }

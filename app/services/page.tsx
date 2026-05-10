@@ -1106,9 +1106,6 @@ export default function ServicesPage() {
           <Link href="/inquire" className="micro" style={{ padding: '14px 26px', border: `1px solid ${color.ink}`, borderRadius: 100 }}>
             Schedule an initial meeting
           </Link>
-          <Link href="/" className="micro" style={{ padding: '14px 22px', opacity: 0.6 }}>
-            ↵ Back to Projects
-          </Link>
         </div>
       </Section>
     </>
