@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { Eyebrow } from '@/components/ui/Eyebrow';
 import { Grid } from '@/components/ui/Grid';
 import { Section } from '@/components/ui/Section';
@@ -16,13 +17,8 @@ const COLUMNS: { h: string; items: { label: string; href?: string; target?: stri
     ]
   },
   {
-    h: 'Visit',
-    items: [{ label: 'XXXX Street' }, { label: 'Augusta, Georgia 12345' }, { label: 'Serving Aiken/Augusta area' }]
-  },
-  {
-    h: 'Contact',
+    h: 'Social',
     items: [
-      { label: 'hello@laurelleaf.studio', href: 'mailto:hello@laurelleaf.studio' },
       { label: 'Instagram', target: '_blank', href: 'https://www.instagram.com/laurelleafdesignstudio' },
       { label: 'Facebook', target: '_blank', href: 'https://www.facebook.com/laurelleafdesignstudio' }
     ]
@@ -48,26 +44,55 @@ export function Footer() {
             Considered interiors for the long view.
           </p>
         </div>
-        {COLUMNS.map(col => (
-          <div key={col.h}>
-            <Eyebrow opacity={0.5} style={{ marginBottom: 22 }}>
-              {col.h}
-            </Eyebrow>
-            <ul style={{ listStyle: 'none', display: 'grid', gap: 10 }}>
-              {col.items.map(it => (
-                <li key={it.label} style={{ fontSize: 14, color: color.inkSoft }}>
-                  {it.href ? (
-                    <a target={it.target || '_self'} rel={it.target === '_blank' ? 'noopener noreferrer' : undefined} href={it.href}>
-                      {it.label}
-                    </a>
-                  ) : (
-                    it.label
-                  )}
-                </li>
-              ))}
-            </ul>
+        <div>
+          <Eyebrow opacity={0.5} style={{ marginBottom: 22 }}>
+            {COLUMNS[0].h}
+          </Eyebrow>
+          <ul style={{ listStyle: 'none', display: 'grid', gap: 10 }}>
+            {COLUMNS[0].items.map(it => (
+              <li key={it.label} style={{ fontSize: 14, color: color.inkSoft }}>
+                {it.href ? <Link href={it.href}>{it.label}</Link> : it.label}
+              </li>
+            ))}
+          </ul>
+        </div>
+        <div>
+          <Eyebrow opacity={0.5} style={{ marginBottom: 22 }}>
+            Inquire
+          </Eyebrow>
+          <Link
+            href="/inquire"
+            style={{
+              display: 'inline-block',
+              fontSize: 14,
+              color: color.inkSoft,
+              marginBottom: 20
+            }}>
+            Tell us about your project
+          </Link>
+          <div style={{ fontSize: 13, color: color.inkSoft, lineHeight: 1.7, opacity: 0.75 }}>
+            <div>By appointment only</div>
+            <div>Augusta, GA · North Augusta · Aiken, SC</div>
           </div>
-        ))}
+        </div>
+        <div>
+          <Eyebrow opacity={0.5} style={{ marginBottom: 22 }}>
+            {COLUMNS[1].h}
+          </Eyebrow>
+          <ul style={{ listStyle: 'none', display: 'grid', gap: 10 }}>
+            {COLUMNS[1].items.map(it => (
+              <li key={it.label} style={{ fontSize: 14, color: color.inkSoft }}>
+                {it.href ? (
+                  <a target={it.target || '_self'} rel={it.target === '_blank' ? 'noopener noreferrer' : undefined} href={it.href}>
+                    {it.label}
+                  </a>
+                ) : (
+                  it.label
+                )}
+              </li>
+            ))}
+          </ul>
+        </div>
         <div
           style={{
             gridColumn: '1 / -1',
