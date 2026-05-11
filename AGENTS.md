@@ -8,17 +8,39 @@ This version has breaking changes — APIs, conventions, and file structure may 
 npm run dev          # Start dev server (Turbopack by default)
 npm run build        # Production build (Turbopack by default)
 npm start            # Start production server
-npm run lint         # Run ESLint + scripts/check-css.mjs (CSS regression guard)
+npm run lint         # ESLint (--max-warnings=0) + scripts/check-css.mjs
 npm run check:css    # CSS guard alone (forbidden patterns in app/globals.css)
+npm run typecheck    # tsc --noEmit (no script runs this implicitly — run before pushing)
 npm run format       # Format the repo with Prettier
 npm run format:check # Verify formatting without writing
 ```
 
 There are no tests configured yet.
 
+## Pre-commit hook
+
+Husky + lint-staged is wired up. On every `git commit`, `.husky/pre-commit` runs `npx lint-staged`, which on staged files only:
+
+1. `eslint --fix --max-warnings=0` on `*.{ts,tsx,js,mjs}` — auto-strips unused imports, fails commit on any remaining warning
+2. `prettier --write` on the same files plus `*.{json,md,css}`
+
+Fixed files are re-staged automatically. Husky installs via the `prepare` script on `npm install` — no manual setup for new contributors.
+
+**Bypassing**: `git commit --no-verify` skips the hook. Reserve for true WIP; the assumption is shared code passes lint.
+
+**Don't run full-repo lint in the hook.** Lint-staged is scoped on purpose — keep it fast so people don't reach for `--no-verify`. CI (when added) is the right place for full-repo `lint` / `format:check` / `typecheck`.
+
+## Linting
+
+ESLint flat config in `eslint.config.mjs` extends `eslint-config-next/core-web-vitals` and `eslint-config-next/typescript`, plus `eslint-plugin-unused-imports`:
+
+- `unused-imports/no-unused-imports`: **error** (auto-fixable). The Next.js preset's `@typescript-eslint/no-unused-vars` is disabled in favor of this — it catches the same things but separates imports from locals so imports can be auto-stripped.
+- `unused-imports/no-unused-vars`: **warning**. Prefix unused names with `_` to silence (e.g. `_unusedArg`).
+- `npm run lint` uses `--max-warnings=0`, so any warning fails CI/lint. Don't commit code with lingering warnings — fix or `_`-prefix.
+
 ## Formatting
 
-Prettier is the source of truth for formatting. Config lives in `.prettierrc.json`; ignore list in `.prettierignore`. Run `npm run format` after edits, or `npm run format:check` in CI. Active rules:
+Prettier is the source of truth for formatting. Config lives in `.prettierrc.json`; ignore list in `.prettierignore`. The pre-commit hook runs Prettier on staged files automatically; use `npm run format` for ad-hoc full-repo runs and `npm run format:check` in CI. Active rules:
 
 - `semi: true` — terminate statements with semicolons
 - `tabWidth: 2`
