@@ -10,7 +10,7 @@ npm run build        # Production build (Turbopack by default)
 npm start            # Start production server
 npm run lint         # ESLint (--max-warnings=0) + scripts/check-css.mjs
 npm run check:css    # CSS guard alone (forbidden patterns in app/globals.css)
-npm run typecheck    # tsc --noEmit (no script runs this implicitly — run before pushing)
+npm run typecheck    # tsc --noEmit (no script runs this implicitly — run before opening a PR; reviewers can't catch type errors otherwise)
 npm run format       # Format the repo with Prettier
 npm run format:check # Verify formatting without writing
 ```
