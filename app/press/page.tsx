@@ -1,6 +1,5 @@
 'use client';
 
-import Link from 'next/link';
 import { useReveal } from '@/hooks/useReveal';
 import { useCols } from '@/hooks/useCompact';
 import { Eyebrow } from '@/components/ui/Eyebrow';
