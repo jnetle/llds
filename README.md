@@ -1,36 +1,59 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Laurel Leaf Design Studio
 
-## Getting Started
+The marketing site for Laurel Leaf Design Studio — an interior design practice based in the Augusta/Aiken region, founded in 2020 by Maria Rhinehart. The studio works on residential and small commercial projects with an unhurried, architecture-first approach.
 
-First, run the development server:
+![Laurel Leaf Design Studio — home](docs/screenshot.png)
+
+## What's in here
+
+A small, editorial Next.js site organised around the studio's work:
+
+- **Home** — a full-bleed project hero grid with scroll-driven parallax, a studio statement, and a horizontal project strip
+- **Projects** — index and detail pages for each commission (`app/projects/`)
+- **Services** — disciplines and engagement model, with a sticky in-page nav
+- **About** — studio story, founder bio, and location
+- **Press** — published work and recognition
+- **Inquire** — a typed contact form (React Hook Form + Zod)
+
+The look is poster-scale serif display type (Cormorant Garamond), Inter for UI text, a low palette of bone/ink, and motion that's slow on purpose.
+
+## Stack
+
+- **Next.js 16.2** App Router with **Turbopack** (dev and build)
+- **React 19.2** + TypeScript
+- **Tailwind v4** for a handful of layout utilities only — the rest is a token-driven design system in `lib/tokens.ts` and primitives in `components/ui/`
+- **React Hook Form** + **Zod** for the inquiry form
+- **ESLint** (flat config) + **Prettier** + **Husky** / **lint-staged** pre-commit hook
+- Deployed on **Vercel**
+
+Project conventions, design tokens, CSS pitfalls, and Next 16-specific gotchas are documented in [`AGENTS.md`](./AGENTS.md).
+
+## Getting started
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
+npm run dev          # http://localhost:3000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Useful scripts
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+npm run build        # Production build (Turbopack)
+npm run lint         # ESLint --max-warnings=0 + CSS guard
+npm run typecheck    # tsc --noEmit
+npm run format       # Prettier write
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Layout
 
-## Learn More
+```
+app/                 # App Router routes, layouts, pages
+components/          # Feature components (Header, HeroGrid, ProjectDetail, …)
+components/ui/       # Design system primitives (Section, Grid, Heading, Eyebrow, Container)
+hooks/               # One hook per file, imported as @/hooks/<name>
+lib/tokens.ts        # Single source of truth: color, spacing, type, motion
+lib/projects.ts      # Project data
+public/images/       # Local image assets (Unsplash URLs are placeholders)
+```
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+The screenshot above lives in `docs/screenshot.png` — regenerate it with headless Chrome against a running dev server if the home page changes meaningfully.
