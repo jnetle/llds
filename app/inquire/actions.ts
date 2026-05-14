@@ -60,7 +60,6 @@ export async function submitInquiry(raw: unknown): Promise<SubmitResult> {
     structuredComm: data.structuredComm,
     anythingElse: data.anythingElse,
     howHeard: data.howHeard,
-    newsletter: data.newsletter,
     submittedAt: new Date().toISOString(),
     __secret: secret
   };

@@ -125,7 +125,6 @@ export const inquirySchema = z.object({
   // 11 — Final Details
   anythingElse: z.string().trim().min(1, 'If nothing else, please write “nothing else” — this field is required.'),
   howHeard: z.string().trim().min(1, 'How did you hear about Laurel Leaf?'),
-  newsletter: z.boolean(),
 
   // Honeypot
   website: z.string()

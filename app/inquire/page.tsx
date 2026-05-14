@@ -133,7 +133,6 @@ const defaultValues: InquiryInput = {
   structuredComm: '',
   anythingElse: '',
   howHeard: '',
-  newsletter: false,
   website: ''
 };
 
@@ -906,13 +905,6 @@ export default function InquirePage() {
                 style={{ ...inputStyle, ...errInputBorder('howHeard') }}
               />
             </Field>
-
-            <label style={{ display: 'flex', alignItems: 'center', gap: 14, cursor: 'pointer', fontSize: 15 }}>
-              <input {...register('newsletter')} type="checkbox" style={{ width: 18, height: 18, accentColor: color.ink }} />
-              <span style={{ color: color.inkSoft }}>
-                I&apos;d like to receive the studio&apos;s quarterly journal — new work, references, and recent reading.
-              </span>
-            </label>
           </fieldset>
         </section>
 

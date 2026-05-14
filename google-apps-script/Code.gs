@@ -65,8 +65,7 @@ const COLUMNS = [
   'Priorities',
   'Structured Comm',
   'Anything Else',
-  'How Heard',
-  'Newsletter'
+  'How Heard'
 ];
 
 const DEFAULT_REPLY_TEMPLATE = [
@@ -155,8 +154,7 @@ function doPost(e) {
       joinList(body.priorities),
       body.structuredComm || '',
       body.anythingElse || '',
-      body.howHeard || '',
-      body.newsletter === true
+      body.howHeard || ''
     ];
     sheet.appendRow(row);
 
