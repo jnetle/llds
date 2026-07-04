@@ -76,7 +76,7 @@ const DEFAULT_REPLY_TEMPLATE = [
   '',
   '',
   'Warmly,',
-  'The Laurel Leaf studio'
+  'Laurel Leaf Design Studio'
 ].join('\n');
 
 function joinList(value) {
@@ -229,7 +229,7 @@ function replyToSelectedLead() {
   }
 
   const firstName = String(record['Name'] || '').split(' ')[0] || 'there';
-  const subject = 'Re: your inquiry to Laurel Leaf';
+  const subject = 'Re: your inquiry to Laurel Leaf Design Studio';
   const template = PropertiesService.getScriptProperties().getProperty('REPLY_TEMPLATE') || DEFAULT_REPLY_TEMPLATE;
   const body = template.replace(/{{firstName}}/g, firstName);
 
