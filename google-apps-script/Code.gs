@@ -76,7 +76,7 @@ const DEFAULT_REPLY_TEMPLATE = [
   '',
   '',
   'Warmly,',
-  'The Laurel Leaf studio'
+  'Laurel Leaf Design Studio'
 ].join('\n');
 
 function joinList(value) {
