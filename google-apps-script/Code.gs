@@ -29,6 +29,35 @@
 
 const STATUS_DEFAULT = 'New';
 const HEADER_ROW = 1;
+
+/* --------------------------------------------------------------------------
+ *  Respondent view (for Looker Studio)
+ *
+ *  The main sheet is "wide" — one column per question. Looker Studio can't
+ *  show that as a per-respondent Q&A list without hard-coding every field,
+ *  which breaks the moment a question changes. So we also maintain a "long"
+ *  (tidy) tab: one row per (respondent, question, answer). Point Looker
+ *  Studio at that tab and the report never needs editing when questions
+ *  change — new/renamed questions just appear as new rows.
+ *
+ *  This tab is rebuilt automatically after each submission (see doPost) and
+ *  can be rebuilt on demand via Inquiries → "Rebuild respondent view".
+ * ------------------------------------------------------------------------ */
+
+// Tab that holds the long/tidy per-respondent rows.
+const TIDY_SHEET_NAME = 'Respondent View';
+
+// Columns kept as row identity (not treated as questions). Everything else
+// in the header row becomes a Question/Answer pair. Matched by header text,
+// so reordering columns on the main sheet is fine.
+const TIDY_IDENTITY = ['Submitted At', 'Name', 'Email', 'Status'];
+
+// Output columns of the tidy tab.
+const TIDY_COLUMNS = ['Respondent', 'Submitted At', 'Name', 'Email', 'Status', 'Order', 'Question', 'Answer'];
+
+// If true, questions a respondent left blank are omitted from their view
+// (cleaner list). Set false to show every question, blank answers included.
+const SKIP_BLANK_ANSWERS = true;
 const COLUMNS = [
   'Submitted At',
   'Status',
@@ -158,6 +187,14 @@ function doPost(e) {
     ];
     sheet.appendRow(row);
 
+    // Keep the Looker Studio data source fresh. Never let a tidy-rebuild
+    // failure block the submission from being recorded / acknowledged.
+    try {
+      rebuildTidyTab();
+    } catch (tidyErr) {
+      console.error('rebuildTidyTab failed', tidyErr);
+    }
+
     if (ownerEmail) {
       const sheetUrl = SpreadsheetApp.getActiveSpreadsheet().getUrl();
       const subject = 'New inquiry — ' + (body.name || 'unknown');
@@ -202,11 +239,85 @@ function jsonResponse(body) {
 }
 
 /* -------------------------------------------------------------------------- */
+/*  Respondent view: rebuild the long/tidy tab for Looker Studio              */
+/* -------------------------------------------------------------------------- */
+
+// Rebuilds the TIDY_SHEET_NAME tab from the main sheet, in long form:
+// one row per (respondent, question, answer). Reads the header row live so
+// it adapts automatically when questions are added, removed, or reordered.
+function rebuildTidyTab() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const dataSheet = ss.getSheets()[0];
+  const lastRow = dataSheet.getLastRow();
+  const lastCol = dataSheet.getLastColumn();
+
+  // No data (or no header) yet: write just the header row and stop.
+  if (lastCol < 1 || lastRow <= HEADER_ROW) {
+    writeTidy(ss, [TIDY_COLUMNS]);
+    return;
+  }
+
+  const headers = dataSheet.getRange(HEADER_ROW, 1, 1, lastCol).getValues()[0];
+  const data = dataSheet.getRange(HEADER_ROW + 1, 1, lastRow - HEADER_ROW, lastCol).getValues();
+
+  const idx = {};
+  headers.forEach(function (h, i) {
+    idx[h] = i;
+  });
+
+  const out = [TIDY_COLUMNS];
+  data.forEach(function (rowVals) {
+    if (rowVals.join('') === '') return; // skip fully-empty rows
+
+    const submittedAt = valueAt(rowVals, idx, 'Submitted At');
+    const name = valueAt(rowVals, idx, 'Name');
+    const email = valueAt(rowVals, idx, 'Email');
+    const status = valueAt(rowVals, idx, 'Status');
+    const label = buildRespondentLabel(name, email, submittedAt);
+
+    let order = 0;
+    headers.forEach(function (header, i) {
+      if (TIDY_IDENTITY.indexOf(header) !== -1) return; // identity, not a question
+      order += 1;
+      const answer = rowVals[i];
+      if (SKIP_BLANK_ANSWERS && (answer === '' || answer === null)) return;
+      out.push([label, submittedAt, name, email, status, order, header, answer]);
+    });
+  });
+
+  writeTidy(ss, out);
+}
+
+function valueAt(rowVals, idx, name) {
+  return idx[name] === undefined ? '' : rowVals[idx[name]];
+}
+
+// Human-readable, reasonably unique label for the Looker Studio respondent
+// picker, e.g. "Jane Doe (2026-07-01)". Falls back to email when unnamed.
+function buildRespondentLabel(name, email, submittedAt) {
+  const who = String(name || email || 'Unknown').trim();
+  const when = String(submittedAt || '').slice(0, 10);
+  return when ? who + ' (' + when + ')' : who;
+}
+
+function writeTidy(ss, rows) {
+  let sheet = ss.getSheetByName(TIDY_SHEET_NAME);
+  if (!sheet) sheet = ss.insertSheet(TIDY_SHEET_NAME);
+  sheet.clearContents();
+  sheet.getRange(1, 1, rows.length, TIDY_COLUMNS.length).setValues(rows);
+  sheet.setFrozenRows(1);
+}
+
+/* -------------------------------------------------------------------------- */
 /*  Sheet UI: "Inquiries" menu — Reply to selected lead                       */
 /* -------------------------------------------------------------------------- */
 
 function onOpen() {
-  SpreadsheetApp.getUi().createMenu('Inquiries').addItem('Reply to selected lead', 'replyToSelectedLead').addToUi();
+  SpreadsheetApp.getUi()
+    .createMenu('Inquiries')
+    .addItem('Reply to selected lead', 'replyToSelectedLead')
+    .addItem('Rebuild respondent view (Looker)', 'rebuildTidyTab')
+    .addToUi();
 }
 
 function replyToSelectedLead() {
