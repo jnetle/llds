@@ -147,7 +147,10 @@ function FilterView({ active, compact }: { active: Filter; compact: boolean }) {
                 — {CATEGORY_LABELS[cat]}
               </Eyebrow>
             )}
-            <Grid cols="repeat(2, 1fr)" columnGap={32} rowGap={{ d: 96, m: 56 }}>
+            <Grid
+              cols={{ d: 'repeat(4, 1fr)', t: 'repeat(3, 1fr)', m: 'repeat(2, 1fr)' }}
+              columnGap={{ d: 32, t: 24, m: 16 }}
+              rowGap={{ d: 64, m: 40 }}>
               {group.map((p, idx) => (
                 <ProjectsTile key={p.id} project={p} index={idx} />
               ))}
