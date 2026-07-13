@@ -1,13 +1,25 @@
+export type ProjectCategory = 'renovation' | 'new-build';
+
 export type Project = {
   id: string;
   title: string;
   location: string;
   year: string;
   discipline: string;
+  category: ProjectCategory;
   cover: string;
   palette: [string, string, string];
   intro: string;
   gallery: [string, string, string];
+};
+
+// Display order and labels for the grouped Projects index. Single source of
+// truth so the component never hardcodes category strings or copy.
+export const CATEGORY_ORDER: ProjectCategory[] = ['renovation', 'new-build'];
+
+export const CATEGORY_LABELS: Record<ProjectCategory, string> = {
+  renovation: 'Renovations',
+  'new-build': 'New Builds'
 };
 
 export const PROJECTS: Project[] = [
@@ -17,6 +29,7 @@ export const PROJECTS: Project[] = [
     location: 'North London',
     year: '2025',
     discipline: 'Full Interior Architecture',
+    category: 'renovation',
     cover: 'https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=1800&q=80',
     palette: ['#C8B89B', '#6B5C42', '#2A2E25'],
     intro:
@@ -33,6 +46,7 @@ export const PROJECTS: Project[] = [
     location: 'Provence, France',
     year: '2024',
     discipline: 'Restoration & Furnishing',
+    category: 'renovation',
     cover: 'https://images.unsplash.com/photo-1505691938895-1758d7feb511?auto=format&fit=crop&w=1800&q=80',
     palette: ['#E8DEC8', '#A88A5C', '#3A2A1C'],
     intro:
@@ -49,6 +63,7 @@ export const PROJECTS: Project[] = [
     location: 'East London',
     year: '2025',
     discipline: 'Apartment Conversion',
+    category: 'renovation',
     cover: 'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=1800&q=80',
     palette: ['#D4CDB8', '#8E7B5C', '#202220'],
     intro:
@@ -65,6 +80,7 @@ export const PROJECTS: Project[] = [
     location: 'Whitstable',
     year: '2024',
     discipline: 'New Build Interiors',
+    category: 'new-build',
     cover: 'https://images.unsplash.com/photo-1616137466211-f939a420be84?auto=format&fit=crop&w=1800&q=80',
     palette: ['#E5DECF', '#9CA193', '#2D332C'],
     intro:
@@ -81,6 +97,7 @@ export const PROJECTS: Project[] = [
     location: 'Central London',
     year: '2025',
     discipline: 'Apartment Refurbishment',
+    category: 'renovation',
     cover: 'https://images.unsplash.com/photo-1616593969747-4797dc75033e?auto=format&fit=crop&w=1800&q=80',
     palette: ['#D8C9A8', '#7A6442', '#2A2520'],
     intro:
@@ -97,6 +114,7 @@ export const PROJECTS: Project[] = [
     location: 'Gloucestershire',
     year: '2025',
     discipline: 'Agricultural Conversion',
+    category: 'renovation',
     cover: 'https://images.unsplash.com/photo-1598928506311-c55ded91a20c?auto=format&fit=crop&w=1800&q=80',
     palette: ['#E2D9C3', '#8B7A5A', '#2B2820'],
     intro:
@@ -113,6 +131,7 @@ export const PROJECTS: Project[] = [
     location: 'North West London',
     year: '2026',
     discipline: 'Listed Restoration',
+    category: 'renovation',
     cover: 'https://images.unsplash.com/photo-1600566753376-12c8ab7fb75b?auto=format&fit=crop&w=1800&q=80',
     palette: ['#D9D3C1', '#6F6A52', '#24261F'],
     intro:
@@ -124,3 +143,5 @@ export const PROJECTS: Project[] = [
     ]
   }
 ];
+
+export const projectsByCategory = (category: ProjectCategory) => PROJECTS.filter(p => p.category === category);
