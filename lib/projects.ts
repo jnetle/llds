@@ -5,10 +5,9 @@ export type Project = {
   title: string;
   location: string;
   year: string;
-  discipline: string;
+  builder: string;
   category: ProjectCategory;
   cover: string;
-  palette: [string, string, string];
   intro: string;
   gallery: [string, string, string];
 };
@@ -22,18 +21,14 @@ export const CATEGORY_LABELS: Record<ProjectCategory, string> = {
   'new-build': 'New Builds'
 };
 
-export const PROJECTS: Project[] = [
+// Placeholder imagery. These are the original Unsplash sets, kept as a small
+// pool and cycled across every project (`i % POOL.length`) until real assets
+// land in `public/images/projects/<slug>/` per the CLAUDE.md workflow.
+type Assets = Pick<Project, 'cover' | 'gallery'>;
+
+const PLACEHOLDER_ASSETS: Assets[] = [
   {
-    id: 'highgate',
-    title: 'Highgate Residence',
-    location: 'North London',
-    year: '2025',
-    discipline: 'Full Interior Architecture',
-    category: 'renovation',
     cover: 'https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=1800&q=80',
-    palette: ['#C8B89B', '#6B5C42', '#2A2E25'],
-    intro:
-      'A late Victorian villa reimagined as a quiet sanctuary for a family of four. Reclaimed oak, lime plaster, and hand-thrown ceramics anchor a layered palette of moss, ochre, and ivory.',
     gallery: [
       'https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=1600&q=80',
       'https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?auto=format&fit=crop&w=1600&q=80',
@@ -41,16 +36,7 @@ export const PROJECTS: Project[] = [
     ]
   },
   {
-    id: 'arles',
-    title: 'Maison d’Arles',
-    location: 'Provence, France',
-    year: '2024',
-    discipline: 'Restoration & Furnishing',
-    category: 'renovation',
     cover: 'https://images.unsplash.com/photo-1505691938895-1758d7feb511?auto=format&fit=crop&w=1800&q=80',
-    palette: ['#E8DEC8', '#A88A5C', '#3A2A1C'],
-    intro:
-      'An 18th century mas restored with restraint. Lime-washed walls, terracotta floors, and antique linens converse with contemporary art and bespoke walnut joinery.',
     gallery: [
       'https://images.unsplash.com/photo-1505691938895-1758d7feb511?auto=format&fit=crop&w=1600&q=80',
       'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?auto=format&fit=crop&w=1600&q=80',
@@ -58,16 +44,7 @@ export const PROJECTS: Project[] = [
     ]
   },
   {
-    id: 'shoreditch',
-    title: 'Shoreditch Loft',
-    location: 'East London',
-    year: '2025',
-    discipline: 'Apartment Conversion',
-    category: 'renovation',
     cover: 'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=1800&q=80',
-    palette: ['#D4CDB8', '#8E7B5C', '#202220'],
-    intro:
-      'A former print works converted into a single-storey loft. Industrial scale tempered by velvet, brushed brass, and a muted earth-toned palette.',
     gallery: [
       'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=1600&q=80',
       'https://images.unsplash.com/photo-1583847268964-b28dc8f51f92?auto=format&fit=crop&w=1600&q=80',
@@ -75,16 +52,7 @@ export const PROJECTS: Project[] = [
     ]
   },
   {
-    id: 'kentcoast',
-    title: 'Coast House, Kent',
-    location: 'Whitstable',
-    year: '2024',
-    discipline: 'New Build Interiors',
-    category: 'new-build',
     cover: 'https://images.unsplash.com/photo-1616137466211-f939a420be84?auto=format&fit=crop&w=1800&q=80',
-    palette: ['#E5DECF', '#9CA193', '#2D332C'],
-    intro:
-      'A weather-board house perched above the shingle. Pale oak floors, heavy linen, ceramic and limewash echo the bleached light of the North Kent coast.',
     gallery: [
       'https://images.unsplash.com/photo-1616137466211-f939a420be84?auto=format&fit=crop&w=1600&q=80',
       'https://images.unsplash.com/photo-1618220179428-22790b461013?auto=format&fit=crop&w=1600&q=80',
@@ -92,16 +60,7 @@ export const PROJECTS: Project[] = [
     ]
   },
   {
-    id: 'marylebone',
-    title: 'Marylebone Pied-à-Terre',
-    location: 'Central London',
-    year: '2025',
-    discipline: 'Apartment Refurbishment',
-    category: 'renovation',
     cover: 'https://images.unsplash.com/photo-1616593969747-4797dc75033e?auto=format&fit=crop&w=1800&q=80',
-    palette: ['#D8C9A8', '#7A6442', '#2A2520'],
-    intro:
-      'A compact two-bedroom mansion flat reworked around a single long sightline. Burl walnut, unlacquered brass, and heavy wool drapery soften the proportions.',
     gallery: [
       'https://images.unsplash.com/photo-1616593969747-4797dc75033e?auto=format&fit=crop&w=1600&q=80',
       'https://images.unsplash.com/photo-1616137466211-f939a420be84?auto=format&fit=crop&w=1600&q=80',
@@ -109,16 +68,7 @@ export const PROJECTS: Project[] = [
     ]
   },
   {
-    id: 'cotswold',
-    title: 'Cotswold Barn',
-    location: 'Gloucestershire',
-    year: '2025',
-    discipline: 'Agricultural Conversion',
-    category: 'renovation',
     cover: 'https://images.unsplash.com/photo-1598928506311-c55ded91a20c?auto=format&fit=crop&w=1800&q=80',
-    palette: ['#E2D9C3', '#8B7A5A', '#2B2820'],
-    intro:
-      'An 18th-century stone threshing barn converted into a single-volume family home. Raw oak trusses, hand-finished plaster, and a low palette of bracken and moss.',
     gallery: [
       'https://images.unsplash.com/photo-1598928506311-c55ded91a20c?auto=format&fit=crop&w=1600&q=80',
       'https://images.unsplash.com/photo-1560185007-cde436f6a4d0?auto=format&fit=crop&w=1600&q=80',
@@ -126,16 +76,7 @@ export const PROJECTS: Project[] = [
     ]
   },
   {
-    id: 'hampstead',
-    title: 'Hampstead Townhouse',
-    location: 'North West London',
-    year: '2026',
-    discipline: 'Listed Restoration',
-    category: 'renovation',
     cover: 'https://images.unsplash.com/photo-1600566753376-12c8ab7fb75b?auto=format&fit=crop&w=1800&q=80',
-    palette: ['#D9D3C1', '#6F6A52', '#24261F'],
-    intro:
-      'A Grade II listed Georgian townhouse returned to period proportions and quietly modernised. Tonal wall colour, slipper chairs, antiquarian books, and heavy glazed linens.',
     gallery: [
       'https://images.unsplash.com/photo-1600566753376-12c8ab7fb75b?auto=format&fit=crop&w=1600&q=80',
       'https://images.unsplash.com/photo-1560448075-bb485b067938?auto=format&fit=crop&w=1600&q=80',
@@ -143,5 +84,134 @@ export const PROJECTS: Project[] = [
     ]
   }
 ];
+
+// Core project metadata. Titles are the street name (a working placeholder until
+// final names are chosen); the owner's surname is intentionally omitted from
+// every value and every slug for privacy. The `// <surname>` comments are for
+// internal mapping only and are stripped from the production bundle — remove
+// them if you'd rather not keep surnames in source at all.
+type ProjectMeta = Pick<Project, 'id' | 'title' | 'location' | 'year' | 'builder' | 'category'>;
+
+const PROJECT_META: ProjectMeta[] = [
+  // Guha
+  {
+    id: 'conifer-rd',
+    title: 'Conifer Rd',
+    location: 'Augusta, GA',
+    year: '2022',
+    builder: 'Southern State Builders',
+    category: 'new-build'
+  },
+  // Bernal
+  {
+    id: 'rolland-place-2023',
+    title: 'Rolland Place (2023)',
+    location: 'McCormick, SC',
+    year: '2023',
+    builder: 'Southern State Builders',
+    category: 'new-build'
+  },
+  // Brown
+  {
+    id: 'holiday-rd',
+    title: 'Holiday Rd',
+    location: 'McCormick, SC',
+    year: '2024',
+    builder: 'Southern State Builders',
+    category: 'new-build'
+  },
+  // Roberson
+  { id: 'gordon-dr', title: 'Gordon Dr', location: 'Modoc, SC', year: '2024', builder: 'Zook Homes', category: 'new-build' },
+  // Ross
+  {
+    id: 'rolland-place-2024',
+    title: 'Rolland Place (2024)',
+    location: 'McCormick, SC',
+    year: '2024',
+    builder: 'Southern State Builders',
+    category: 'new-build'
+  },
+  // McCann
+  {
+    id: 'amelia-dr',
+    title: 'Amelia Dr',
+    location: 'McCormick, SC',
+    year: '2024',
+    builder: 'Southern State Builders',
+    category: 'new-build'
+  },
+  // McDonald
+  {
+    id: 'mcdonald-ln',
+    title: 'McDonald Ln',
+    location: 'Evans, GA',
+    year: '2025',
+    builder: 'Southern State Builders',
+    category: 'new-build'
+  },
+  // Faveran
+  {
+    id: 'faveran-ln',
+    title: 'Faveran Ln',
+    location: 'McCormick, SC',
+    year: '2025',
+    builder: 'Southern State Builders',
+    category: 'new-build'
+  },
+  // Shuford
+  {
+    id: 'yucca-ave',
+    title: 'Yucca Ave',
+    location: 'North Augusta, SC',
+    year: '2026',
+    builder: 'Southern State Builders',
+    category: 'new-build'
+  },
+  // Wachowicz
+  {
+    id: 'kestwick-dr',
+    title: 'Kestwick Dr',
+    location: 'Martinez, GA',
+    year: '2022',
+    builder: 'Southern State Builders',
+    category: 'renovation'
+  },
+  // Fisher
+  {
+    id: 'riverclub-ln',
+    title: 'Riverclub Ln',
+    location: 'North Augusta, SC',
+    year: '2024',
+    builder: 'Southern State Builders',
+    category: 'renovation'
+  },
+  // Campbell
+  {
+    id: 'heatherstone-way',
+    title: 'Heatherstone Way',
+    location: 'Martinez, GA',
+    year: '2024',
+    builder: 'Southern State Builders',
+    category: 'renovation'
+  },
+  // Willingham
+  { id: 'atomic-rd', title: 'Atomic Rd', location: 'Aiken, SC', year: '2024', builder: 'Southern State Builders', category: 'renovation' },
+  // Woodward
+  { id: 'heathwood-dr', title: 'Heathwood Dr', location: 'Aiken, SC', year: '2024', builder: 'Chandler Homes', category: 'renovation' },
+  // Sanders
+  { id: 'two-mile-dr', title: 'Two Mile Dr', location: 'Johnston, SC', year: '2025', builder: 'Chandler Homes', category: 'renovation' }
+];
+
+// Neutral placeholder intro copy derived from the facts we have. Replace with
+// real project descriptions when available.
+const buildIntro = (m: ProjectMeta): string =>
+  m.category === 'new-build'
+    ? `A new home in ${m.location}, completed in ${m.year} in collaboration with ${m.builder}.`
+    : `A full renovation in ${m.location}, completed in ${m.year} with ${m.builder}.`;
+
+export const PROJECTS: Project[] = PROJECT_META.map((m, i) => {
+  const assets = PLACEHOLDER_ASSETS[i % PLACEHOLDER_ASSETS.length];
+  return { ...m, ...assets, intro: buildIntro(m) };
+});
 
 export const projectsByCategory = (category: ProjectCategory) => PROJECTS.filter(p => p.category === category);
