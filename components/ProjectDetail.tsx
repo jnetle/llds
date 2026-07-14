@@ -47,7 +47,7 @@ export function ProjectDetail({ project }: Props) {
         <Link href="/projects" className="micro" style={{ display: 'flex', alignItems: 'center', gap: 10, color: 'inherit' }}>
           <span style={{ fontSize: 14, lineHeight: 1 }}>←</span> All Projects
         </Link>
-        <Eyebrow opacity={0.6}>{project.discipline}</Eyebrow>
+        <Eyebrow opacity={0.6}>Built by {project.builder}</Eyebrow>
         <Link href={`/projects/${next.id}`} className="micro" style={{ display: 'flex', alignItems: 'center', gap: 10, color: 'inherit' }}>
           Next:{' '}
           <span style={{ fontStyle: 'italic' }} className="serif">
@@ -83,16 +83,6 @@ export function ProjectDetail({ project }: Props) {
           </Heading>
           <p style={{ ...text.body, fontSize: 19, marginTop: 60, maxWidth: '52ch' }}>{project.intro}</p>
         </Container>
-      </Section>
-
-      {/* Material palette */}
-      <Section padTop="none" padBottom="xs" style={{ display: 'flex', alignItems: 'center', gap: 40, flexWrap: 'wrap' }}>
-        <Eyebrow opacity={0.5}>Material Palette</Eyebrow>
-        <div style={{ display: 'flex', gap: 16 }}>
-          {project.palette.map(c => (
-            <div key={c} style={{ width: 64, height: 64, background: c, borderRadius: '50%' }} />
-          ))}
-        </div>
       </Section>
 
       {/* Gallery */}
