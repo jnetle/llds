@@ -57,23 +57,37 @@ This project deploys to Vercel. Prefer Vercel-compatible patterns: avoid long-ru
 
 ## Images
 
-Raster images live in `public/images/` and are served via Vercel's edge CDN at no extra cost. Current Unsplash URLs are **placeholders** — replace with local paths as real assets arrive.
+Raster photos are hosted on **Cloudflare R2** (chosen for zero egress fees) behind a CDN
+domain. Today the **About** page loads its profile photos directly from R2 (see the
+`pub-….r2.dev` URLs in `app/about/page.tsx`); **project** imagery is still on the Unsplash
+placeholder pool in `lib/projects.ts` and will migrate to R2 under the slug convention
+below as real assets are uploaded. **SVGs** (logo, UI icons) stay in `public/` as
+versioned code assets — they are not hosted on R2.
 
-**Directory layout:**
+**Bucket layout (single bucket, feature-first).** Keys are lowercase kebab-case,
+use descriptive slugs (never camera/Unsplash IDs), and have stable filenames so URLs
+are deterministic from data:
 
 ```
-public/images/
-  projects/<project-slug>/cover.jpg, gallery-1.jpg, …
-  about/hero.jpg
-  press/award-1.jpg, …
+<NEXT_PUBLIC_IMG_BASE>/
+  projects/<slug>/cover.jpg
+  projects/<slug>/gallery-1.jpg … gallery-3.jpg      # slugs = PROJECT_META ids in lib/projects.ts
+  about/profile-1.jpg … profile-3.jpg                # profile shots
+  about/hero.jpg                                       # if/when added
+  press/awards/<award-slug>.jpg                        # one per award
+  press/gallery/1.jpg … 6.jpg                          # the strip, in order
+  services/<section-slug>/hero.jpg                     # one per Services section
+  shared/…                                             # genuine cross-page one-offs
 ```
 
 **Rules:**
 
-- Use `next/image` (not CSS `backgroundImage`) — it handles lazy loading, WebP conversion, and responsive `srcSet` automatically
-- Compress images before committing: target ≤ 200 KB per image, max 1600–2400 px wide
-- Prefer `.jpg` for photos; `next/image` will re-serve as WebP on the fly
-- SVGs stay in `public/` (not `public/images/`) as they are now
+- Folder = feature/route; leaf = role (`cover`, `hero`, `gallery-N`, `profile-N`). Numbered variants are plain 1-based.
+- Compress before upload with `node scripts/compress-images.mjs <in> <out>`: target ≤ 200 KB per image, max 2400 px wide, output `.jpg`.
+- Rename on upload to meaningful slugs — don't carry `photo-160058…` IDs over.
+- Replace-in-place keeps the URL stable, but the CDN caches by TTL — purge the object in Cloudflare, or append `?v=2`, for an immediate swap.
+- Project grid/detail images render via CSS `backgroundImage`, so `next/image` does not optimize them — pre-compression above is what keeps them small. Pages that do use `next/image` (e.g. About) need the R2 hostname added to `next.config.ts` `images.remotePatterns`.
+- SVGs stay in `public/` (not on R2).
 
 ## Architecture
 

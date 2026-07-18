@@ -7,6 +7,7 @@ import { Section } from '@/components/ui/Section';
 import { Eyebrow } from '@/components/ui/Eyebrow';
 import { Heading } from '@/components/ui/Heading';
 import { color, motion, text } from '@/lib/tokens';
+import { img } from '@/lib/img';
 
 const PRINCIPLES = [
   {
@@ -40,7 +41,7 @@ export default function AboutPage() {
         }}>
         <div style={{ position: 'relative', overflow: 'hidden', height: compact ? '82vh' : '100%' }}>
           <Image
-            src="/images/profile/maria39.jpg"
+            src={img('about/maria39.jpg')}
             alt="Maria Rhinehart, founder of Laurel Leaf Design Studio"
             fill
             priority
@@ -103,7 +104,7 @@ export default function AboutPage() {
           }}>
           <div style={{ position: 'relative', aspectRatio: '4/5', overflow: 'hidden' }}>
             <Image
-              src="/images/profile/maria117.jpg"
+              src={img('about/maria117.jpg')}
               alt="Maria Rhinehart in the studio"
               fill
               sizes="(max-width: 1024px) 100vw, 40vw"
@@ -121,7 +122,7 @@ export default function AboutPage() {
               borderTop: `1px solid ${color.hairline}`
             }}>
             <Image
-              src="/images/profile/maria36.jpg"
+              src={img('about/maria36.jpg')}
               alt="Maria Rhinehart"
               width={90}
               height={110}
