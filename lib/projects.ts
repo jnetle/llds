@@ -1,24 +1,12 @@
-export type ProjectCategory = 'renovation' | 'new-build';
-
 export type Project = {
   id: string;
   title: string;
   location: string;
   year: string;
   builder: string;
-  category: ProjectCategory;
   cover: string;
   intro: string;
   gallery: [string, string, string];
-};
-
-// Display order and labels for the grouped Projects index. Single source of
-// truth so the component never hardcodes category strings or copy.
-export const CATEGORY_ORDER: ProjectCategory[] = ['renovation', 'new-build'];
-
-export const CATEGORY_LABELS: Record<ProjectCategory, string> = {
-  renovation: 'Renovations',
-  'new-build': 'New Builds'
 };
 
 // Placeholder imagery. These are the original Unsplash sets, kept as a small
@@ -90,128 +78,49 @@ const PLACEHOLDER_ASSETS: Assets[] = [
 // every value and every slug for privacy. The `// <surname>` comments are for
 // internal mapping only and are stripped from the production bundle — remove
 // them if you'd rather not keep surnames in source at all.
-type ProjectMeta = Pick<Project, 'id' | 'title' | 'location' | 'year' | 'builder' | 'category'>;
+type ProjectMeta = Pick<Project, 'id' | 'title' | 'location' | 'year' | 'builder'>;
 
+// Ordered newest-first. This array is the single ordering source for the
+// Projects index, the home hero/strip, and detail-page prev/next — keep it
+// sorted by `year` descending when adding work.
 const PROJECT_META: ProjectMeta[] = [
-  // Guha
-  {
-    id: 'conifer-rd',
-    title: 'Conifer Rd',
-    location: 'Augusta, GA',
-    year: '2022',
-    builder: 'Southern State Builders',
-    category: 'new-build'
-  },
-  // Bernal
-  {
-    id: 'rolland-place-2023',
-    title: 'Rolland Place (2023)',
-    location: 'McCormick, SC',
-    year: '2023',
-    builder: 'Southern State Builders',
-    category: 'new-build'
-  },
-  // Brown
-  {
-    id: 'holiday-rd',
-    title: 'Holiday Rd',
-    location: 'McCormick, SC',
-    year: '2024',
-    builder: 'Southern State Builders',
-    category: 'new-build'
-  },
-  // Roberson
-  { id: 'gordon-dr', title: 'Gordon Dr', location: 'Modoc, SC', year: '2024', builder: 'Zook Homes', category: 'new-build' },
-  // Ross
-  {
-    id: 'rolland-place-2024',
-    title: 'Rolland Place (2024)',
-    location: 'McCormick, SC',
-    year: '2024',
-    builder: 'Southern State Builders',
-    category: 'new-build'
-  },
-  // McCann
-  {
-    id: 'amelia-dr',
-    title: 'Amelia Dr',
-    location: 'McCormick, SC',
-    year: '2024',
-    builder: 'Southern State Builders',
-    category: 'new-build'
-  },
-  // McDonald
-  {
-    id: 'mcdonald-ln',
-    title: 'McDonald Ln',
-    location: 'Evans, GA',
-    year: '2025',
-    builder: 'Southern State Builders',
-    category: 'new-build'
-  },
-  // Faveran
-  {
-    id: 'faveran-ln',
-    title: 'Faveran Ln',
-    location: 'McCormick, SC',
-    year: '2025',
-    builder: 'Southern State Builders',
-    category: 'new-build'
-  },
   // Shuford
-  {
-    id: 'yucca-ave',
-    title: 'Yucca Ave',
-    location: 'North Augusta, SC',
-    year: '2026',
-    builder: 'Southern State Builders',
-    category: 'new-build'
-  },
-  // Wachowicz
-  {
-    id: 'kestwick-dr',
-    title: 'Kestwick Dr',
-    location: 'Martinez, GA',
-    year: '2022',
-    builder: 'Southern State Builders',
-    category: 'renovation'
-  },
-  // Fisher
-  {
-    id: 'riverclub-ln',
-    title: 'Riverclub Ln',
-    location: 'North Augusta, SC',
-    year: '2024',
-    builder: 'Southern State Builders',
-    category: 'renovation'
-  },
-  // Campbell
-  {
-    id: 'heatherstone-way',
-    title: 'Heatherstone Way',
-    location: 'Martinez, GA',
-    year: '2024',
-    builder: 'Southern State Builders',
-    category: 'renovation'
-  },
-  // Willingham
-  { id: 'atomic-rd', title: 'Atomic Rd', location: 'Aiken, SC', year: '2024', builder: 'Southern State Builders', category: 'renovation' },
-  // Woodward
-  { id: 'heathwood-dr', title: 'Heathwood Dr', location: 'Aiken, SC', year: '2024', builder: 'Chandler Homes', category: 'renovation' },
+  { id: 'yucca-ave', title: 'Yucca Ave', location: 'North Augusta, SC', year: '2026', builder: 'Southern State Builders' },
+  // McDonald
+  { id: 'mcdonald-ln', title: 'McDonald Ln', location: 'Evans, GA', year: '2025', builder: 'Southern State Builders' },
+  // Faveran
+  { id: 'faveran-ln', title: 'Faveran Ln', location: 'McCormick, SC', year: '2025', builder: 'Southern State Builders' },
   // Sanders
-  { id: 'two-mile-dr', title: 'Two Mile Dr', location: 'Johnston, SC', year: '2025', builder: 'Chandler Homes', category: 'renovation' }
+  { id: 'two-mile-dr', title: 'Two Mile Dr', location: 'Johnston, SC', year: '2025', builder: 'Chandler Homes' },
+  // Brown
+  { id: 'holiday-rd', title: 'Holiday Rd', location: 'McCormick, SC', year: '2024', builder: 'Southern State Builders' },
+  // Roberson
+  { id: 'gordon-dr', title: 'Gordon Dr', location: 'Modoc, SC', year: '2024', builder: 'Zook Homes' },
+  // Ross
+  { id: 'rolland-place-2024', title: 'Rolland Place (2024)', location: 'McCormick, SC', year: '2024', builder: 'Southern State Builders' },
+  // McCann
+  { id: 'amelia-dr', title: 'Amelia Dr', location: 'McCormick, SC', year: '2024', builder: 'Southern State Builders' },
+  // Fisher
+  { id: 'riverclub-ln', title: 'Riverclub Ln', location: 'North Augusta, SC', year: '2024', builder: 'Southern State Builders' },
+  // Campbell
+  { id: 'heatherstone-way', title: 'Heatherstone Way', location: 'Martinez, GA', year: '2024', builder: 'Southern State Builders' },
+  // Willingham
+  { id: 'atomic-rd', title: 'Atomic Rd', location: 'Aiken, SC', year: '2024', builder: 'Southern State Builders' },
+  // Woodward
+  { id: 'heathwood-dr', title: 'Heathwood Dr', location: 'Aiken, SC', year: '2024', builder: 'Chandler Homes' },
+  // Bernal
+  { id: 'rolland-place-2023', title: 'Rolland Place (2023)', location: 'McCormick, SC', year: '2023', builder: 'Southern State Builders' },
+  // Guha
+  { id: 'conifer-rd', title: 'Conifer Rd', location: 'Augusta, GA', year: '2022', builder: 'Southern State Builders' },
+  // Wachowicz
+  { id: 'kestwick-dr', title: 'Kestwick Dr', location: 'Martinez, GA', year: '2022', builder: 'Southern State Builders' }
 ];
 
 // Neutral placeholder intro copy derived from the facts we have. Replace with
 // real project descriptions when available.
-const buildIntro = (m: ProjectMeta): string =>
-  m.category === 'new-build'
-    ? `A new home in ${m.location}, completed in ${m.year} in collaboration with ${m.builder}.`
-    : `A full renovation in ${m.location}, completed in ${m.year} with ${m.builder}.`;
+const buildIntro = (m: ProjectMeta): string => `A home in ${m.location}, completed in ${m.year} with ${m.builder}.`;
 
 export const PROJECTS: Project[] = PROJECT_META.map((m, i) => {
   const assets = PLACEHOLDER_ASSETS[i % PLACEHOLDER_ASSETS.length];
   return { ...m, ...assets, intro: buildIntro(m) };
 });
-
-export const projectsByCategory = (category: ProjectCategory) => PROJECTS.filter(p => p.category === category);
