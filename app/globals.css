@@ -8,6 +8,7 @@
   --ink-error: #8b3a2e;
   --hairline: rgba(42, 46, 37, 0.18);
   --divider-color: rgba(244, 240, 232, 0.85);
+  --navy: #1e2733;
 
   /* motion */
   --ease-elegant: cubic-bezier(0.22, 0.61, 0.36, 1);
@@ -107,6 +108,37 @@ a {
   100% {
     transform: translateX(250%);
   }
+}
+
+/* Global fixed header (components/Header.tsx). Transparent over the photo
+   heroes at the top of a page; fills with navy on hover, and stays navy once
+   scrolled (`data-solid`) so the cream foreground reads on the cream routes.
+   The transition lives here rather than inline because inline styles win the
+   cascade — an inline `transition` would drop background-color and the fill
+   would snap instead of fade. */
+.site-header {
+  background-color: transparent;
+  transition:
+    padding var(--dur-fast) var(--ease-elegant),
+    transform 360ms var(--ease-elegant),
+    opacity 360ms var(--ease-elegant),
+    background-color var(--dur-med) var(--ease-elegant);
+}
+
+.site-header:hover,
+.site-header[data-solid] {
+  background-color: var(--navy);
+}
+
+/* Scrim and navy are mutually exclusive — stacking them muddies the bar. */
+.site-header__scrim {
+  opacity: 1;
+  transition: opacity var(--dur-med) var(--ease-elegant);
+}
+
+.site-header:hover .site-header__scrim,
+.site-header[data-solid] .site-header__scrim {
+  opacity: 0;
 }
 
 .nav-underline {

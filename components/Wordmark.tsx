@@ -11,7 +11,7 @@ export function Wordmark({ color = 'currentColor', className }: WordmarkProps) {
         color,
         fontSize: 18,
         letterSpacing: '0.22em',
-        fontWeight: 300,
+        fontWeight: 600,
         textTransform: 'uppercase',
         lineHeight: 1,
         whiteSpace: 'nowrap'

@@ -52,6 +52,8 @@ export function Header() {
   return (
     <>
       <header
+        className="site-header"
+        data-solid={scrolled ? '' : undefined}
         style={{
           position: 'fixed',
           top: 0,
@@ -61,10 +63,10 @@ export function Header() {
           padding: scrolled ? '18px 36px' : '28px 36px',
           transform: hidden ? 'translateY(-100%)' : 'translateY(0)',
           opacity: hidden ? 0 : 1,
-          pointerEvents: hidden ? 'none' : 'auto',
-          transition: 'padding 0.4s ease, transform 0.36s ease, opacity 0.36s ease'
+          pointerEvents: hidden ? 'none' : 'auto'
         }}>
         <div
+          className="site-header__scrim"
           style={{
             position: 'absolute',
             top: 0,

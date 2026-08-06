@@ -102,7 +102,6 @@ function ProjectsTile({ project, index }: { project: Project; index: number }) {
             fontSize: 'clamp(22px, 2vw, 30px)',
             fontWeight: 300,
             letterSpacing: '0.005em',
-            textAlign: 'center',
             margin: 0
           }}>
           {project.title}

@@ -12,7 +12,8 @@ export const color = {
   inkSoft: 'var(--ink-soft)',
   error: 'var(--ink-error)',
   hairline: 'var(--hairline)',
-  divider: 'var(--divider-color)'
+  divider: 'var(--divider-color)',
+  navy: 'var(--navy)'
 } as const;
 
 // ── Spacing (px) ──────────────────────────────────────────────────────────────
