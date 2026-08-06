@@ -47,10 +47,10 @@ export function ProjectDetail({ project }: Props) {
         <Link href="/projects" className="micro" style={{ display: 'flex', alignItems: 'center', gap: 10, color: 'inherit' }}>
           <span style={{ fontSize: 14, lineHeight: 1 }}>←</span> All Projects
         </Link>
-        <Eyebrow opacity={0.6}>Built by {project.builder}</Eyebrow>
+
         <Link href={`/projects/${next.id}`} className="micro" style={{ display: 'flex', alignItems: 'center', gap: 10, color: 'inherit' }}>
           Next:{' '}
-          <span style={{ fontStyle: 'italic' }} className="serif">
+          <span style={{}} className="serif">
             {next.title}
           </span>{' '}
           <span style={{ fontSize: 14, lineHeight: 1 }}>→</span>
@@ -70,7 +70,7 @@ export function ProjectDetail({ project }: Props) {
       />
 
       {/* Title block */}
-      <Section padY="xs">
+      <Section padY="xxs">
         <Container maxWidth={1400} align="center">
           <Eyebrow style={{ marginBottom: 28 }}>
             {project.location} · {project.year}
@@ -81,7 +81,7 @@ export function ProjectDetail({ project }: Props) {
             style={{ fontSize: 'clamp(48px, 7vw, 110px)', lineHeight: 0.98, letterSpacing: '-0.012em', maxWidth: '14ch' }}>
             {project.title}
           </Heading>
-          <p style={{ ...text.body, fontSize: 19, marginTop: 60, maxWidth: '52ch' }}>{project.intro}</p>
+          <p style={{ ...text.body, fontSize: 19, marginTop: 8, maxWidth: '80ch' }}>{project.intro}</p>
         </Container>
       </Section>
 
@@ -102,11 +102,9 @@ export function ProjectDetail({ project }: Props) {
                 backgroundPosition: 'center'
               }}
             />
-            <Eyebrow size="sm" opacity={0.5} style={{ marginTop: 12 }}>
-              Plate 0{i + 1} · {project.title}
-            </Eyebrow>
           </button>
         ))}
+        <Eyebrow opacity={0.6}>Built by {project.builder}</Eyebrow>
       </Section>
 
       {/* Footer nav between projects — bespoke 36px gutter to align with top bar.
@@ -126,7 +124,7 @@ export function ProjectDetail({ project }: Props) {
           <span style={{ fontSize: 14 }}>←</span>
           <span style={{ display: 'grid', gap: 4, textAlign: 'left' }}>
             <span style={{ opacity: 0.5 }}>Previous</span>
-            <span className="serif" style={{ fontStyle: 'italic', fontSize: 18, opacity: 0.95, textTransform: 'none', letterSpacing: 0 }}>
+            <span className="serif" style={{ fontSize: 18, opacity: 0.95, textTransform: 'none', letterSpacing: 0 }}>
               {prev.title}
             </span>
           </span>
@@ -143,7 +141,7 @@ export function ProjectDetail({ project }: Props) {
           style={{ display: 'flex', alignItems: 'center', gap: 12, justifySelf: 'end', color: 'inherit' }}>
           <span style={{ display: 'grid', gap: 4, textAlign: 'right' }}>
             <span style={{ opacity: 0.5 }}>Next</span>
-            <span className="serif" style={{ fontStyle: 'italic', fontSize: 18, opacity: 0.95, textTransform: 'none', letterSpacing: 0 }}>
+            <span className="serif" style={{ fontSize: 18, opacity: 0.95, textTransform: 'none', letterSpacing: 0 }}>
               {next.title}
             </span>
           </span>
