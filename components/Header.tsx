@@ -17,6 +17,10 @@ export function Header() {
   const [hidden, setHidden] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const isCompact = useCompact();
+  // 600px, not the 1024px default above: it matches the media query in
+  // globals.css that pins header padding to `16px 18px`, which is what decides
+  // how much room the mark actually has.
+  const isMobile = useCompact(600);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 30);
@@ -90,7 +94,10 @@ export function Header() {
           }}>
           <div style={{ justifySelf: 'start' }}>
             <Link href="/" aria-label="Laurel Leaf Design Studio — Home" style={{ display: 'flex' }}>
-              <LogoLong />
+              {/* Shrinks with the bar on scroll, matching the padding shift above.
+                  Flat on mobile — the 600px media query overrides that padding
+                  shift, so the bar height doesn't change and neither should the mark. */}
+              <LogoLong height={isMobile ? 36 : scrolled ? 38 : 48} />
             </Link>
           </div>
 
