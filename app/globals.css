@@ -1,14 +1,27 @@
 @import 'tailwindcss';
 
 :root {
+  /* brand — 2026 Laurel Leaf Final Branding. Raw palette; don't reach for these
+     directly in components, go through the semantic vars below (or lib/tokens.ts). */
+  --saddle-leather: #8a5a32;
+  --navy-ink: #0f1a2b;
+  --heritage-green: #1f3a32;
+  --charleston-sage: #7c8e76;
+  --modern-tan: #e6dcc7;
+  --bone-white: #f4f1ea;
+  --warm-stone: #a89f96;
+  --titanium-white: #ffffff;
+  --midnight-black: #000000;
+
   /* color */
-  --bg: #f4f0e8;
-  --ink: #2a2e25;
-  --ink-soft: rgba(42, 46, 37, 0.65);
-  --ink-error: #8b3a2e;
-  --hairline: rgba(42, 46, 37, 0.18);
-  --divider-color: rgba(244, 240, 232, 0.85);
-  --navy: #1e2733;
+  --bg: var(--bone-white);
+  --ink: var(--heritage-green);
+  --ink-soft: rgba(31, 58, 50, 0.65);
+  --ink-error: #8b3a2e; /* functional, intentionally outside the brand palette */
+  --hairline: rgba(31, 58, 50, 0.18);
+  --divider-color: rgba(244, 241, 234, 0.85);
+  --navy: var(--navy-ink);
+  --header-fill: var(--warm-stone);
 
   /* motion */
   --ease-elegant: cubic-bezier(0.22, 0.61, 0.36, 1);
@@ -111,23 +124,29 @@ a {
 }
 
 /* Global fixed header (components/Header.tsx). Transparent over the photo
-   heroes at the top of a page; fills with navy on hover, and stays navy once
-   scrolled (`data-solid`) so the cream foreground reads on the cream routes.
-   The transition lives here rather than inline because inline styles win the
-   cascade — an inline `transition` would drop background-color and the fill
-   would snap instead of fade. */
+   heroes at the top of a page; fills with warm stone on hover, and stays filled
+   once scrolled (`data-solid`) so the bar reads on the cream routes.
+
+   Warm stone is a mid-tone, so the foreground flips with the fill: cream over
+   the photography, ink once filled (2.3:1 vs 4.7:1 — the cream would fail AA on
+   the 11px nav labels). Both the fill and the foreground live here rather than
+   inline, because inline styles win the cascade — Header.tsx deliberately sets
+   no `color` so every child can inherit / use currentColor. */
 .site-header {
   background-color: transparent;
+  color: var(--bg);
   transition:
     padding var(--dur-fast) var(--ease-elegant),
     transform 360ms var(--ease-elegant),
     opacity 360ms var(--ease-elegant),
-    background-color var(--dur-med) var(--ease-elegant);
+    background-color var(--dur-med) var(--ease-elegant),
+    color var(--dur-med) var(--ease-elegant);
 }
 
 .site-header:hover,
 .site-header[data-solid] {
-  background-color: var(--navy);
+  background-color: var(--header-fill);
+  color: var(--ink);
 }
 
 /* Scrim and navy are mutually exclusive — stacking them muddies the bar. */
@@ -321,7 +340,7 @@ a {
   position: fixed;
   inset: 0;
   z-index: 100;
-  background: rgba(42, 46, 37, 0.96);
+  background: rgba(31, 58, 50, 0.96);
   backdrop-filter: blur(20px);
   display: flex;
   align-items: center;

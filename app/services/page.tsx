@@ -331,11 +331,11 @@ export default function ServicesPage() {
           position: 'sticky',
           top: 0,
           zIndex: 30,
-          background: stuck ? 'rgba(244,240,232,0.97)' : 'rgba(244,240,232,0.92)',
+          background: stuck ? 'rgba(244,241,234,0.97)' : 'rgba(244,241,234,0.92)',
           backdropFilter: 'blur(10px)',
           WebkitBackdropFilter: 'blur(10px)',
           borderBottom: `1px solid ${stuck ? color.inkSoft : color.hairline}`,
-          boxShadow: stuck ? '0 6px 24px rgba(42,46,37,0.06)' : 'none',
+          boxShadow: stuck ? '0 6px 24px rgba(31,58,50,0.06)' : 'none',
           padding: '18px 8vw',
           transition: `background ${motion.durFast} ease, border-color ${motion.durFast} ease, box-shadow ${motion.durFast} ease`
         }}>
@@ -460,7 +460,7 @@ export default function ServicesPage() {
       </Section>
 
       {/* Scope */}
-      <Section id="sec-scope" padY="sm" style={{ background: 'rgba(42,46,37,0.04)', scrollMarginTop: 90 }}>
+      <Section id="sec-scope" padY="sm" style={{ background: 'rgba(31,58,50,0.04)', scrollMarginTop: 90 }}>
         <div
           ref={refScope}
           style={{
@@ -675,7 +675,7 @@ export default function ServicesPage() {
       </Section>
 
       {/* Process */}
-      <Section id="sec-process" padY="sm" style={{ background: 'rgba(42,46,37,0.04)', scrollMarginTop: 70 }}>
+      <Section id="sec-process" padY="sm" style={{ background: 'rgba(31,58,50,0.04)', scrollMarginTop: 70 }}>
         <div
           style={{
             display: 'grid',
@@ -859,7 +859,7 @@ export default function ServicesPage() {
       </Section>
 
       {/* The Difference */}
-      <Section id="sec-difference" padY="sm" style={{ background: 'rgba(42,46,37,0.04)', scrollMarginTop: 70 }}>
+      <Section id="sec-difference" padY="sm" style={{ background: 'rgba(31,58,50,0.04)', scrollMarginTop: 70 }}>
         <div
           style={{
             display: 'grid',

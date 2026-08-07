@@ -111,7 +111,8 @@ The codebase has a small, opinionated design system. Prefer it over new CSS or a
 
 **Tokens — `lib/tokens.ts`:**
 
-- `color` — `{ bg, ink, inkSoft, hairline, divider }`. All resolve via CSS vars (`var(--bg)` etc.).
+- `brand` — the nine colors of the 2026 Laurel Leaf brand book, verbatim: `saddleLeather #8A5A32`, `navyInk #0F1A2B`, `heritageGreen #1F3A32`, `charlestonSage #7C8E76`, `modernTan #E6DCC7`, `boneWhite #F4F1EA`, `warmStone #A89F96`, `titaniumWhite #FFF`, `midnightBlack #000`. **Go through `color` below unless you need a deliberate brand accent** — the semantic tokens are what a future palette change re-points. Never introduce a hex that isn't in this list.
+- `color` — semantic roles, each resolving through a CSS var to a `brand` value: `{ bg, ink, inkSoft, error, hairline, divider, navy, headerFill }`. `bg` is Bone White, `ink` is Heritage Green, `navy` is Navy Ink, `headerFill` is Warm Stone. `error` (`#8B3A2E`) is the one deliberate exception — the brand book has no error color.
 - `text` — `{ display, section, card, body, bodySm }`. Spread into a style: `style={{ ...text.body }}`.
 - `motion` — `{ ease, durFast, durMed, durSlow, durXSlow }`. Compose into transitions: `` transition: `opacity ${motion.durMed} ${motion.ease}` ``.
 - `sectionPadY` — `{ none, xxs, xs, sm, md, lg, xl, '2xl' }`, each `{ d, m }`. Desktop values are 0/60/80/120/140/160/180/200; mobile values follow ~40% ratio (0/24/32/48/56/64/72/80). Consumed by `<Section>` — rarely used directly.

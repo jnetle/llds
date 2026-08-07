@@ -291,7 +291,7 @@ export default function PressPage() {
       <Section
         padY="lg"
         style={{
-          background: 'rgba(42,46,37,0.04)',
+          background: 'rgba(31,58,50,0.04)',
           borderBottom: `1px solid ${color.hairline}`
         }}>
         <div
@@ -364,13 +364,13 @@ export default function PressPage() {
                 background: 'linear-gradient(165deg, #d8cfbf 0%, #b8ad97 60%, #968a72 100%)',
                 position: 'relative',
                 overflow: 'hidden',
-                boxShadow: '0 30px 60px -20px rgba(42,46,37,0.35), 0 8px 20px -8px rgba(42,46,37,0.25)'
+                boxShadow: '0 30px 60px -20px rgba(31,58,50,0.35), 0 8px 20px -8px rgba(31,58,50,0.25)'
               }}>
               <div
                 style={{
                   position: 'absolute',
                   inset: 0,
-                  background: 'repeating-linear-gradient(90deg, transparent 0 60px, rgba(42,46,37,0.025) 60px 61px)'
+                  background: 'repeating-linear-gradient(90deg, transparent 0 60px, rgba(31,58,50,0.025) 60px 61px)'
                 }}
               />
               <div
@@ -411,7 +411,7 @@ export default function PressPage() {
                 style={{
                   position: 'absolute',
                   inset: '38% 28% 38% 28%',
-                  border: '1px dashed rgba(42,46,37,0.4)',
+                  border: '1px dashed rgba(31,58,50,0.4)',
                   display: 'grid',
                   placeItems: 'center'
                 }}>
