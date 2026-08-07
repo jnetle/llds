@@ -3,7 +3,6 @@
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { useCompact } from '@/hooks/useCompact';
-import { color } from '@/lib/tokens';
 import { Wordmark } from './Wordmark';
 
 const NAV = [
@@ -45,10 +44,11 @@ export function Header() {
     };
   }, [menuOpen]);
 
-  // Foreground for the fixed header — light text (bg color) sits over the
-  // dark gradient overlay below so it reads on imagery-heavy pages.
-  const fg = color.bg;
-
+  // The header foreground is owned by `.site-header` in globals.css so it can
+  // flip with the fill (cream over the photo scrim → ink once filled, since
+  // warm stone is too light to carry cream text). Nothing below may set an
+  // inline `color` — inline wins the cascade and would freeze the flip. Children
+  // inherit, or use currentColor where they need the value on another property.
   return (
     <>
       <header
@@ -86,12 +86,11 @@ export function Header() {
             display: 'grid',
             gridTemplateColumns: isCompact ? '1fr auto' : '1fr auto 1fr',
             alignItems: 'center',
-            color: fg,
             gap: 24
           }}>
           <div style={{ justifySelf: 'start' }}>
             <Link href="/" aria-label="Laurel Leaf Design Studio — Home">
-              <Wordmark color={fg} />
+              <Wordmark />
             </Link>
           </div>
 
@@ -102,7 +101,7 @@ export function Header() {
               justifySelf: 'center'
             }}>
             {NAV.map(item => (
-              <Link key={item.label} href={item.href} className="micro nav-link" style={{ position: 'relative', color: fg }}>
+              <Link key={item.label} href={item.href} className="micro nav-link" style={{ position: 'relative' }}>
                 {item.label}
                 <span className="nav-underline" />
               </Link>
@@ -121,9 +120,9 @@ export function Header() {
                 padding: 8,
                 marginRight: -8
               }}>
-              <span style={{ width: 24, height: 1, background: fg, display: 'block' }} />
-              <span style={{ width: 24, height: 1, background: fg, display: 'block' }} />
-              <span style={{ width: 24, height: 1, background: fg, display: 'block' }} />
+              <span style={{ width: 24, height: 1, background: 'currentColor', display: 'block' }} />
+              <span style={{ width: 24, height: 1, background: 'currentColor', display: 'block' }} />
+              <span style={{ width: 24, height: 1, background: 'currentColor', display: 'block' }} />
             </button>
           ) : (
             <div
@@ -138,9 +137,8 @@ export function Header() {
                 className="micro"
                 style={{
                   padding: '9px 18px',
-                  border: '1px solid rgba(244,240,232,0.6)',
-                  borderRadius: 100,
-                  color: fg
+                  border: '1px solid color-mix(in srgb, currentColor 60%, transparent)',
+                  borderRadius: 100
                 }}>
                 Inquire
               </Link>

@@ -4,16 +4,34 @@
 
 import type { CSSProperties } from 'react';
 
+// ── Brand palette ─────────────────────────────────────────────────────────────
+// The nine colors of the 2026 Laurel Leaf brand book, verbatim. Prefer the
+// semantic `color` tokens below — reach in here only for a deliberate brand
+// accent that no semantic token covers.
+export const brand = {
+  saddleLeather: 'var(--saddle-leather)', // #8a5a32
+  navyInk: 'var(--navy-ink)', // #0f1a2b
+  heritageGreen: 'var(--heritage-green)', // #1f3a32
+  charlestonSage: 'var(--charleston-sage)', // #7c8e76
+  modernTan: 'var(--modern-tan)', // #e6dcc7
+  boneWhite: 'var(--bone-white)', // #f4f1ea
+  warmStone: 'var(--warm-stone)', // #a89f96
+  titaniumWhite: 'var(--titanium-white)', // #ffffff
+  midnightBlack: 'var(--midnight-black)' // #000000
+} as const;
+
 // ── Color ─────────────────────────────────────────────────────────────────────
-// All values resolve through CSS vars so theme changes are one-file.
+// Semantic roles. All values resolve through CSS vars — which in turn resolve to
+// `brand` above — so a palette change is one file.
 export const color = {
-  bg: 'var(--bg)',
-  ink: 'var(--ink)',
+  bg: 'var(--bg)', // bone white
+  ink: 'var(--ink)', // heritage green
   inkSoft: 'var(--ink-soft)',
-  error: 'var(--ink-error)',
+  error: 'var(--ink-error)', // functional, outside the brand palette
   hairline: 'var(--hairline)',
   divider: 'var(--divider-color)',
-  navy: 'var(--navy)'
+  navy: 'var(--navy)', // navy ink
+  headerFill: 'var(--header-fill)' // warm stone
 } as const;
 
 // ── Spacing (px) ──────────────────────────────────────────────────────────────

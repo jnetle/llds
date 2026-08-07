@@ -7,7 +7,7 @@ import { useCompact } from '@/hooks/useCompact';
 import { useReveal } from '@/hooks/useReveal';
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
 import { Grid } from '@/components/ui/Grid';
-import { motion } from '@/lib/tokens';
+import { brand, motion } from '@/lib/tokens';
 
 export function ProjectsGrid() {
   const compact = useCompact();
@@ -81,7 +81,7 @@ function ProjectsTile({ project, index }: { project: Project; index: number }) {
           style={{
             aspectRatio: '1440 / 1860',
             overflow: 'hidden',
-            background: '#d8d4cb',
+            background: brand.modernTan,
             marginBottom: 22
           }}>
           <div

@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import type { Project } from '@/lib/projects';
 import { useScrollY } from '@/hooks/useScrollY';
 import { useCompact } from '@/hooks/useCompact';
+import { color } from '@/lib/tokens';
 import { GridCell } from './GridCell';
 
 type HeroGridProps = {
@@ -113,7 +114,7 @@ export function HeroGrid({ projects, onOpen }: HeroGridProps) {
             bottom: 24,
             left: 36,
             zIndex: 20,
-            color: '#F4F0E8',
+            color: color.bg,
             mixBlendMode: 'difference'
           }}>
           <div className="micro-sm" style={{ opacity: 0.85 }}>
@@ -126,7 +127,7 @@ export function HeroGrid({ projects, onOpen }: HeroGridProps) {
             bottom: 24,
             right: 36,
             zIndex: 20,
-            color: '#F4F0E8',
+            color: color.bg,
             mixBlendMode: 'difference',
             display: 'flex',
             alignItems: 'center',
@@ -137,7 +138,7 @@ export function HeroGrid({ projects, onOpen }: HeroGridProps) {
             style={{
               width: 28,
               height: 1,
-              background: '#F4F0E8',
+              background: color.bg,
               position: 'relative',
               overflow: 'hidden'
             }}>
@@ -148,7 +149,7 @@ export function HeroGrid({ projects, onOpen }: HeroGridProps) {
                 top: 0,
                 bottom: 0,
                 width: '40%',
-                background: '#F4F0E8',
+                background: color.bg,
                 animation: 'scroll-indic 2.4s ease-in-out infinite'
               }}
             />
