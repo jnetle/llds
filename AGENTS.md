@@ -94,7 +94,7 @@ are deterministic from data:
 Next.js 16.2 App Router project with TypeScript and React 19.2. Tailwind CSS v4 is installed and configured, but utility-class usage is limited to a handful of shell utilities in `app/layout.tsx` (`min-h-full`, `flex`, `flex-col`, `flex-1`). The rest of the codebase uses the design system below — do not migrate inline styles to Tailwind utilities.
 
 - `app/` — App Router: all routes, layouts, and pages live here
-- `app/layout.tsx` — root layout; loads Cormorant Garamond (serif) and Inter (sans) via `next/font/google` and exposes them as the `--font-cormorant` / `--font-inter` CSS vars
+- `app/layout.tsx` — root layout; loads Cormorant Garamond (serif) and Inter (sans) via `next/font/google` and exposes them as the `--font-cormorant` / `--font-inter` CSS vars. These are **not** the logo's fonts — see "Logo typography" below before changing them
 - `app/page.tsx` — home route (`/`)
 - `components/ui/` — design system primitives (`Section`, `Grid`, `Container`, `Heading`, `Eyebrow`)
 - `components/` — feature components (`Header`, `Footer`, `HeroGrid`, `GridCell`, `ProjectsGrid`, `ProjectDetail`, `StatementSection`, `ProjectStrip`, `Wordmark`, `HomeShell`)
@@ -132,6 +132,24 @@ The codebase has a small, opinionated design system. Prefer it over new CSS or a
 - **Bespoke poster typography** (e.g. Press hero h1 at `clamp(96px, 16vw, 280px)`, Services hero at 132px). Forcing through `<Heading>` with style overrides for every property defeats the point. Use raw `<h1 className="serif" style={{ ..., margin: 0 }}>`.
 - **Bespoke gutters** (`ProjectsGrid` uses 32px desktop / 20px mobile to maximize tile width; `ProjectDetail`'s top-bar and footer-nav use 36px to align with the global header). `<Section>`'s `8vw` desktop gutter would crop content too tightly. Use a raw `<section>` / `<div>` and apply tokens for color/motion.
 - **Full-bleed heroes** (Services hero at `100vh` with absolute-positioned content). `<Section>` is for padded content blocks, not edge-to-edge layout.
+
+## Logo typography — the artwork does not set the site's fonts
+
+The master logo lives outside the repo (`Laurel Leaf Final Logo LONG.ai`). Its type was never converted to outlines, so the families are readable straight from the file's PDF font descriptors:
+
+| Logo element            | Font in the artwork                                     |
+| ----------------------- | ------------------------------------------------------- |
+| `LAUREL LEAF` wordmark  | **STIX Two Text** Regular (400), hand-kerned per letter |
+| `DESIGN STUDIO` tagline | **Gotham Medium** (500), `0.14em` tracking              |
+
+**The site deliberately does not use either.** It runs Cormorant Garamond + Inter, and that mismatch is a decision, not an oversight — both logo fonts were trialled on the site and rolled back. Do not "fix" it by swapping the site to match the artwork.
+
+Notes if the question ever comes back up:
+
+- **STIX Two Text is free** (SIL OFL, on Google Fonts, `STIX_Two_Text` in `next/font/google`) — but it has **no weight below 400**. Everything serif here is 300, so a swap forces `.serif`, `.form-band-numeral`, and the `display`/`section`/`card` weights in `lib/tokens.ts` up to 400.
+- **Gotham is commercial** (Hoefler&Co). Measured against the subset embedded in the `.ai`, the closest free substitute is **Montserrat** — ~4% RMS deviation on cap-relative letterwidths and the same exact 0.700 cap-height ratio; Archivo is next at ~5.8%. Note Montserrat Medium is lighter than Gotham Medium (stem 14.3% of cap vs 17.6%), so match the weight up, not across.
+- `public/logo-full.svg` is fully outlined paths — **no runtime font dependency**, so none of the above affects rendering the mark itself.
+- `components/Wordmark.tsx` sets the header wordmark in Cormorant at weight 400. It is not trying to reproduce the artwork's letterfit; the artwork is hand-kerned glyph by glyph, the component uses uniform `0.22em` tracking.
 
 ## CSS pitfalls (regression-guarded)
 
