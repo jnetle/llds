@@ -160,6 +160,37 @@ a {
   opacity: 0;
 }
 
+/* Landscape logo (components/LogoLong.tsx). Two color variants stacked and
+   crossfaded, rather than one mark recolored — the artwork is raster, so it
+   can't ride `currentColor` like every other header child. The trigger lives
+   here and not in React because the fill has two triggers: `data-solid` (React
+   state) and `:hover` (CSS only, invisible to React). Picking a `src` in JS
+   would catch the scroll and miss the hover. Timing matches the fill above so
+   the mark, the bar, and the nav flip as one motion. */
+.logo-long {
+  position: relative;
+  display: block;
+}
+
+.logo-long__layer {
+  object-fit: contain;
+  transition: opacity var(--dur-med) var(--ease-elegant);
+}
+
+.logo-long__layer--navy {
+  opacity: 0;
+}
+
+.site-header:hover .logo-long__layer--navy,
+.site-header[data-solid] .logo-long__layer--navy {
+  opacity: 1;
+}
+
+.site-header:hover .logo-long__layer--bone,
+.site-header[data-solid] .logo-long__layer--bone {
+  opacity: 0;
+}
+
 .nav-underline {
   position: absolute;
   left: 0;
@@ -290,11 +321,6 @@ a {
   }
   nav[style*='position: sticky'] ul li {
     flex-shrink: 0 !important;
-  }
-
-  /* Wordmark — shrink suffix */
-  header .serif span {
-    font-size: 0.85em !important;
   }
 
   /* Hero rows — shorter on mobile */

@@ -88,6 +88,7 @@ are deterministic from data:
 - Replace-in-place keeps the URL stable, but the CDN caches by TTL — purge the object in Cloudflare, or append `?v=2`, for an immediate swap.
 - Project grid/detail images render via CSS `backgroundImage`, so `next/image` does not optimize them — pre-compression above is what keeps them small. Pages that do use `next/image` (e.g. About) need the R2 hostname added to `next.config.ts` `images.remotePatterns`.
 - SVGs stay in `public/` (not on R2).
+- The brand mark is the exception to "rasters live on R2": `public/logo-long-{navy,bone}.png` are versioned code assets, cropped to identical tight bounds so `components/LogoLong.tsx` can stack them and crossfade between the two — a raster mark can't be recolored via `currentColor` the way the rest of the header is.
 
 ## Architecture
 

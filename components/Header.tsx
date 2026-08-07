@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { useCompact } from '@/hooks/useCompact';
-import { Wordmark } from './Wordmark';
+import { LogoLong } from './LogoLong';
 
 const NAV = [
   { label: 'About', href: '/about' },
@@ -89,8 +89,8 @@ export function Header() {
             gap: 24
           }}>
           <div style={{ justifySelf: 'start' }}>
-            <Link href="/" aria-label="Laurel Leaf Design Studio — Home">
-              <Wordmark />
+            <Link href="/" aria-label="Laurel Leaf Design Studio — Home" style={{ display: 'flex' }}>
+              <LogoLong />
             </Link>
           </div>
 
