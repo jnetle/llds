@@ -19,8 +19,8 @@ export function LogoLong({ height = 32, className }: LogoLongProps) {
     <span className={`logo-long ${className ?? ''}`} style={{ height, aspectRatio: `${bone.width} / ${bone.height}` }}>
       {/* Both layers stay mounted — fetching the hidden variant on first hover
           would flash. alt="" on both: the wrapping link carries the label. */}
-      <Image src={bone} alt="" fill sizes="160px" priority className="logo-long__layer logo-long__layer--bone" />
-      <Image src={navy} alt="" fill sizes="160px" priority className="logo-long__layer logo-long__layer--navy" />
+      <Image src={bone} alt="" fill sizes="220px" priority className="logo-long__layer logo-long__layer--bone" />
+      <Image src={navy} alt="" fill sizes="220px" priority className="logo-long__layer logo-long__layer--navy" />
     </span>
   );
 }

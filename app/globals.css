@@ -170,6 +170,10 @@ a {
 .logo-long {
   position: relative;
   display: block;
+  /* The header passes a smaller height once scrolled; ease it on the same
+     duration/curve as `.site-header`'s padding so bar and mark resize as one
+     motion. `aspect-ratio` on the span carries the width along. */
+  transition: height var(--dur-fast) var(--ease-elegant);
 }
 
 .logo-long__layer {
