@@ -101,12 +101,12 @@ export function HeroGrid({ projects, onOpen, pinnedLead = false, coverStage = fa
     <section style={{ position: 'relative', width: '100%' }}>
       {/* The lead — full width, and the cover panel's backdrop when `pinnedLead`
           is set. One image rather than two tiles so the arch window frames a
-          single picture instead of straddling a centre divider. It uses svh: the
-          ≤600px rules in globals.css match on the literal `height: 100vh`
-          substring and would clamp it to 60vh. zIndex is declared rather than
-          left to paint order — the lead is sticky (so it paints in the positioned
-          layer) and comes after <CoverPanel /> in the DOM, so without it the
-          stacking would rest on the panel's z-45 happening to beat `auto`. */}
+          single picture instead of straddling a centre divider. svh when pinned
+          so it matches the cover panel exactly on mobile, where vh ignores the
+          browser chrome. zIndex is declared rather than left to paint order —
+          the lead is sticky (so it paints in the positioned layer) and comes
+          after <CoverPanel /> in the DOM, so without it the stacking would rest
+          on the panel's z-45 happening to beat `auto`. */}
       <Stage active={pinnedLead} height={coverStage ? COVER_STAGE : SOLO_STAGE}>
         <div
           style={{

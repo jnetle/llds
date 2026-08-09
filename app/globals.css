@@ -43,6 +43,19 @@
   --font-sans: var(--font-inter);
 }
 
+/* Breakpoints. The design has exactly two boundaries — mobile ≤600px and
+   tablet ≤1024px — which used to be read in JS by `useCompact`. Tailwind is
+   min-width/mobile-first, so the tiers invert: base styles are mobile, `sm:`
+   is everything above mobile, `lg:` is everything above tablet.
+
+   601/1025 rather than 600/1024 so the boundaries land exactly where the old
+   max-width queries did. Tailwind's `md`, `xl` and `2xl` defaults are left in
+   place but the design has no such tiers — don't reach for them. */
+@theme {
+  --breakpoint-sm: 601px;
+  --breakpoint-lg: 1025px;
+}
+
 html,
 body {
   background: var(--bg);
@@ -104,6 +117,38 @@ button {
   color: inherit;
   cursor: pointer;
   font: inherit;
+}
+
+/* Responsive grid tiers for the <Grid> primitive (components/ui/Grid.tsx).
+   `cols` is a free-form track string, so it can't become a Tailwind class —
+   Tailwind only emits classes it can find as literal text. Grid instead writes
+   one custom property per tier and this rule picks the right one, which keeps
+   the breakpoints in CSS (so the first paint is correct) without a build-time
+   vocabulary. Tiers: base ≤600px, `t` 601–1024px, `d` ≥1025px.
+
+   Grid resolves rowGap/columnGap against gap in JS, so only two gap vars per
+   tier arrive here. The 0px fallbacks stand in for "gap omitted". */
+.grid-tiers {
+  display: grid;
+  grid-template-columns: var(--cols-m);
+  row-gap: var(--row-m, 0px);
+  column-gap: var(--col-m, 0px);
+}
+
+@media (min-width: 601px) {
+  .grid-tiers {
+    grid-template-columns: var(--cols-t);
+    row-gap: var(--row-t, 0px);
+    column-gap: var(--col-t, 0px);
+  }
+}
+
+@media (min-width: 1025px) {
+  .grid-tiers {
+    grid-template-columns: var(--cols-d);
+    row-gap: var(--row-d, 0px);
+    column-gap: var(--col-d, 0px);
+  }
 }
 
 a {
@@ -441,43 +486,9 @@ a {
     --gutter: 24px;
   }
 
-  /* Quick-links nav (services page) — tighten horizontal gutter to 24px.
-     Kept until that nav is migrated to use var(--gutter) directly. */
-  nav[style*='8vw'] {
-    padding-left: 24px !important;
-    padding-right: 24px !important;
-  }
-
   /* Header padding */
   header {
     padding: 16px 18px !important;
-  }
-
-  /* Quick-links sticky nav: allow horizontal scroll */
-  nav[style*='position: sticky'] ul {
-    flex-wrap: nowrap !important;
-    overflow-x: auto !important;
-    justify-content: flex-start !important;
-    gap: 22px !important;
-    padding-bottom: 4px !important;
-  }
-  nav[style*='position: sticky'] ul li {
-    flex-shrink: 0 !important;
-  }
-
-  /* Hero rows — shorter on mobile */
-  div[style*='height: 100vh'][style*='overflow: hidden'] {
-    height: 60vh !important;
-    min-height: 380px !important;
-  }
-  section[style*='height: 100vh'] {
-    height: 70vh !important;
-    min-height: 480px !important;
-  }
-
-  /* Project overlay gallery */
-  div[style*='aspect-ratio: 4 / 5'] {
-    aspect-ratio: 3 / 4 !important;
   }
 
   /* Buttons: keep tap target */

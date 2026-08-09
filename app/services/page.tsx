@@ -325,8 +325,12 @@ export default function ServicesPage() {
       {/* Sentinel: flips when the quick-links nav reaches the top */}
       <div ref={sentinelRef} aria-hidden style={{ height: 1 }} />
 
-      {/* Quick links — raw <nav>: sticky with custom 18px vertical padding */}
+      {/* Quick links — raw <nav>: sticky with custom 18px vertical padding.
+          Gutter and the mobile scroll-strip behaviour are classes, not inline
+          styles: the `stuck` state rewrites this element's style attribute, and
+          the rules these replaced keyed off that attribute's text. */}
       <nav
+        className="px-[24px] py-[18px] sm:px-[8vw]"
         style={{
           position: 'sticky',
           top: 0,
@@ -336,12 +340,11 @@ export default function ServicesPage() {
           WebkitBackdropFilter: 'blur(10px)',
           borderBottom: `1px solid ${stuck ? color.inkSoft : color.hairline}`,
           boxShadow: stuck ? '0 6px 24px rgba(31,58,50,0.06)' : 'none',
-          padding: '18px 8vw',
           transition: `background ${motion.durFast} ease, border-color ${motion.durFast} ease, box-shadow ${motion.durFast} ease`
         }}>
-        <ul style={{ listStyle: 'none', display: 'flex', gap: 36, flexWrap: 'wrap', justifyContent: 'center', alignItems: 'center' }}>
+        <ul className="flex list-none items-center justify-start gap-[22px] overflow-x-auto pb-[4px] sm:flex-wrap sm:justify-center sm:gap-[36px] sm:overflow-x-visible sm:pb-0">
           {QUICK_LINKS.map(([id, label]) => (
-            <li key={id}>
+            <li key={id} className="shrink-0 sm:shrink">
               <a
                 href={'#' + id}
                 className="micro-sm"

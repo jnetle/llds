@@ -92,7 +92,17 @@ are deterministic from data:
 
 ## Architecture
 
-Next.js 16.2 App Router project with TypeScript and React 19.2. Tailwind CSS v4 is installed and configured, but utility-class usage is limited to a handful of shell utilities in `app/layout.tsx` (`min-h-full`, `flex`, `flex-col`, `flex-1`). The rest of the codebase uses the design system below — do not migrate inline styles to Tailwind utilities.
+Next.js 16.2 App Router project with TypeScript, Tailwind CSS v4, and React 19.2.
+
+**Styling splits three ways:**
+
+- **Tailwind** — the responsive layer, and only that: breakpoints, section padding, gutters, grid tiers. Breakpoints belong in CSS. This layer used to be read in JS via `useCompact`, which meant SSR and first paint always emitted the _desktop_ tier and reflowed on hydrate; it also forced `'use client'` onto `<Section>` and `<Grid>`. Two breakpoints are defined in `app/globals.css` (`sm` 601px, `lg` 1025px) — Tailwind's `md`/`xl`/`2xl` defaults survive but the design has no such tiers, so don't reach for them.
+- **Inline `style` + `lib/tokens.ts`** — static and per-instance values (colors, type, one-off spacing, image URLs, animation delays). This is most of the codebase and it is fine where it is.
+- **`app/globals.css`** — global typography (`.serif`, `.micro`), element resets, `:root` tokens, and bespoke keyframe choreography that utilities express badly (the cover panel stagger, the header/logo crossfade).
+
+The inline-style style originates from PR #2, which ported a single-file React + Babel-standalone HTML mock. That mock had no build step, so it could have neither Tailwind's compiler nor CSS Modules — everything _had_ to be inline. That constraint has never applied to this repo, but the result works: **don't bulk-convert what isn't broken.** Reach for Tailwind when something needs a breakpoint, not to restyle what already renders correctly.
+
+CSS Modules are available and unused. They're the right tool if a component ever needs scoped pseudo-elements or state selectors beyond what utilities cover; nothing needs them today.
 
 - `app/` — App Router: all routes, layouts, and pages live here
 - `app/layout.tsx` — root layout; loads Cormorant Garamond (serif) and Inter (sans) via `next/font/google` and exposes them as the `--font-cormorant` / `--font-inter` CSS vars. These are **not** the logo's fonts — see "Logo typography" below before changing them
@@ -122,7 +132,7 @@ The codebase has a small, opinionated design system. Prefer it over new CSS or a
 
 **Primitives — `components/ui/`:**
 
-- `<Section>` — page section wrapper. Owns vertical padding (preset `padY` or `padTop`/`padBottom`), horizontal gutter, optional `topBorder`, and the desktop/mobile padding split via `useCompact(600)`. `as` accepts `'section' | 'div' | 'article' | 'header' | 'footer' | 'form'`. Forwards `ref` and inherits `HTMLAttributes` (so `onSubmit`, `aria-*`, `id`, etc. flow through).
+- `<Section>` — page section wrapper. Owns vertical padding (preset `padY` or `padTop`/`padBottom`), horizontal gutter, optional `topBorder`, and the desktop/mobile split — all as Tailwind classes, so it is a server component. `as` accepts `'section' | 'div' | 'article' | 'header' | 'footer' | 'form'`. Forwards `ref` and inherits `HTMLAttributes` (so `onSubmit`, `aria-*`, `id`, etc. flow through). Its `PAD_TOP`/`PAD_BOTTOM` maps must be **complete literal class strings** — Tailwind scans source text, so an interpolated `` `pt-[${n}px]` `` is never emitted and silently renders as no padding. `scripts/check-css.mjs` asserts those maps stay in step with `sectionPadY`.
 - `<Grid>` — responsive grid. `cols` accepts a string (auto-collapses to `'1fr'` at ≤1024px, like the `useCols` pattern) or `{ d, t?, m }` for explicit per-tier control where `t` falls back to `m`. `gap`/`rowGap`/`columnGap` take the same form. Replaces inline `gridTemplateColumns: cols(...)` patterns.
 - `<Container>` — max-width content wrapper with optional `align: 'left' | 'center'`. Used inside `<Section>` for capped editorial widths (e.g. `maxWidth={1100}` or `1400`).
 - `<Heading>` — `level: 'display' | 'section' | 'card'` drives the typography token. `as` overrides the rendered tag (defaults: display→h1, section→h2, card→h3). `italic` and `serif` (default `true`) handle common variants. Style overrides win over level defaults.
@@ -157,8 +167,9 @@ Notes if the question ever comes back up:
 - **Never** apply `overflow: hidden` (or `overflow-x` / `overflow-y: hidden`) to `html`, `body`, or `:root`. It creates a scroll container and silently disables `position: sticky` on every descendant. The Services page quick-links nav (`app/services/page.tsx`) is the canary — if it stops sticking, suspect this rule first. `npm run lint` enforces this via `scripts/check-css.mjs`.
 - To suppress horizontal overflow at the root, use `overflow-x: clip` instead. Per spec, `clip` hides overflowing content without becoming a scroll container, so sticky positioning of descendants still works. `body { overflow-x: clip }` is the current setup in `globals.css` and is intentional.
 - If a specific component (not the root) is overflowing, prefer fixing the source: `width: 100%`, `min-width: 0`, `flex-basis: min(<px>, <vw>)`, or scoped `overflow: hidden` on a container that is not an ancestor of any sticky element.
-- Layout responsiveness is fully JS-driven. Use `useCompact()` (default `(max-width: 1024px)`) and the `useCols()` helper from `hooks/useCompact.ts` to switch grid templates between desktop and tablet/mobile values. Section vertical padding and gutter are owned by the `<Section>` primitive (`components/ui/Section.tsx`) which uses `useCompact(600)` for the desktop/mobile split. Token presets live in `lib/tokens.ts` (`sectionPadY`, `gutter`, `text`, `motion`, `color`).
-- A handful of mobile-only CSS rules remain in `app/globals.css` (≤600px): hero height clamps for `section[style*='height: 100vh']`, the services quick-links sticky nav scroll behaviour, header padding, the `header > div > nav { display: none }` rule that's load-bearing for the compact Header layout, and a few accessibility/typography defaults. Anything relying on inline-style attribute selectors for grids or padding has been removed — those concerns now live in the design system primitives.
+- **Never write a selector that matches inline-style text** (`nav[style*='position: sticky']`, `div[style*='height: 100vh']`). React emits `height:100vh` **unspaced** during SSR, but the CSSOM re-serialises to `height: 100vh` **spaced** the moment React updates that element — so such a rule is inert on load and switches on mid-session when unrelated state changes. The services quick-links nav did exactly this: it wrapped on mobile until the sticky state flipped, then snapped to a scroll strip. Put a class on the element. `npm run lint` enforces this via `scripts/check-css.mjs`.
+- Responsiveness lives in CSS. `<Section>` and `<Grid>` handle it themselves (Tailwind classes and the `.grid-tiers` custom properties respectively) and are server components. `useCompact()` / `useCols()` from `hooks/useCompact.ts` remain for genuinely behavioural cases — swapping rendered markup, not styling it — but note they initialise to `false`, so anything using them renders the desktop branch on first paint. Don't reach for them for layout. Token presets live in `lib/tokens.ts` (`sectionPadY`, `gutter`, `text`, `motion`, `color`).
+- A handful of mobile-only CSS rules remain in `app/globals.css` (≤600px): header padding, the `header > div > nav { display: none }` rule that's load-bearing for the compact Header layout, and a few accessibility/typography defaults.
 
 ## Next.js 16 Breaking Changes to Know
 

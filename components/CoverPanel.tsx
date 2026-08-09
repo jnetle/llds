@@ -107,9 +107,8 @@ export function CoverPanel({ onDismiss }: CoverPanelProps) {
         top: 0,
         left: 0,
         right: 0,
-        // svh, never vh: the ≤600px rules in globals.css match on the literal
-        // `height: 100vh` substring in the style attribute and would clamp this
-        // panel to 70vh.
+        // svh, never vh: the panel is a full-viewport cover, and on mobile vh
+        // measures past the browser chrome — the kicker would sit off-screen.
         height: '100svh',
         overflow: 'hidden',
         zIndex: 45,
@@ -269,7 +268,7 @@ export function CoverPanel({ onDismiss }: CoverPanelProps) {
               textTransform: 'uppercase'
             }}>
             <p style={{ margin: 0, ['--delay' as string]: '1s' }}>
-              <span style={{ display: 'block', color: brand.saddleLeather, fontVariantNumeric: 'tabular-nums' }}>Est. 2023</span>
+              <span style={{ display: 'block', color: brand.boneWhite, fontVariantNumeric: 'tabular-nums' }}>Est. 2023</span>
               Interior renovations
               <br />
               &amp; new builds
@@ -281,7 +280,7 @@ export function CoverPanel({ onDismiss }: CoverPanelProps) {
                 paddingLeft: narrow ? 0 : 'clamp(18px,2.4vw,34px)',
                 ['--delay' as string]: '1.1s'
               }}>
-              <span style={{ display: 'block', color: brand.saddleLeather }}>Serving</span>
+              <span style={{ display: 'block', color: brand.boneWhite }}>Serving</span>
               Augusta, GA · Aiken, SC
               <br />
               &amp; surrounding areas
@@ -309,7 +308,7 @@ export function CoverPanel({ onDismiss }: CoverPanelProps) {
             fontSize: 12,
             letterSpacing: '0.2em',
             textTransform: 'uppercase',
-            color: brand.saddleLeather
+            color: brand.boneWhite
           }}>
           Scroll
           <span className="cover-nudge" aria-hidden="true" style={{ display: 'inline-block' }}>
