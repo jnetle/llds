@@ -268,7 +268,7 @@ export function CoverPanel({ onDismiss }: CoverPanelProps) {
               textTransform: 'uppercase'
             }}>
             <p style={{ margin: 0, ['--delay' as string]: '1s' }}>
-              <span style={{ display: 'block', color: brand.boneWhite, fontVariantNumeric: 'tabular-nums' }}>Est. 2023</span>
+              <span style={{ display: 'block', color: brand.boneWhite, fontVariantNumeric: 'tabular-nums' }}>Est. 2020</span>
               Interior renovations
               <br />
               &amp; new builds
