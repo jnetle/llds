@@ -192,7 +192,22 @@ a {
 
 .site-header:hover,
 .site-header[data-solid] {
-  background-color: var(--header-fill);
+  /* Frosted fill: the page reads through the bar, but diffused rather than
+     sharp. The alpha lives here rather than on --header-fill because that token
+     is also used opaque. The two values are a pair — push the fill much past
+     ~70% and there is no backdrop left to blur.
+
+     10px matches the Services quick-links nav (app/services/page.tsx), the
+     site's other frosted surface. `backdrop-filter` is deliberately NOT in the
+     transition list above: animating it from `none` is expensive, and the
+     background-color transition already carries the state change.
+
+     Unprefixed only — Lightning CSS adds `-webkit-backdrop-filter` from
+     browserslist. Writing the prefix by hand is actively harmful here: it reads
+     the pair as one property and keeps the last, so a manual `-webkit-` line
+     *deletes* the standard one from the build. Same as .mobile-nav-overlay. */
+  background-color: color-mix(in srgb, var(--header-fill) 60%, transparent);
+  backdrop-filter: blur(10px);
   color: var(--ink);
 }
 
