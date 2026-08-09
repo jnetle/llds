@@ -131,12 +131,14 @@ a {
    the photography, ink once filled (2.3:1 vs 4.7:1 — the cream would fail AA on
    the 11px nav labels). Both the fill and the foreground live here rather than
    inline, because inline styles win the cascade — Header.tsx deliberately sets
-   no `color` so every child can inherit / use currentColor. */
+   no `color` so every child can inherit / use currentColor.
+
+   The bar is one height on every route and no longer resizes on scroll, so
+   `padding` is not in the transition list. */
 .site-header {
   background-color: transparent;
   color: var(--bg);
   transition:
-    padding var(--dur-fast) var(--ease-elegant),
     transform 360ms var(--ease-elegant),
     opacity 360ms var(--ease-elegant),
     background-color var(--dur-med) var(--ease-elegant),
@@ -170,9 +172,9 @@ a {
 .logo-long {
   position: relative;
   display: block;
-  /* The header passes a smaller height once scrolled; ease it on the same
-     duration/curve as `.site-header`'s padding so bar and mark resize as one
-     motion. `aspect-ratio` on the span carries the width along. */
+  /* The header passes one height at each breakpoint and no longer resizes on
+     scroll, so this only eases the 38→36 step when crossing 600px.
+     `aspect-ratio` on the span carries the width along. */
   transition: height var(--dur-fast) var(--ease-elegant);
 }
 
@@ -291,6 +293,142 @@ a {
      compact 2-col grid layout requires it to be removed from layout flow. */
   header > div > nav {
     display: none !important;
+  }
+}
+
+/* Cover panel (components/CoverPanel.tsx) — the arch-window plane shown on entry.
+   Only its keyframes live here; everything static is inline in the component.
+   Every selector is scoped under `.cover-panel` so none of these generic names
+   (`.draw`, `.seat`) can reach anything else. The stagger is arch → lockup →
+   scroll pill → monogram → kicker. */
+@keyframes cover-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes cover-rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(28px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes cover-glass-in {
+  from {
+    opacity: 0;
+    transform: scale(1.08);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* The two monogram copies slide in from opposite corners and meet. */
+@keyframes cover-seat-in {
+  0% {
+    opacity: 0;
+    transform: translate(-244px, -363px) scale(1.055);
+  }
+  30% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes cover-seat-out {
+  0% {
+    opacity: 0;
+    transform: translate(244px, 363px) scale(1.055);
+  }
+  30% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes cover-nudge {
+  0%,
+  72%,
+  100% {
+    transform: none;
+  }
+  82% {
+    transform: translateY(4px);
+  }
+  92% {
+    transform: none;
+  }
+}
+
+/* pathLength="1" on each stroke normalises every path to a unit length, so one
+   dash pair draws all six regardless of their real arc lengths. */
+.cover-panel .draw {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: cover-draw var(--dur) cubic-bezier(0.62, 0.02, 0.24, 1) var(--delay) both;
+}
+
+.cover-panel .seat {
+  transform-box: fill-box;
+  transform-origin: 50% 50%;
+  animation: var(--seat) 1.05s cubic-bezier(0.19, 0.94, 0.28, 1) var(--delay) both;
+}
+
+.cover-panel .cover-arch {
+  animation: cover-glass-in 1.4s cubic-bezier(0.19, 0.94, 0.28, 1) both;
+}
+
+.cover-panel .cover-lockup {
+  animation: cover-rise-in 1.1s ease 0.8s both;
+}
+
+.cover-panel .cover-scroll {
+  animation: cover-rise-in 1s ease 0.9s both;
+  transition:
+    border-color var(--dur-fast) var(--ease-elegant),
+    color var(--dur-fast) var(--ease-elegant);
+}
+
+.cover-panel .cover-scroll:hover {
+  border-color: var(--navy-ink);
+  color: var(--navy-ink);
+}
+
+.cover-panel .cover-kicker p {
+  animation: cover-rise-in 1s ease var(--delay) both;
+}
+
+.cover-panel .cover-nudge {
+  animation: cover-nudge 2.4s ease-in-out 2s infinite;
+}
+
+/* Reduced motion: the panel should arrive fully composed. Nothing here is
+   load-bearing for legibility, so every animation is simply dropped — including
+   the entrance fades, which the source mock leaves running. */
+@media (prefers-reduced-motion: reduce) {
+  .cover-panel .draw {
+    stroke-dashoffset: 0;
+  }
+  .cover-panel .draw,
+  .cover-panel .seat,
+  .cover-panel .cover-arch,
+  .cover-panel .cover-lockup,
+  .cover-panel .cover-scroll,
+  .cover-panel .cover-kicker p,
+  .cover-panel .cover-nudge {
+    animation: none;
   }
 }
 
