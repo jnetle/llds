@@ -417,30 +417,39 @@ a {
   }
 }
 
+/* One dial for the whole entrance. Every duration and delay below is multiplied
+   by it, so the authored rhythm — including the per-element `--dur`/`--delay`
+   set inline in the component — scales uniformly from a single number. Note
+   these local `--dur`/`--delay` props have nothing to do with the global
+   `--dur-fast`/`--dur-med` tokens in :root; .cover-scroll below uses both. */
+.cover-panel {
+  --cover-tempo: 1.25;
+}
+
 /* pathLength="1" on each stroke normalises every path to a unit length, so one
    dash pair draws all six regardless of their real arc lengths. */
 .cover-panel .draw {
   stroke-dasharray: 1;
   stroke-dashoffset: 1;
-  animation: cover-draw var(--dur) cubic-bezier(0.62, 0.02, 0.24, 1) var(--delay) both;
+  animation: cover-draw calc(var(--dur) * var(--cover-tempo)) cubic-bezier(0.62, 0.02, 0.24, 1) calc(var(--delay) * var(--cover-tempo)) both;
 }
 
 .cover-panel .seat {
   transform-box: fill-box;
   transform-origin: 50% 50%;
-  animation: var(--seat) 1.05s cubic-bezier(0.19, 0.94, 0.28, 1) var(--delay) both;
+  animation: var(--seat) calc(1.05s * var(--cover-tempo)) cubic-bezier(0.19, 0.94, 0.28, 1) calc(var(--delay) * var(--cover-tempo)) both;
 }
 
 .cover-panel .cover-arch {
-  animation: cover-glass-in 1.4s cubic-bezier(0.19, 0.94, 0.28, 1) both;
+  animation: cover-glass-in calc(1.4s * var(--cover-tempo)) cubic-bezier(0.19, 0.94, 0.28, 1) both;
 }
 
 .cover-panel .cover-lockup {
-  animation: cover-rise-in 1.1s ease 0.8s both;
+  animation: cover-rise-in calc(1.1s * var(--cover-tempo)) ease calc(0.8s * var(--cover-tempo)) both;
 }
 
 .cover-panel .cover-scroll {
-  animation: cover-rise-in 1s ease 0.9s both;
+  animation: cover-rise-in calc(1s * var(--cover-tempo)) ease calc(0.9s * var(--cover-tempo)) both;
   transition:
     border-color var(--dur-fast) var(--ease-elegant),
     color var(--dur-fast) var(--ease-elegant);
@@ -452,11 +461,33 @@ a {
 }
 
 .cover-panel .cover-kicker p {
-  animation: cover-rise-in 1s ease var(--delay) both;
+  animation: cover-rise-in calc(1s * var(--cover-tempo)) ease calc(var(--delay) * var(--cover-tempo)) both;
 }
 
+/* A looping idle affordance rather than part of the stagger: only its start is
+   scaled, so it still waits for the entrance to settle. The period stays 2.4s. */
 .cover-panel .cover-nudge {
-  animation: cover-nudge 2.4s ease-in-out 2s infinite;
+  animation: cover-nudge 2.4s ease-in-out calc(2s * var(--cover-tempo)) infinite;
+}
+
+/* Hold the whole timeline until CoverPanel says the panel can be seen playing it.
+   CSS animations advance on wall-clock time, not on frames — a main thread busy
+   hydrating doesn't delay this choreography, it skips it, and the first frame the
+   browser paints lands wherever the clock already got to. Pausing is the only way
+   to make the entrance start when there is someone to watch it. Every animation
+   above uses `both`, so a paused element holds at its `from` keyframe: undrawn
+   strokes, invisible lockup and kicker. The wildcard is safe — nothing inside the
+   panel animates except this choreography. */
+.cover-panel:not(.is-playing) * {
+  animation-play-state: paused;
+}
+
+/* Without JS there is nothing to add .is-playing, so opt back out. Same
+   specificity as the rule above, so it has to stay after it to win. */
+@media (scripting: none) {
+  .cover-panel:not(.is-playing) * {
+    animation-play-state: running;
+  }
 }
 
 /* Reduced motion: the panel should arrive fully composed. Nothing here is
