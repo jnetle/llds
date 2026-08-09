@@ -64,7 +64,12 @@ export function Header() {
           left: 0,
           right: 0,
           zIndex: 50,
-          padding: scrolled ? '18px 36px' : '28px 36px',
+          // One size on every route. The bar used to open taller and shrink on
+          // scroll, but the home page never showed that state — the cover panel
+          // suppresses the header until 0.92 of a viewport, by which point it is
+          // already compact. Home set the standard, so the compact size is now
+          // the only size. `scrolled` still drives the fill; just not the sizing.
+          padding: '18px 36px',
           transform: hidden ? 'translateY(-100%)' : 'translateY(0)',
           opacity: hidden ? 0 : 1,
           pointerEvents: hidden ? 'none' : 'auto'
@@ -94,10 +99,9 @@ export function Header() {
           }}>
           <div style={{ justifySelf: 'start' }}>
             <Link href="/" aria-label="Laurel Leaf Design Studio — Home" style={{ display: 'flex' }}>
-              {/* Shrinks with the bar on scroll, matching the padding shift above.
-                  Flat on mobile — the 600px media query overrides that padding
-                  shift, so the bar height doesn't change and neither should the mark. */}
-              <LogoLong height={isMobile ? 36 : scrolled ? 38 : 48} />
+              {/* Flat, like the bar around it. Mobile is a touch smaller because
+                  the 600px media query tightens the bar's padding to match. */}
+              <LogoLong height={isMobile ? 36 : 38} />
             </Link>
           </div>
 

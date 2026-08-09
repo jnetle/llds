@@ -6,18 +6,11 @@ import { color, motion } from '@/lib/tokens';
 
 type GridCellProps = {
   project: Project;
-  index: number;
-  scrollY: number;
-  rowOffsetTop: number;
   onOpen: (p: Project) => void;
 };
 
-export function GridCell({ project, index, scrollY, rowOffsetTop, onOpen }: GridCellProps) {
+export function GridCell({ project, onOpen }: GridCellProps) {
   const [hovered, setHovered] = useState(false);
-
-  const localScroll = scrollY - rowOffsetTop;
-  const parallaxOffset = localScroll * (0.08 + (index % 2) * 0.03);
-  const imgTransform = hovered ? 'scale(1.08)' : 'scale(1.02)';
 
   return (
     <div
@@ -30,14 +23,19 @@ export function GridCell({ project, index, scrollY, rowOffsetTop, onOpen }: Grid
         cursor: 'pointer',
         background: '#1a1a1a'
       }}>
+      {/* inset 0, and scale(1) at rest: the layer sits at exactly `cover`, the
+          sharpest it can be. It used to be inset -20% to give a scroll parallax
+          somewhere to travel, but that oversize made every image render 1.4x
+          larger than it needed to and visibly soft. Hover still scales up —
+          growing past the frame crops outward and can't expose an edge. */}
       <div
         style={{
           position: 'absolute',
-          inset: '-20%',
+          inset: 0,
           backgroundImage: `url("${project.cover}")`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
-          transform: `${imgTransform} translateY(${-parallaxOffset}px)`,
+          transform: hovered ? 'scale(1.08)' : 'scale(1)',
           transition: `transform ${motion.durSlow} ${motion.ease}, filter ${motion.durMed} ease`
         }}
       />

@@ -1,42 +1,82 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { type ReactNode } from 'react';
 import type { Project } from '@/lib/projects';
-import { useScrollY } from '@/hooks/useScrollY';
 import { useCompact } from '@/hooks/useCompact';
 import { color } from '@/lib/tokens';
 import { GridCell } from './GridCell';
 
+// Home hero. Placeholder pending real photography — migrates to
+// shared/home-hero.jpg on R2 under the convention in AGENTS.md.
+//
+// w=3200 so the full-bleed lead still has pixels to spare on a 1440px viewport
+// at DPR 2 (2880 device px). These render as CSS background images, so next/image
+// never sees them and there is no srcset — one width has to serve every screen.
+const HERO_IMAGE = 'https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?auto=format&fit=crop&w=3200&q=80';
+
 type HeroGridProps = {
   projects: Project[];
   onOpen: (p: Project) => void;
+  /** Rendered between the lead and row 2 — the studio statement, in practice. */
+  interlude?: ReactNode;
+  /**
+   * Hold the lead still as a backdrop for the cover panel that sits over it (see
+   * HomeShell). The panel is absolutely positioned at document 0 and rides up
+   * with the page; pinning the lead underneath is what turns that into a reveal
+   * rather than the panel and the hero scrolling away together.
+   */
+  pinnedLead?: boolean;
+  /**
+   * Reserve the extra viewport of scroll the cover panel rides up through. Set
+   * only while the panel is mounted — once it is dismissed, or on a return visit
+   * that never shows it, that scroll room would be a dead viewport above the
+   * hero where nothing moves.
+   */
+  coverStage?: boolean;
 };
 
-export function HeroGrid({ projects, onOpen }: HeroGridProps) {
-  const scrollY = useScrollY();
+// A `top: 0` sticky child of height 100svh stays pinned for (stage − 100svh).
+// 235svh therefore holds the lead for 135svh: the first 100 are spent under the
+// lifting panel, the remaining 35 are a solo beat before it releases. The
+// number is the reference mock's container height, kept verbatim.
+const COVER_STAGE = '235svh';
+
+// The same stage minus the panel's viewport: the 35svh solo beat on its own.
+const SOLO_STAGE = '135svh';
+
+/** The scroll room the lead is pinned against. Renders nothing when unpinned. */
+function Stage({ active, height, children }: { active: boolean; height: string; children: ReactNode }) {
+  if (!active) return <>{children}</>;
+  return <div style={{ position: 'relative', height }}>{children}</div>;
+}
+
+/**
+ * The lead image. Deliberately not a GridCell — it belongs to no project, so it
+ * carries no caption, no click-through and no hover state. Plain `cover` at
+ * exactly the frame size, like the reference mock's <img>: nothing moves, and
+ * the image renders as sharp as its source allows.
+ */
+function HeroLead() {
+  return (
+    <div
+      style={{
+        position: 'absolute',
+        inset: 0,
+        backgroundImage: `url("${HERO_IMAGE}")`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center'
+      }}
+    />
+  );
+}
+
+export function HeroGrid({ projects, onOpen, pinnedLead = false, coverStage = false, interlude }: HeroGridProps) {
   const isCompact = useCompact();
 
-  const row1Ref = useRef<HTMLDivElement>(null);
-  const row2Ref = useRef<HTMLDivElement>(null);
-  const row3Ref = useRef<HTMLDivElement>(null);
-  const [offsets, setOffsets] = useState({ row1: 0, row2: 0, row3: 0 });
-
-  useEffect(() => {
-    const measure = () => {
-      setOffsets({
-        row1: row1Ref.current?.offsetTop ?? 0,
-        row2: row2Ref.current?.offsetTop ?? 0,
-        row3: row3Ref.current?.offsetTop ?? 0
-      });
-    };
-    measure();
-    window.addEventListener('resize', measure);
-    return () => window.removeEventListener('resize', measure);
-  }, [isCompact]);
-
-  const row1 = projects.slice(0, 2);
-  const row2 = projects[2];
-  const row3 = projects.slice(3, 5);
+  // The lead shows HERO_IMAGE, not a project, so the rows start from the top of
+  // the list rather than skipping one.
+  const row2 = projects.slice(0, 2);
+  const row3 = projects.slice(2, 4);
 
   const dividerColor = 'var(--divider-color)';
   const dividerThickness = 1;
@@ -59,9 +99,33 @@ export function HeroGrid({ projects, onOpen }: HeroGridProps) {
 
   return (
     <section style={{ position: 'relative', width: '100%' }}>
-      {/* Row 1 */}
+      {/* The lead — full width, and the cover panel's backdrop when `pinnedLead`
+          is set. One image rather than two tiles so the arch window frames a
+          single picture instead of straddling a centre divider. It uses svh: the
+          ≤600px rules in globals.css match on the literal `height: 100vh`
+          substring and would clamp it to 60vh. zIndex is declared rather than
+          left to paint order — the lead is sticky (so it paints in the positioned
+          layer) and comes after <CoverPanel /> in the DOM, so without it the
+          stacking would rest on the panel's z-45 happening to beat `auto`. */}
+      <Stage active={pinnedLead} height={coverStage ? COVER_STAGE : SOLO_STAGE}>
+        <div
+          style={{
+            position: pinnedLead ? 'sticky' : 'relative',
+            top: pinnedLead ? 0 : undefined,
+            zIndex: pinnedLead ? 0 : undefined,
+            height: pinnedLead ? '100svh' : isCompact ? '60vh' : '100vh',
+            width: '100%',
+            overflow: 'hidden',
+            background: '#1a1a1a'
+          }}>
+          <HeroLead />
+        </div>
+      </Stage>
+
+      {interlude}
+
+      {/* Row 2 */}
       <div
-        ref={row1Ref}
         style={{
           position: 'relative',
           height: isCompact ? 'auto' : '100vh',
@@ -71,29 +135,14 @@ export function HeroGrid({ projects, onOpen }: HeroGridProps) {
           gridAutoRows: isCompact ? '60vh' : undefined,
           overflow: 'hidden'
         }}>
-        {row1.map((p, i) => (
-          <GridCell key={p.id} project={p} index={i} scrollY={scrollY} rowOffsetTop={offsets.row1} onOpen={onOpen} />
+        {row2.map(p => (
+          <GridCell key={p.id} project={p} onOpen={onOpen} />
         ))}
         {!isCompact && vDiv}
       </div>
 
-      {/* Row 2 — full width */}
-      <div
-        ref={row2Ref}
-        style={{
-          position: 'relative',
-          height: isCompact ? '60vh' : '100vh',
-          width: '100%',
-          overflow: 'hidden',
-          display: 'grid',
-          gridTemplateColumns: '1fr'
-        }}>
-        {row2 && <GridCell project={row2} index={2} scrollY={scrollY} rowOffsetTop={offsets.row2} onOpen={onOpen} />}
-      </div>
-
       {/* Row 3 */}
       <div
-        ref={row3Ref}
         style={{
           position: 'relative',
           height: isCompact ? 'auto' : '100vh',
@@ -103,8 +152,8 @@ export function HeroGrid({ projects, onOpen }: HeroGridProps) {
           gridAutoRows: isCompact ? '60vh' : undefined,
           overflow: 'hidden'
         }}>
-        {row3.map((p, i) => (
-          <GridCell key={p.id} project={p} index={3 + i} scrollY={scrollY} rowOffsetTop={offsets.row3} onOpen={onOpen} />
+        {row3.map(p => (
+          <GridCell key={p.id} project={p} onOpen={onOpen} />
         ))}
         {!isCompact && vDiv}
 
