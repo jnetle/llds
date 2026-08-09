@@ -3,6 +3,7 @@
 import Image from 'next/image';
 import { useEffect, useRef } from 'react';
 import { useCompact } from '@/hooks/useCompact';
+import { useCoverReady } from '@/hooks/useCoverReady';
 import { useScrollY } from '@/hooks/useScrollY';
 import { brand } from '@/lib/tokens';
 import { ArchGlyphDefs, LL_GLYPH_ID } from './ArchGlyph';
@@ -67,6 +68,10 @@ export function CoverPanel({ onDismiss }: CoverPanelProps) {
   const hiddenRef = useRef<boolean | null>(null);
   const sectionRef = useRef<HTMLElement>(null);
 
+  // The entrance is held paused until the panel can actually be seen playing it
+  // — see useCoverReady for why CSS delays alone get skipped on a cold load.
+  const playing = useCoverReady(sectionRef);
+
   // Hand the header off: keep it out of the way while the panel owns the
   // viewport — the panel's own lockup stands in for it — and release it once the
   // panel has all but cleared. Same 0.92-of-a-viewport gate as the reference, and
@@ -101,7 +106,7 @@ export function CoverPanel({ onDismiss }: CoverPanelProps) {
   return (
     <section
       ref={sectionRef}
-      className="cover-panel"
+      className={playing ? 'cover-panel is-playing' : 'cover-panel'}
       style={{
         position: 'absolute',
         top: 0,
