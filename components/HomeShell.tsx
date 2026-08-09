@@ -3,6 +3,7 @@
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useIsomorphicLayoutEffect } from '@/hooks/useIsomorphicLayoutEffect';
+import { useScrollTopOnLoad } from '@/hooks/useScrollTopOnLoad';
 import { PROJECTS, type Project } from '@/lib/projects';
 import { CoverPanel } from './CoverPanel';
 import { HeroGrid } from './HeroGrid';
@@ -26,6 +27,18 @@ let coverSeen = false;
 export function HomeShell() {
   const router = useRouter();
   const openProject = (p: Project) => router.push(`/projects/${p.id}`);
+
+  // A reload is an arrival, so it has to arrive at the top. The panel below is
+  // absolutely positioned at document 0 and rides up with the page, so a scroll
+  // offset restored by the browser mounts it already half gone — and an offset
+  // past a viewport trips the dismissal below on the very first frame, which
+  // then compensates scroll for a swap the reader never saw.
+  //
+  // A layout effect here is early enough to prevent that: effects run
+  // child-first, but CoverPanel's dismissal check is a passive effect, and every
+  // layout effect runs before any passive one. `useScrollY` starts at 0 and
+  // seeds itself from the mount effect, so it too reads a document already reset.
+  useScrollTopOnLoad();
 
   // Server and first client render agree: on a full page load `coverSeen` is
   // false in both, so hydration matches. On a client-side navigation there is
