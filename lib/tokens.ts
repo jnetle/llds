@@ -51,10 +51,11 @@ export const space = {
 } as const;
 
 // ── Section vertical padding (px) ─────────────────────────────────────────────
-// `d` = desktop / tablet (>600px), `m` = mobile (≤600px). <Section> reads both
-// directly via useCompact(600) and emits them inline, so the mobile-collapse
-// CSS rules in app/globals.css are no longer needed for Section-driven pages.
-// (They remain as a fallback for sections that haven't been migrated yet.)
+// `d` = desktop / tablet (>600px), `m` = mobile (≤600px). This table is the
+// source of truth, but <Section> can't read it at runtime — Tailwind only emits
+// classes it can find as literal source text, so components/ui/Section.tsx
+// restates each preset as a complete class string. scripts/check-css.mjs fails
+// the build if the two drift apart; edit them together.
 export const sectionPadY = {
   none: { d: 0, m: 0 },
   xxs: { d: 60, m: 24 },
