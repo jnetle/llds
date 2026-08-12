@@ -3,6 +3,7 @@ import { Cormorant_Garamond, Inter } from 'next/font/google';
 import './globals.css';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
+import { GoogleAnalytics } from '@next/third-parties/google';
 
 const cormorant = Cormorant_Garamond({
   variable: '--font-cormorant',
@@ -35,6 +36,10 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // Set per environment in Vercel: production property on Production, test property on
+  // Preview/Development. Unset (the local default) renders no gtag script at all.
+  const gaId = process.env.GA_MEASUREMENT_ID;
+
   return (
     <html lang="en" className={`${cormorant.variable} ${inter.variable} h-full`}>
       <body className="min-h-full flex flex-col">
@@ -42,6 +47,7 @@ export default function RootLayout({
         <main className="flex-1">{children}</main>
         <Footer />
       </body>
+      {gaId && <GoogleAnalytics gaId={gaId} />}
     </html>
   );
 }
