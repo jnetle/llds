@@ -16,10 +16,15 @@ export function Wordmark({ color = 'currentColor', className }: WordmarkProps) {
         // nearest cut, 500. 400 states the intent instead of relying on that.
         fontWeight: 400,
         textTransform: 'uppercase',
-        lineHeight: 1,
-        whiteSpace: 'nowrap'
+        lineHeight: 1.35
       }}>
-      Laurel Leaf <span style={{ letterSpacing: '0.22em' }}>Design Studio</span>
+      {/* Each half is unbreakable, the space between them is not. The whole lockup
+          is ~380px at this size and tracking, so a blanket `nowrap` overflowed
+          every container narrower than that — clipped outright on mobile, and on
+          desktop it pinned the footer's first grid track to a 380px min-content
+          floor and starved the other columns. "Laurel Leaf / Design Studio" is the
+          lockup's own break; breaking inside either half is not. */}
+      <span style={{ whiteSpace: 'nowrap' }}>Laurel Leaf</span> <span style={{ whiteSpace: 'nowrap' }}>Design Studio</span>
     </div>
   );
 }
