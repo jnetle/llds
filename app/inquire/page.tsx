@@ -2,19 +2,18 @@
 
 import * as React from 'react';
 import Link from 'next/link';
-import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from 'react';
 import { useForm, Controller, useWatch } from 'react-hook-form';
 import { ShowWhen } from './ShowWhen';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Eyebrow } from '@/components/ui/Eyebrow';
 import { Heading } from '@/components/ui/Heading';
-import { Section } from '@/components/ui/Section';
+import { Grid } from '@/components/ui/Grid';
 import { Field } from '@/components/ui/Field';
 import { Chip } from '@/components/ui/Chip';
 import { RadioPills } from '@/components/ui/RadioPills';
 import { RadioStack } from '@/components/ui/RadioStack';
 import { BandHeader } from './BandHeader';
-import { useCompact } from '@/hooks/useCompact';
 import { color, motion, text } from '@/lib/tokens';
 import {
   inquirySchema,
@@ -42,6 +41,10 @@ import {
 } from '@/lib/inquirySchema';
 import { submitInquiry } from './actions';
 
+// `width`/`minWidth` are load-bearing, not cosmetic: a bare <input> carries an
+// intrinsic min-content width of ~177px, which an `auto`-floored grid track has
+// to honour. Without them a two-up field row can out-measure a phone viewport,
+// and body's `overflow-x: clip` swallows the excess instead of scrolling it.
 const inputStyle: CSSProperties = {
   background: 'transparent',
   border: 'none',
@@ -51,6 +54,8 @@ const inputStyle: CSSProperties = {
   color: color.ink,
   fontFamily: 'inherit',
   outline: 'none',
+  width: '100%',
+  minWidth: 0,
   transition: 'border-color 0.3s'
 };
 
@@ -64,6 +69,8 @@ const textareaBaseStyle: CSSProperties = {
   color: color.ink,
   fontFamily: 'inherit',
   outline: 'none',
+  width: '100%',
+  minWidth: 0,
   transition: 'border-color 0.3s',
   resize: 'vertical',
   lineHeight: 1.6
@@ -78,12 +85,15 @@ const honeypotStyle: CSSProperties = {
   pointerEvents: 'none'
 };
 
-const bandSectionStyle: CSSProperties = {
-  display: 'grid',
-  gridTemplateColumns: 'minmax(220px, 280px) minmax(0, 1fr)',
-  gap: 80,
-  padding: '64px 8vw 72px',
-  alignItems: 'start'
+// The single horizontal rhythm for the whole page — hero, bands and submit row
+// all sit in this one column, so their left edges agree at every width. Below
+// ~1666px the gutter term wins and reproduces the site's standard inset;
+// above it the cap engages and the form centres rather than stretching to the
+// full width of a large display. `--gutter` (globals.css) is 8vw, tightening to
+// 24px at ≤600px, which keeps the breakpoint in CSS rather than JS.
+const pageColumnStyle: CSSProperties = {
+  width: 'min(1400px, calc(100% - 2 * var(--gutter)))',
+  marginInline: 'auto'
 };
 
 const fieldsetStyle: CSSProperties = {
@@ -94,6 +104,27 @@ const fieldsetStyle: CSSProperties = {
   margin: 0,
   minWidth: 0
 };
+
+/**
+ * One numbered band: sticky numeral rail beside its fieldset, stacking to a
+ * single column at ≤1024px. The collapse is a <Grid> tier rather than a media
+ * query or a `useCompact` read, so the server-rendered markup is already
+ * correct at the viewport it lands in. Vertical padding is bespoke (the
+ * <Section> presets have no 64/72 step), hence literal Tailwind classes.
+ */
+function FormBand({ numeral, label, children }: { numeral: string; label: string; children: ReactNode }) {
+  return (
+    <Grid
+      as="section"
+      className="form-band pt-[36px] pb-[40px] sm:pt-[64px] sm:pb-[72px]"
+      cols="minmax(220px, 280px) minmax(0, 1fr)"
+      gap={{ d: 80, m: 24 }}
+      alignItems="start">
+      <BandHeader numeral={numeral} label={label} />
+      <fieldset style={fieldsetStyle}>{children}</fieldset>
+    </Grid>
+  );
+}
 
 // Mirror of every field in inquirySchema. When a field is added to the schema,
 // add it here too — useForm needs an explicit default for every key, otherwise
@@ -141,8 +172,6 @@ export default function InquirePage() {
   const [serverError, setServerError] = useState<string | null>(null);
   const [attempted, setAttempted] = useState(false);
   const fieldRefs = useRef<Record<string, HTMLLabelElement | null>>({});
-  const heroStack = useCompact(900);
-
   // One stable ref setter per known field name. Pre-built once so React
   // doesn't see a new function (and re-bind the ref) on every render.
   // Typed against InquiryInput so a `refSetters.adress` typo is a compile error.
@@ -199,8 +228,10 @@ export default function InquirePage() {
   const scrollToField = useCallback((key: string) => {
     const node = fieldRefs.current[key];
     if (!node) return;
-    const top = node.getBoundingClientRect().top + window.scrollY - 140;
-    window.scrollTo({ top, behavior: 'smooth' });
+    // Header clearance comes from Field's `scroll-margin-top: var(--scroll-offset)`,
+    // which the browser applies here. Doing the arithmetic in JS meant one
+    // hardcoded desktop offset that overshot on phones.
+    node.scrollIntoView({ behavior: 'smooth', block: 'start' });
     setTimeout(() => {
       const focusable = node.querySelector<HTMLElement>('input, textarea, select');
       if (focusable) focusable.focus({ preventScroll: true });
@@ -233,11 +264,10 @@ export default function InquirePage() {
       <div
         role="status"
         aria-live="polite"
+        className="inquire-success px-[24px] pt-[96px] pb-[72px] sm:px-[32px] sm:pt-[160px] sm:pb-[120px]"
         style={{
-          minHeight: '100vh',
           display: 'grid',
           placeItems: 'center',
-          padding: '160px 32px 120px',
           textAlign: 'center'
         }}>
         <div style={{ maxWidth: 640 }}>
@@ -271,17 +301,13 @@ export default function InquirePage() {
     .filter(([, msg]) => Boolean(msg)) as Array<readonly [string, string]>;
 
   return (
-    <>
-      {/* Hero */}
-      <Section padTop="md" padBottom="sm" style={{ borderBottom: `1px solid ${color.hairline}` }}>
+    <div style={pageColumnStyle}>
+      {/* Hero. A raw <section> rather than <Section>: the gutter is owned by the
+          page column above, and <Section> bakes its own in with no opt-out. The
+          padding classes are `padTop="md"` / `padBottom="sm"` written out. */}
+      <section className="pt-[56px] pb-[48px] sm:pt-[140px] sm:pb-[120px]" style={{ borderBottom: `1px solid ${color.hairline}` }}>
         <Eyebrow style={{ marginBottom: 24 }}>— New Inquiries</Eyebrow>
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: heroStack ? '1fr' : 'minmax(0, 1.05fr) minmax(0, 1fr)',
-            gap: heroStack ? 28 : 80,
-            alignItems: 'end'
-          }}>
+        <Grid cols="minmax(0, 1.05fr) minmax(0, 1fr)" gap={{ d: 80, m: 28 }} alignItems="end">
           <Heading
             level="display"
             style={{
@@ -305,8 +331,8 @@ export default function InquirePage() {
               ∗ Indicates a required field
             </p>
           </div>
-        </div>
-      </Section>
+        </Grid>
+      </section>
 
       {/* Form — always visible. Previously hidden behind a useReveal IO that
           could fail on refresh/scroll-restoration, leaving the entire form
@@ -323,593 +349,560 @@ export default function InquirePage() {
         <input {...register('website')} type="text" tabIndex={-1} autoComplete="off" aria-hidden="true" style={honeypotStyle} />
 
         {/* 01 — CONTACT INFORMATION */}
-        <section className="form-band" style={bandSectionStyle}>
-          <BandHeader numeral="01" label="Contact Information" />
-          <fieldset style={fieldsetStyle}>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 36 }}>
-              <Field label="Full name" required name="name" error={errors.name?.message} registerRef={refSetters.name}>
-                <input {...register('name')} aria-invalid={!!errors.name} style={{ ...inputStyle, ...errInputBorder('name') }} />
-              </Field>
-              <Field label="Email address" required name="email" error={errors.email?.message} registerRef={refSetters.email}>
-                <input
-                  {...register('email')}
-                  type="email"
-                  aria-invalid={!!errors.email}
-                  style={{ ...inputStyle, ...errInputBorder('email') }}
-                />
-              </Field>
-              <Field label="Phone number" required name="phone" error={errors.phone?.message} registerRef={refSetters.phone}>
-                <input {...register('phone')} aria-invalid={!!errors.phone} style={{ ...inputStyle, ...errInputBorder('phone') }} />
-              </Field>
-            </div>
-          </fieldset>
-        </section>
+        <FormBand numeral="01" label="Contact Information">
+          <Grid cols="minmax(0, 1fr) minmax(0, 1fr)" gap={36}>
+            <Field label="Full name" required name="name" error={errors.name?.message} registerRef={refSetters.name}>
+              <input {...register('name')} aria-invalid={!!errors.name} style={{ ...inputStyle, ...errInputBorder('name') }} />
+            </Field>
+            <Field label="Email address" required name="email" error={errors.email?.message} registerRef={refSetters.email}>
+              <input
+                {...register('email')}
+                type="email"
+                aria-invalid={!!errors.email}
+                style={{ ...inputStyle, ...errInputBorder('email') }}
+              />
+            </Field>
+            <Field label="Phone number" required name="phone" error={errors.phone?.message} registerRef={refSetters.phone}>
+              <input {...register('phone')} aria-invalid={!!errors.phone} style={{ ...inputStyle, ...errInputBorder('phone') }} />
+            </Field>
+          </Grid>
+        </FormBand>
 
         {/* 02 — PROJECT OVERVIEW */}
-        <section className="form-band" style={bandSectionStyle}>
-          <BandHeader numeral="02" label="Project Overview" />
-          <fieldset style={fieldsetStyle}>
-            <Field label="Project address" required name="address" error={errors.address?.message} registerRef={refSetters.address}>
-              <input
-                {...register('address')}
-                placeholder="Street, city, state / postcode"
-                aria-invalid={!!errors.address}
-                style={{ ...inputStyle, ...errInputBorder('address') }}
-              />
-            </Field>
+        <FormBand numeral="02" label="Project Overview">
+          <Field label="Project address" required name="address" error={errors.address?.message} registerRef={refSetters.address}>
+            <input
+              {...register('address')}
+              placeholder="Street, city, state / postcode"
+              aria-invalid={!!errors.address}
+              style={{ ...inputStyle, ...errInputBorder('address') }}
+            />
+          </Field>
 
-            <Field
-              label="What type of project are you planning? — select all that apply"
-              required
+          <Field
+            label="What type of project are you planning? — select all that apply"
+            required
+            name="projectType"
+            error={errors.projectType?.message}
+            registerRef={refSetters.projectType}>
+            <Controller
+              control={control}
               name="projectType"
-              error={errors.projectType?.message}
-              registerRef={refSetters.projectType}>
-              <Controller
-                control={control}
-                name="projectType"
-                render={({ field }) => (
-                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, marginTop: 4 }}>
-                    {PROJECT_TYPES.map(t => (
-                      <Chip
-                        key={t}
-                        label={t}
-                        active={field.value.includes(t)}
-                        onClick={() => field.onChange(field.value.includes(t) ? field.value.filter(v => v !== t) : [...field.value, t])}
-                      />
-                    ))}
-                  </div>
-                )}
-              />
-              <ShowWhen control={control} name="projectType" when={v => v.length > 0}>
-                <input {...register('projectTypeOther')} placeholder="Other (optional)" style={{ ...inputStyle, marginTop: 14 }} />
-              </ShowWhen>
-            </Field>
+              render={({ field }) => (
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, marginTop: 4 }}>
+                  {PROJECT_TYPES.map(t => (
+                    <Chip
+                      key={t}
+                      label={t}
+                      active={field.value.includes(t)}
+                      onClick={() => field.onChange(field.value.includes(t) ? field.value.filter(v => v !== t) : [...field.value, t])}
+                    />
+                  ))}
+                </div>
+              )}
+            />
+            <ShowWhen control={control} name="projectType" when={v => v.length > 0}>
+              <input {...register('projectTypeOther')} placeholder="Other (optional)" style={{ ...inputStyle, marginTop: 14 }} />
+            </ShowWhen>
+          </Field>
 
-            <Field
-              label="What areas are included? — select all that apply"
-              required
+          <Field
+            label="What areas are included? — select all that apply"
+            required
+            name="areas"
+            error={errors.areas?.message}
+            registerRef={refSetters.areas}>
+            <Controller
+              control={control}
               name="areas"
-              error={errors.areas?.message}
-              registerRef={refSetters.areas}>
-              <Controller
-                control={control}
-                name="areas"
-                render={({ field }) => (
-                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, marginTop: 4 }}>
-                    {AREAS.map(a => (
-                      <Chip
-                        key={a}
-                        label={a}
-                        active={field.value.includes(a)}
-                        onClick={() => field.onChange(field.value.includes(a) ? field.value.filter(v => v !== a) : [...field.value, a])}
-                      />
-                    ))}
-                  </div>
-                )}
-              />
-            </Field>
+              render={({ field }) => (
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, marginTop: 4 }}>
+                  {AREAS.map(a => (
+                    <Chip
+                      key={a}
+                      label={a}
+                      active={field.value.includes(a)}
+                      onClick={() => field.onChange(field.value.includes(a) ? field.value.filter(v => v !== a) : [...field.value, a])}
+                    />
+                  ))}
+                </div>
+              )}
+            />
+          </Field>
 
-            <Field label="Approximate size of the home or area involved">
-              <input
-                {...register('size')}
-                placeholder="Total square footage, or an estimate of the areas being renovated"
-                style={inputStyle}
-              />
-            </Field>
+          <Field label="Approximate size of the home or area involved">
+            <input
+              {...register('size')}
+              placeholder="Total square footage, or an estimate of the areas being renovated"
+              style={inputStyle}
+            />
+          </Field>
 
-            <Field
-              label="Please briefly describe your project and goals"
-              required
-              name="description"
-              error={errors.description?.message}
-              registerRef={refSetters.description}>
-              <textarea
-                {...register('description')}
-                rows={5}
-                aria-invalid={!!errors.description}
-                placeholder="The site, the household, what you'd like the home to feel like, what's prompting the project…"
-                style={{
-                  ...textareaBaseStyle,
-                  border: `1px solid ${errors.description ? color.error : color.hairline}`,
-                  minHeight: 140
-                }}
-              />
-            </Field>
-          </fieldset>
-        </section>
+          <Field
+            label="Please briefly describe your project and goals"
+            required
+            name="description"
+            error={errors.description?.message}
+            registerRef={refSetters.description}>
+            <textarea
+              {...register('description')}
+              rows={5}
+              aria-invalid={!!errors.description}
+              placeholder="The site, the household, what you'd like the home to feel like, what's prompting the project…"
+              style={{
+                ...textareaBaseStyle,
+                border: `1px solid ${errors.description ? color.error : color.hairline}`,
+                minHeight: 140
+              }}
+            />
+          </Field>
+        </FormBand>
 
         {/* 03 — PROJECT TEAM + READINESS */}
-        <section className="form-band" style={bandSectionStyle}>
-          <BandHeader numeral="03" label="Project Team + Readiness" />
-          <fieldset style={fieldsetStyle}>
-            <Field
-              label="Do you have a builder or contractor selected?"
-              required
+        <FormBand numeral="03" label="Project Team + Readiness">
+          <Field
+            label="Do you have a builder or contractor selected?"
+            required
+            name="builder"
+            error={errors.builder?.message}
+            registerRef={refSetters.builder}>
+            <Controller
+              control={control}
               name="builder"
-              error={errors.builder?.message}
-              registerRef={refSetters.builder}>
-              <Controller
-                control={control}
-                name="builder"
-                render={({ field }) => (
-                  <RadioPills options={BUILDER_OPTIONS} value={field.value} onChange={field.onChange} hasError={!!errors.builder} />
-                )}
-              />
+              render={({ field }) => (
+                <RadioPills options={BUILDER_OPTIONS} value={field.value} onChange={field.onChange} hasError={!!errors.builder} />
+              )}
+            />
+          </Field>
+
+          <ShowWhen control={control} name="builder" when={v => v === 'Yes'}>
+            <Field label="If yes, who are you working with?">
+              <input {...register('builderName')} style={inputStyle} />
             </Field>
+          </ShowWhen>
 
-            <ShowWhen control={control} name="builder" when={v => v === 'Yes'}>
-              <Field label="If yes, who are you working with?">
-                <input {...register('builderName')} style={inputStyle} />
-              </Field>
-            </ShowWhen>
-
-            <Field
-              label="Are architectural plans completed?"
-              required
+          <Field
+            label="Are architectural plans completed?"
+            required
+            name="plans"
+            error={errors.plans?.message}
+            registerRef={refSetters.plans}>
+            <Controller
+              control={control}
               name="plans"
-              error={errors.plans?.message}
-              registerRef={refSetters.plans}>
-              <Controller
-                control={control}
-                name="plans"
-                render={({ field }) => (
-                  <RadioPills options={PLANS_OPTIONS} value={field.value} onChange={field.onChange} hasError={!!errors.plans} />
-                )}
-              />
-            </Field>
-          </fieldset>
-        </section>
+              render={({ field }) => (
+                <RadioPills options={PLANS_OPTIONS} value={field.value} onChange={field.onChange} hasError={!!errors.plans} />
+              )}
+            />
+          </Field>
+        </FormBand>
 
         {/* 04 — TIMELINE */}
-        <section className="form-band" style={bandSectionStyle}>
-          <BandHeader numeral="04" label="Timeline" />
-          <fieldset style={fieldsetStyle}>
-            <Field
-              label="When would you ideally like to begin?"
-              required
+        <FormBand numeral="04" label="Timeline">
+          <Field
+            label="When would you ideally like to begin?"
+            required
+            name="beginTime"
+            error={errors.beginTime?.message}
+            registerRef={refSetters.beginTime}>
+            <Controller
+              control={control}
               name="beginTime"
-              error={errors.beginTime?.message}
-              registerRef={refSetters.beginTime}>
-              <Controller
-                control={control}
-                name="beginTime"
-                render={({ field }) => (
-                  <RadioPills options={BEGIN_TIMES} value={field.value} onChange={field.onChange} hasError={!!errors.beginTime} />
-                )}
-              />
-            </Field>
+              render={({ field }) => (
+                <RadioPills options={BEGIN_TIMES} value={field.value} onChange={field.onChange} hasError={!!errors.beginTime} />
+              )}
+            />
+          </Field>
 
-            <Field
-              label="What is your ideal project completion timeframe?"
-              required
+          <Field
+            label="What is your ideal project completion timeframe?"
+            required
+            name="completion"
+            error={errors.completion?.message}
+            registerRef={refSetters.completion}>
+            <Controller
+              control={control}
               name="completion"
-              error={errors.completion?.message}
-              registerRef={refSetters.completion}>
-              <Controller
-                control={control}
-                name="completion"
-                render={({ field }) => (
-                  <RadioPills options={COMPLETION_TIMES} value={field.value} onChange={field.onChange} hasError={!!errors.completion} />
-                )}
-              />
-            </Field>
+              render={({ field }) => (
+                <RadioPills options={COMPLETION_TIMES} value={field.value} onChange={field.onChange} hasError={!!errors.completion} />
+              )}
+            />
+          </Field>
 
-            <Field
-              label="Are there any specific deadlines we should be aware of?"
-              required
-              name="deadlines"
-              error={errors.deadlines?.message}
-              registerRef={refSetters.deadlines}>
-              <input
-                {...register('deadlines')}
-                placeholder='Move-in date, holiday, sale completion — or write "none"'
-                aria-invalid={!!errors.deadlines}
-                style={{ ...inputStyle, ...errInputBorder('deadlines') }}
-              />
-            </Field>
-          </fieldset>
-        </section>
+          <Field
+            label="Are there any specific deadlines we should be aware of?"
+            required
+            name="deadlines"
+            error={errors.deadlines?.message}
+            registerRef={refSetters.deadlines}>
+            <input
+              {...register('deadlines')}
+              placeholder='Move-in date, holiday, sale completion — or write "none"'
+              aria-invalid={!!errors.deadlines}
+              style={{ ...inputStyle, ...errInputBorder('deadlines') }}
+            />
+          </Field>
+        </FormBand>
 
         {/* 05 — PROJECT EXPERIENCE */}
-        <section className="form-band" style={bandSectionStyle}>
-          <BandHeader numeral="05" label="Project Experience" />
-          <fieldset style={fieldsetStyle}>
-            <Field
-              label="Have you previously built or renovated a home?"
-              required
+        <FormBand numeral="05" label="Project Experience">
+          <Field
+            label="Have you previously built or renovated a home?"
+            required
+            name="builtBefore"
+            error={errors.builtBefore?.message}
+            registerRef={refSetters.builtBefore}>
+            <Controller
+              control={control}
               name="builtBefore"
-              error={errors.builtBefore?.message}
-              registerRef={refSetters.builtBefore}>
-              <Controller
-                control={control}
-                name="builtBefore"
-                render={({ field }) => (
-                  <RadioPills options={YES_NO} value={field.value} onChange={field.onChange} hasError={!!errors.builtBefore} />
-                )}
-              />
+              render={({ field }) => (
+                <RadioPills options={YES_NO} value={field.value} onChange={field.onChange} hasError={!!errors.builtBefore} />
+              )}
+            />
+          </Field>
+
+          <ShowWhen control={control} name="builtBefore" when={v => v === 'Yes'}>
+            <Field label="If yes, how would you describe that experience?">
+              <textarea {...register('builtBeforeNote')} rows={3} style={{ ...textareaBaseStyle, minHeight: 96 }} />
             </Field>
+          </ShowWhen>
 
-            <ShowWhen control={control} name="builtBefore" when={v => v === 'Yes'}>
-              <Field label="If yes, how would you describe that experience?">
-                <textarea {...register('builtBeforeNote')} rows={3} style={{ ...textareaBaseStyle, minHeight: 96 }} />
-              </Field>
-            </ShowWhen>
-
-            <Field
-              label="Have you worked with a designer before?"
-              required
+          <Field
+            label="Have you worked with a designer before?"
+            required
+            name="workedDesigner"
+            error={errors.workedDesigner?.message}
+            registerRef={refSetters.workedDesigner}>
+            <Controller
+              control={control}
               name="workedDesigner"
-              error={errors.workedDesigner?.message}
-              registerRef={refSetters.workedDesigner}>
-              <Controller
-                control={control}
-                name="workedDesigner"
-                render={({ field }) => (
-                  <RadioPills options={YES_NO} value={field.value} onChange={field.onChange} hasError={!!errors.workedDesigner} />
-                )}
-              />
-            </Field>
+              render={({ field }) => (
+                <RadioPills options={YES_NO} value={field.value} onChange={field.onChange} hasError={!!errors.workedDesigner} />
+              )}
+            />
+          </Field>
 
-            <ShowWhen control={control} name="workedDesigner" when={v => v === 'Yes'}>
-              <Field label="If yes, how would you describe that experience?">
-                <textarea {...register('workedDesignerNote')} rows={3} style={{ ...textareaBaseStyle, minHeight: 96 }} />
-              </Field>
-            </ShowWhen>
-          </fieldset>
-        </section>
+          <ShowWhen control={control} name="workedDesigner" when={v => v === 'Yes'}>
+            <Field label="If yes, how would you describe that experience?">
+              <textarea {...register('workedDesignerNote')} rows={3} style={{ ...textareaBaseStyle, minHeight: 96 }} />
+            </Field>
+          </ShowWhen>
+        </FormBand>
 
         {/* 06 — INVESTMENT */}
-        <section className="form-band" style={bandSectionStyle}>
-          <BandHeader numeral="06" label="Investment" />
-          <fieldset style={fieldsetStyle}>
-            <p style={{ ...text.bodySm, maxWidth: '60ch', marginTop: -8 }}>
-              Thoughtful planning and realistic budgeting are essential to creating a cohesive, well-executed home. Design fees vary based
-              on scope, level of detail, and overall project complexity. The following helps us align expectations from the beginning.
-            </p>
+        <FormBand numeral="06" label="Investment">
+          <p style={{ ...text.bodySm, maxWidth: '60ch', marginTop: -8 }}>
+            Thoughtful planning and realistic budgeting are essential to creating a cohesive, well-executed home. Design fees vary based on
+            scope, level of detail, and overall project complexity. The following helps us align expectations from the beginning.
+          </p>
 
-            <Field
-              label="Anticipated overall investment (construction + materials)"
-              required
-              name="investment"
-              error={errors.investment?.message}
-              registerRef={refSetters.investment}>
-              <select
-                {...register('investment')}
-                aria-invalid={!!errors.investment}
-                style={{ ...inputStyle, ...errInputBorder('investment'), appearance: 'none', cursor: 'pointer' }}>
-                <option value="">Please select —</option>
-                {INVESTMENT_RANGES.map(r => (
-                  <option key={r}>{r}</option>
-                ))}
-              </select>
-            </Field>
+          <Field
+            label="Anticipated overall investment (construction + materials)"
+            required
+            name="investment"
+            error={errors.investment?.message}
+            registerRef={refSetters.investment}>
+            <select
+              {...register('investment')}
+              aria-invalid={!!errors.investment}
+              style={{ ...inputStyle, ...errInputBorder('investment'), appearance: 'none', cursor: 'pointer' }}>
+              <option value="">Please select —</option>
+              {INVESTMENT_RANGES.map(r => (
+                <option key={r}>{r}</option>
+              ))}
+            </select>
+          </Field>
 
-            <Field
-              label="Have you allocated a budget for professional design services?"
-              required
+          <Field
+            label="Have you allocated a budget for professional design services?"
+            required
+            name="designBudgetAllocated"
+            error={errors.designBudgetAllocated?.message}
+            registerRef={refSetters.designBudgetAllocated}>
+            <Controller
+              control={control}
               name="designBudgetAllocated"
-              error={errors.designBudgetAllocated?.message}
-              registerRef={refSetters.designBudgetAllocated}>
-              <Controller
-                control={control}
-                name="designBudgetAllocated"
-                render={({ field }) => (
-                  <RadioPills
-                    options={DESIGN_BUDGET_OPTIONS}
-                    value={field.value}
-                    onChange={field.onChange}
-                    hasError={!!errors.designBudgetAllocated}
-                  />
-                )}
-              />
-            </Field>
+              render={({ field }) => (
+                <RadioPills
+                  options={DESIGN_BUDGET_OPTIONS}
+                  value={field.value}
+                  onChange={field.onChange}
+                  hasError={!!errors.designBudgetAllocated}
+                />
+              )}
+            />
+          </Field>
 
-            <Field
-              label="What level of investment are you comfortable allocating toward design services?"
-              required
+          <Field
+            label="What level of investment are you comfortable allocating toward design services?"
+            required
+            name="designInvestment"
+            error={errors.designInvestment?.message}
+            registerRef={refSetters.designInvestment}>
+            <Controller
+              control={control}
               name="designInvestment"
-              error={errors.designInvestment?.message}
-              registerRef={refSetters.designInvestment}>
-              <Controller
-                control={control}
-                name="designInvestment"
-                render={({ field }) => (
-                  <RadioStack
-                    name="designInvestment"
-                    options={DESIGN_INVESTMENT_OPTIONS}
-                    value={field.value}
-                    onChange={field.onChange}
-                    hasError={!!errors.designInvestment}
-                  />
-                )}
-              />
-            </Field>
-          </fieldset>
-        </section>
+              render={({ field }) => (
+                <RadioStack
+                  name="designInvestment"
+                  options={DESIGN_INVESTMENT_OPTIONS}
+                  value={field.value}
+                  onChange={field.onChange}
+                  hasError={!!errors.designInvestment}
+                />
+              )}
+            />
+          </Field>
+        </FormBand>
 
         {/* 07 — PROJECT APPROACH */}
-        <section className="form-band" style={bandSectionStyle}>
-          <BandHeader numeral="07" label="Project Approach" />
-          <fieldset style={fieldsetStyle}>
-            <Field
-              label="Will your project be:"
-              required
+        <FormBand numeral="07" label="Project Approach">
+          <Field
+            label="Will your project be:"
+            required
+            name="builderApproach"
+            error={errors.builderApproach?.message}
+            registerRef={refSetters.builderApproach}>
+            <Controller
+              control={control}
               name="builderApproach"
-              error={errors.builderApproach?.message}
-              registerRef={refSetters.builderApproach}>
-              <Controller
-                control={control}
-                name="builderApproach"
-                render={({ field }) => (
-                  <RadioStack
-                    name="builderApproach"
-                    options={BUILDER_APPROACH_OPTIONS}
-                    value={field.value}
-                    onChange={field.onChange}
-                    hasError={!!errors.builderApproach}
-                  />
-                )}
-              />
-            </Field>
+              render={({ field }) => (
+                <RadioStack
+                  name="builderApproach"
+                  options={BUILDER_APPROACH_OPTIONS}
+                  value={field.value}
+                  onChange={field.onChange}
+                  hasError={!!errors.builderApproach}
+                />
+              )}
+            />
+          </Field>
 
-            <Field
-              label="What level of design support are you looking for?"
-              required
+          <Field
+            label="What level of design support are you looking for?"
+            required
+            name="designSupport"
+            error={errors.designSupport?.message}
+            registerRef={refSetters.designSupport}>
+            <Controller
+              control={control}
               name="designSupport"
-              error={errors.designSupport?.message}
-              registerRef={refSetters.designSupport}>
-              <Controller
-                control={control}
-                name="designSupport"
-                render={({ field }) => (
-                  <RadioStack
-                    name="designSupport"
-                    options={DESIGN_SUPPORT_OPTIONS}
-                    value={field.value}
-                    onChange={field.onChange}
-                    hasError={!!errors.designSupport}
-                  />
-                )}
-              />
-            </Field>
-          </fieldset>
-        </section>
+              render={({ field }) => (
+                <RadioStack
+                  name="designSupport"
+                  options={DESIGN_SUPPORT_OPTIONS}
+                  value={field.value}
+                  onChange={field.onChange}
+                  hasError={!!errors.designSupport}
+                />
+              )}
+            />
+          </Field>
+        </FormBand>
 
         {/* 08 — DECISION-MAKING + EXPECTATIONS */}
-        <section className="form-band" style={bandSectionStyle}>
-          <BandHeader numeral="08" label="Decision-Making + Expectations" />
-          <fieldset style={fieldsetStyle}>
-            <Field
-              label="Who will be the primary decision-maker for this project?"
-              required
+        <FormBand numeral="08" label="Decision-Making + Expectations">
+          <Field
+            label="Who will be the primary decision-maker for this project?"
+            required
+            name="decisionMaker"
+            error={errors.decisionMaker?.message}
+            registerRef={refSetters.decisionMaker}>
+            <Controller
+              control={control}
               name="decisionMaker"
-              error={errors.decisionMaker?.message}
-              registerRef={refSetters.decisionMaker}>
-              <Controller
-                control={control}
-                name="decisionMaker"
-                render={({ field }) => (
-                  <RadioPills
-                    options={DECISION_MAKER_OPTIONS}
-                    value={field.value}
-                    onChange={field.onChange}
-                    hasError={!!errors.decisionMaker}
-                  />
-                )}
-              />
-            </Field>
+              render={({ field }) => (
+                <RadioPills
+                  options={DECISION_MAKER_OPTIONS}
+                  value={field.value}
+                  onChange={field.onChange}
+                  hasError={!!errors.decisionMaker}
+                />
+              )}
+            />
+          </Field>
 
-            <Field
-              label="How comfortable are you making decisions within a defined timeline?"
-              required
+          <Field
+            label="How comfortable are you making decisions within a defined timeline?"
+            required
+            name="decisionComfort"
+            error={errors.decisionComfort?.message}
+            registerRef={refSetters.decisionComfort}>
+            <Controller
+              control={control}
               name="decisionComfort"
-              error={errors.decisionComfort?.message}
-              registerRef={refSetters.decisionComfort}>
-              <Controller
-                control={control}
-                name="decisionComfort"
-                render={({ field }) => (
-                  <RadioPills
-                    options={DECISION_COMFORT_OPTIONS}
-                    value={field.value}
-                    onChange={field.onChange}
-                    hasError={!!errors.decisionComfort}
-                  />
-                )}
-              />
-            </Field>
+              render={({ field }) => (
+                <RadioPills
+                  options={DECISION_COMFORT_OPTIONS}
+                  value={field.value}
+                  onChange={field.onChange}
+                  hasError={!!errors.decisionComfort}
+                />
+              )}
+            />
+          </Field>
 
-            <Field
-              label="Are you open to professional recommendations, even if they differ from your initial ideas?"
-              required
+          <Field
+            label="Are you open to professional recommendations, even if they differ from your initial ideas?"
+            required
+            name="openToRecs"
+            error={errors.openToRecs?.message}
+            registerRef={refSetters.openToRecs}>
+            <Controller
+              control={control}
               name="openToRecs"
-              error={errors.openToRecs?.message}
-              registerRef={refSetters.openToRecs}>
-              <Controller
-                control={control}
-                name="openToRecs"
-                render={({ field }) => (
-                  <RadioPills options={OPEN_TO_RECS_OPTIONS} value={field.value} onChange={field.onChange} hasError={!!errors.openToRecs} />
-                )}
-              />
-            </Field>
+              render={({ field }) => (
+                <RadioPills options={OPEN_TO_RECS_OPTIONS} value={field.value} onChange={field.onChange} hasError={!!errors.openToRecs} />
+              )}
+            />
+          </Field>
 
-            <Field
-              label="How involved would you like to be in the selection process?"
-              required
+          <Field
+            label="How involved would you like to be in the selection process?"
+            required
+            name="involvement"
+            error={errors.involvement?.message}
+            registerRef={refSetters.involvement}>
+            <Controller
+              control={control}
               name="involvement"
-              error={errors.involvement?.message}
-              registerRef={refSetters.involvement}>
-              <Controller
-                control={control}
-                name="involvement"
-                render={({ field }) => (
-                  <RadioPills options={INVOLVEMENT_OPTIONS} value={field.value} onChange={field.onChange} hasError={!!errors.involvement} />
-                )}
-              />
-            </Field>
+              render={({ field }) => (
+                <RadioPills options={INVOLVEMENT_OPTIONS} value={field.value} onChange={field.onChange} hasError={!!errors.involvement} />
+              )}
+            />
+          </Field>
 
-            <Field label="During a project, unexpected decisions and adjustments may arise. How do you typically approach these situations?">
-              <Controller
-                control={control}
-                name="changesApproach"
-                render={({ field }) => (
-                  <RadioStack name="changesApproach" options={CHANGES_APPROACH_OPTIONS} value={field.value} onChange={field.onChange} />
-                )}
-              />
-            </Field>
-          </fieldset>
-        </section>
+          <Field label="During a project, unexpected decisions and adjustments may arise. How do you typically approach these situations?">
+            <Controller
+              control={control}
+              name="changesApproach"
+              render={({ field }) => (
+                <RadioStack name="changesApproach" options={CHANGES_APPROACH_OPTIONS} value={field.value} onChange={field.onChange} />
+              )}
+            />
+          </Field>
+        </FormBand>
 
         {/* 09 — STYLE + PRIORITIES */}
-        <section className="form-band" style={bandSectionStyle}>
-          <BandHeader numeral="09" label="Style + Priorities" />
-          <fieldset style={fieldsetStyle}>
-            <Field
-              label="How would you describe your style?"
-              required
-              name="style"
-              error={errors.style?.message}
-              registerRef={refSetters.style}>
-              <textarea
-                {...register('style')}
-                rows={3}
-                aria-invalid={!!errors.style}
-                placeholder="A few words, a few references, or what you keep coming back to…"
-                style={{
-                  ...textareaBaseStyle,
-                  border: `1px solid ${errors.style ? color.error : color.hairline}`,
-                  minHeight: 100
-                }}
-              />
-            </Field>
+        <FormBand numeral="09" label="Style + Priorities">
+          <Field
+            label="How would you describe your style?"
+            required
+            name="style"
+            error={errors.style?.message}
+            registerRef={refSetters.style}>
+            <textarea
+              {...register('style')}
+              rows={3}
+              aria-invalid={!!errors.style}
+              placeholder="A few words, a few references, or what you keep coming back to…"
+              style={{
+                ...textareaBaseStyle,
+                border: `1px solid ${errors.style ? color.error : color.hairline}`,
+                minHeight: 100
+              }}
+            />
+          </Field>
 
-            <Field
-              label={`Top priorities for this project — select up to three (${priorities.length}/${PRIORITIES_MAX})`}
-              required
+          <Field
+            label={`Top priorities for this project — select up to three (${priorities.length}/${PRIORITIES_MAX})`}
+            required
+            name="priorities"
+            error={errors.priorities?.message}
+            registerRef={refSetters.priorities}>
+            <Controller
+              control={control}
               name="priorities"
-              error={errors.priorities?.message}
-              registerRef={refSetters.priorities}>
-              <Controller
-                control={control}
-                name="priorities"
-                render={({ field }) => (
-                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, marginTop: 4 }}>
-                    {PRIORITIES.map(p => {
-                      const active = field.value.includes(p);
-                      const atCap = field.value.length >= PRIORITIES_MAX;
-                      return (
-                        <Chip
-                          key={p}
-                          label={p}
-                          active={active}
-                          disabled={!active && atCap}
-                          onClick={() => {
-                            if (active) field.onChange(field.value.filter(v => v !== p));
-                            else if (!atCap) field.onChange([...field.value, p]);
-                          }}
-                        />
-                      );
-                    })}
-                  </div>
-                )}
-              />
-            </Field>
-          </fieldset>
-        </section>
+              render={({ field }) => (
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, marginTop: 4 }}>
+                  {PRIORITIES.map(p => {
+                    const active = field.value.includes(p);
+                    const atCap = field.value.length >= PRIORITIES_MAX;
+                    return (
+                      <Chip
+                        key={p}
+                        label={p}
+                        active={active}
+                        disabled={!active && atCap}
+                        onClick={() => {
+                          if (active) field.onChange(field.value.filter(v => v !== p));
+                          else if (!atCap) field.onChange([...field.value, p]);
+                        }}
+                      />
+                    );
+                  })}
+                </div>
+              )}
+            />
+          </Field>
+        </FormBand>
 
         {/* 10 — COMMUNICATION + PROCESS */}
-        <section className="form-band" style={bandSectionStyle}>
-          <BandHeader numeral="10" label="Communication + Process" />
-          <fieldset style={fieldsetStyle}>
-            <p style={{ ...text.bodySm, maxWidth: '60ch', marginTop: -8 }}>
-              To maintain organization and clarity across all projects, communication is handled primarily through email and scheduled
-              meetings.
-            </p>
+        <FormBand numeral="10" label="Communication + Process">
+          <p style={{ ...text.bodySm, maxWidth: '60ch', marginTop: -8 }}>
+            To maintain organization and clarity across all projects, communication is handled primarily through email and scheduled
+            meetings.
+          </p>
 
-            <Field
-              label="Are you comfortable with structured communication and scheduled check-ins throughout the project?"
-              required
+          <Field
+            label="Are you comfortable with structured communication and scheduled check-ins throughout the project?"
+            required
+            name="structuredComm"
+            error={errors.structuredComm?.message}
+            registerRef={refSetters.structuredComm}>
+            <Controller
+              control={control}
               name="structuredComm"
-              error={errors.structuredComm?.message}
-              registerRef={refSetters.structuredComm}>
-              <Controller
-                control={control}
-                name="structuredComm"
-                render={({ field }) => (
-                  <RadioPills
-                    options={STRUCTURED_COMM_OPTIONS}
-                    value={field.value}
-                    onChange={field.onChange}
-                    hasError={!!errors.structuredComm}
-                  />
-                )}
-              />
-            </Field>
-          </fieldset>
-        </section>
+              render={({ field }) => (
+                <RadioPills
+                  options={STRUCTURED_COMM_OPTIONS}
+                  value={field.value}
+                  onChange={field.onChange}
+                  hasError={!!errors.structuredComm}
+                />
+              )}
+            />
+          </Field>
+        </FormBand>
 
         {/* 11 — FINAL DETAILS */}
-        <section className="form-band" style={bandSectionStyle}>
-          <BandHeader numeral="11" label="Final Details" />
-          <fieldset style={fieldsetStyle}>
-            <Field
-              label="Is there anything else you'd like us to know about your project?"
-              required
-              name="anythingElse"
-              error={errors.anythingElse?.message}
-              registerRef={refSetters.anythingElse}>
-              <textarea
-                {...register('anythingElse')}
-                rows={4}
-                aria-invalid={!!errors.anythingElse}
-                placeholder='Family rhythms, pets, art collections, accessibility needs, anything that feels relevant — or write "nothing else"'
-                style={{
-                  ...textareaBaseStyle,
-                  border: `1px solid ${errors.anythingElse ? color.error : color.hairline}`,
-                  minHeight: 110
-                }}
-              />
-            </Field>
+        <FormBand numeral="11" label="Final Details">
+          <Field
+            label="Is there anything else you'd like us to know about your project?"
+            required
+            name="anythingElse"
+            error={errors.anythingElse?.message}
+            registerRef={refSetters.anythingElse}>
+            <textarea
+              {...register('anythingElse')}
+              rows={4}
+              aria-invalid={!!errors.anythingElse}
+              placeholder='Family rhythms, pets, art collections, accessibility needs, anything that feels relevant — or write "nothing else"'
+              style={{
+                ...textareaBaseStyle,
+                border: `1px solid ${errors.anythingElse ? color.error : color.hairline}`,
+                minHeight: 110
+              }}
+            />
+          </Field>
 
-            <Field
-              label="How did you hear about Laurel Leaf Design Studio?"
-              required
-              name="howHeard"
-              error={errors.howHeard?.message}
-              registerRef={refSetters.howHeard}>
-              <input
-                {...register('howHeard')}
-                placeholder="Press, Instagram, a referral, online search…"
-                aria-invalid={!!errors.howHeard}
-                style={{ ...inputStyle, ...errInputBorder('howHeard') }}
-              />
-            </Field>
-          </fieldset>
-        </section>
+          <Field
+            label="How did you hear about Laurel Leaf Design Studio?"
+            required
+            name="howHeard"
+            error={errors.howHeard?.message}
+            registerRef={refSetters.howHeard}>
+            <input
+              {...register('howHeard')}
+              placeholder="Press, Instagram, a referral, online search…"
+              aria-invalid={!!errors.howHeard}
+              style={{ ...inputStyle, ...errInputBorder('howHeard') }}
+            />
+          </Field>
+        </FormBand>
 
         {/* Submit */}
-        <div style={{ display: 'grid', gap: 28, width: 'min(1100px, calc(100% - 16vw))', margin: '64px auto 80px' }}>
+        <div className="mt-[40px] mb-[56px] sm:mt-[64px] sm:mb-[80px]" style={{ display: 'grid', gap: 28 }}>
           {attempted && errorEntries.length > 0 && (
             <div
               role="alert"
@@ -968,6 +961,7 @@ export default function InquirePage() {
             <button
               type="submit"
               disabled={isSubmitting}
+              className="w-full sm:w-auto"
               style={{
                 padding: '16px 40px',
                 background: color.ink,
@@ -987,6 +981,6 @@ export default function InquirePage() {
           </div>
         </div>
       </form>
-    </>
+    </div>
   );
 }

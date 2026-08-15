@@ -18,8 +18,10 @@ export function RadioPills({ options, value, onChange, hasError }: RadioPillsPro
             type="button"
             onClick={() => onChange(opt)}
             aria-pressed={active}
-            className="micro-sm"
+            className="micro-sm pill"
             style={{
+              display: 'inline-flex',
+              alignItems: 'center',
               padding: '10px 18px',
               borderRadius: 100,
               border: '1px solid ' + (active ? color.ink : hasError ? color.error : color.hairline),

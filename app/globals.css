@@ -32,6 +32,12 @@
 
   /* layout */
   --gutter: 8vw;
+
+  /* Clearance for the fixed header when something is scrolled into view.
+     Consumed as `scroll-margin-top` (components/ui/Field.tsx) so the browser
+     does the offsetting — no JS reads this. Tightened on mobile below, where
+     the header bar is shorter. */
+  --scroll-offset: 140px;
 }
 
 @theme inline {
@@ -333,16 +339,21 @@ a {
     transform: translateY(0);
   }
 }
-@media (max-width: 900px) {
-  .form-band {
-    grid-template-columns: 1fr !important;
-    gap: 24px !important;
-    padding-top: 36px !important;
-    padding-bottom: 40px !important;
-  }
+/* Matches the tier at which <Grid> collapses the band to one column — a sticky
+   rail makes no sense once it sits above the fields rather than beside them.
+   Columns, gap and padding are all owned by the component now (Grid tiers and
+   Tailwind classes); this is the only thing left that CSS has to say. */
+@media (max-width: 1024px) {
   .form-band-header {
     position: static;
   }
+}
+
+/* Success screen (app/inquire/page.tsx). The svh declaration is simply dropped
+   by engines that don't support it, so the vh line is the fallback. */
+.inquire-success {
+  min-height: 100vh;
+  min-height: 100svh;
 }
 
 /* ======================== RESPONSIVE ======================== */
@@ -530,6 +541,8 @@ a {
      inside a hero) gets the same tightening. */
   :root {
     --gutter: 24px;
+    /* Header bar is ~68px here (16px padding + 36px logo) vs ~74px on desktop. */
+    --scroll-offset: 96px;
   }
 
   /* Header padding */
@@ -540,6 +553,15 @@ a {
   /* Buttons: keep tap target */
   button {
     min-height: 36px;
+  }
+
+  /* Chip / RadioPills (components/ui/) — 36px is under the 44px tap-target
+     floor, and these are the densest controls on the site. It has to live here
+     rather than as a `min-h-[44px]` utility on the component: Tailwind emits
+     utilities into `@layer utilities`, and the unlayered `button` rule above
+     beats any layered rule no matter how specific. */
+  .pill {
+    min-height: 44px;
   }
   a {
     min-height: 36px;

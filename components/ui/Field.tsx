@@ -16,7 +16,7 @@ export type FieldProps = {
 
 export function Field({ label, required, error, registerRef, children }: FieldProps) {
   return (
-    <label ref={registerRef} style={{ display: 'grid', gap: 10, scrollMarginTop: 140 }}>
+    <label ref={registerRef} style={{ display: 'grid', gap: 10, scrollMarginTop: 'var(--scroll-offset)' }}>
       <Eyebrow as="span" size="sm" opacity={0.6} style={{ color: error ? color.error : undefined, transition: 'color 0.3s' }}>
         {label}
         {required && <span style={{ marginLeft: 6, opacity: error ? 0.9 : 0.5 }}>*</span>}
