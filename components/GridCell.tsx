@@ -1,8 +1,7 @@
 'use client';
 
-import { useState } from 'react';
 import type { Project } from '@/lib/projects';
-import { color, motion } from '@/lib/tokens';
+import { color } from '@/lib/tokens';
 
 type GridCellProps = {
   project: Project;
@@ -10,35 +9,14 @@ type GridCellProps = {
 };
 
 export function GridCell({ project, onOpen }: GridCellProps) {
-  const [hovered, setHovered] = useState(false);
-
   return (
-    <div
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-      onClick={() => onOpen(project)}
-      style={{
-        position: 'relative',
-        overflow: 'hidden',
-        cursor: 'pointer',
-        background: '#1a1a1a'
-      }}>
+    <div className="grid-cell" onClick={() => onOpen(project)}>
       {/* inset 0, and scale(1) at rest: the layer sits at exactly `cover`, the
           sharpest it can be. It used to be inset -20% to give a scroll parallax
           somewhere to travel, but that oversize made every image render 1.4x
           larger than it needed to and visibly soft. Hover still scales up —
           growing past the frame crops outward and can't expose an edge. */}
-      <div
-        style={{
-          position: 'absolute',
-          inset: 0,
-          backgroundImage: `url("${project.cover}")`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          transform: hovered ? 'scale(1.08)' : 'scale(1)',
-          transition: `transform ${motion.durSlow} ${motion.ease}, filter ${motion.durMed} ease`
-        }}
-      />
+      <div className="grid-cell__media" style={{ backgroundImage: `url("${project.cover}")` }} />
 
       <div
         style={{
@@ -49,18 +27,7 @@ export function GridCell({ project, onOpen }: GridCellProps) {
         }}
       />
 
-      <div
-        style={{
-          position: 'absolute',
-          left: 32,
-          right: 32,
-          bottom: 64,
-          color: color.bg,
-          transform: hovered ? 'translateY(0)' : 'translateY(20px)',
-          opacity: hovered ? 1 : 0.85,
-          transition: `transform ${motion.durMed} ${motion.ease}, opacity ${motion.durMed} ease`,
-          pointerEvents: 'none'
-        }}>
+      <div className="grid-cell__caption" style={{ color: color.bg }}>
         <div className="micro-sm" style={{ opacity: 0.75, marginBottom: 10 }}>
           {project.location} · {project.year}
         </div>
@@ -76,16 +43,7 @@ export function GridCell({ project, onOpen }: GridCellProps) {
           }}>
           {project.title}
         </h2>
-        <div
-          style={{
-            marginTop: 18,
-            display: 'flex',
-            alignItems: 'center',
-            gap: 14,
-            opacity: hovered ? 1 : 0,
-            transform: hovered ? 'translateY(0)' : 'translateY(8px)',
-            transition: `transform ${motion.durMed} ease 0.1s, opacity ${motion.durMed} ease 0.1s`
-          }}>
+        <div className="grid-cell__cta">
           <span className="micro" style={{ fontSize: 10 }}>
             View Project
           </span>

@@ -356,6 +356,169 @@ a {
   min-height: 100svh;
 }
 
+/* ======================== INTERACTION STATES ========================
+
+   Hover and focus are the two things inline styles structurally cannot express,
+   so every component that needed them either faked them in JS or went without.
+   Both are collected here rather than in *.module.css files: the pattern above
+   (.site-header:hover, .nav-link:hover, .cover-panel .cover-scroll:hover) is
+   already established and these are the last few holdouts. */
+
+/* Nothing in this codebase drew a focus ring before this block. The inquire
+   form went further and set `outline: none` inline on every input — an inline
+   declaration no stylesheet can override — so a keyboard user filling out a
+   20-field form had no indication of where they were. The inline declarations
+   are gone; this pair replaces them.
+
+   Pointer focus stays ringless, so the visual design is unchanged for mouse
+   users. Note that text inputs match :focus-visible even when clicked (per
+   spec, since they take keyboard input) — that is intended, not a leak. */
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
+:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 3px;
+}
+
+/* Inquire submit button (app/inquire/page.tsx). Background lives here, not
+   inline, because an inline `background` outranks the :hover rule. The
+   submitting state reads :disabled rather than a second copy of isSubmitting. */
+.btn-primary {
+  background: var(--ink);
+  color: var(--bg);
+  transition:
+    background-color var(--dur-fast) var(--ease-elegant),
+    opacity var(--dur-med) var(--ease-elegant);
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: var(--navy);
+}
+
+.btn-primary:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
+/* Home hero tile (components/GridCell.tsx). Hover drove three descendants off
+   one useState, which re-rendered the tile on every pointer cross and did
+   nothing at all until hydration. One parent :hover now feeds all three. */
+.grid-cell {
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+  background: #1a1a1a;
+}
+
+.grid-cell__media {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  transform: scale(1);
+  transition:
+    transform var(--dur-slow) var(--ease-elegant),
+    filter var(--dur-med) ease;
+}
+
+.grid-cell:hover .grid-cell__media,
+.grid-cell:focus-within .grid-cell__media {
+  transform: scale(1.08);
+}
+
+.grid-cell__caption {
+  position: absolute;
+  left: 32px;
+  right: 32px;
+  bottom: 64px;
+  pointer-events: none;
+  opacity: 0.85;
+  transform: translateY(20px);
+  transition:
+    transform var(--dur-med) var(--ease-elegant),
+    opacity var(--dur-med) ease;
+}
+
+.grid-cell:hover .grid-cell__caption,
+.grid-cell:focus-within .grid-cell__caption {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.grid-cell__cta {
+  margin-top: 18px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  opacity: 0;
+  transform: translateY(8px);
+  transition:
+    transform var(--dur-med) ease 0.1s,
+    opacity var(--dur-med) ease 0.1s;
+}
+
+.grid-cell:hover .grid-cell__cta,
+.grid-cell:focus-within .grid-cell__cta {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Projects index tile (components/ProjectsGrid.tsx). Same useState-per-tile
+   pattern as above. :focus-within earns its keep here — the tile wraps a
+   <Link>, so tabbing to it now previews the same way hovering does. */
+.project-tile__media {
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+  background-position: center;
+  transform: scale(1);
+  transition: transform 1.4s var(--ease-elegant);
+}
+
+.project-tile:hover .project-tile__media,
+.project-tile:focus-within .project-tile__media {
+  transform: scale(1.03);
+}
+
+/* Project strip tile (components/ProjectStrip.tsx). Was two handlers writing
+   e.currentTarget.style.filter directly — DOM mutations React does not know
+   about, and which never fired for keyboard users. The transition was `all`;
+   only filter ever changed. */
+.strip-tile__media {
+  width: 100%;
+  height: 580px;
+  background-size: cover;
+  background-position: center;
+  transition: filter var(--dur-med) ease;
+}
+
+.strip-tile:hover .strip-tile__media,
+.strip-tile:focus-visible .strip-tile__media {
+  filter: brightness(1.05);
+}
+
+/* Services quick-links nav (app/services/page.tsx). Also two handlers mutating
+   currentTarget.style. Declared after .micro-sm so the tighter tracking wins. */
+.quick-link {
+  color: var(--ink);
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  opacity: 0.7;
+  padding-bottom: 4px;
+  border-bottom: 1px solid transparent;
+  transition:
+    opacity 0.3s ease,
+    border-color 0.3s ease;
+}
+
+.quick-link:hover,
+.quick-link:focus-visible {
+  opacity: 1;
+  border-bottom-color: var(--ink);
+}
+
 /* ======================== RESPONSIVE ======================== */
 
 /* TABLET ≤ 1024px */

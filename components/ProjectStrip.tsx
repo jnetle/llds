@@ -74,23 +74,13 @@ export function ProjectStrip({ projects, onOpen }: Props) {
           <button
             key={`${p.id}-${i}`}
             onClick={() => onOpen(p)}
+            className="strip-tile"
             style={{
               flex: '0 0 460px',
               textAlign: 'left',
               cursor: 'pointer'
             }}>
-            <div
-              style={{
-                width: '100%',
-                height: 580,
-                backgroundImage: `url("${p.cover}")`,
-                backgroundSize: 'cover',
-                backgroundPosition: 'center',
-                transition: 'all 0.6s ease'
-              }}
-              onMouseEnter={e => (e.currentTarget.style.filter = 'brightness(1.05)')}
-              onMouseLeave={e => (e.currentTarget.style.filter = 'none')}
-            />
+            <div className="strip-tile__media" style={{ backgroundImage: `url("${p.cover}")` }} />
             <div
               style={{
                 display: 'flex',
