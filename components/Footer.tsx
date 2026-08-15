@@ -28,8 +28,15 @@ const COLUMNS: { h: string; items: { label: string; href?: string; target?: stri
 export function Footer() {
   return (
     <Section as="footer" padY="xs" topBorder>
-      <Grid cols={{ d: '1.4fr 1fr 1fr 1fr', t: '1fr 1fr', m: '1fr' }} gap={{ d: 60, t: 32, m: 28 }} alignItems="start">
-        <div>
+      {/* Tablet keeps the desktop's three link columns and gives the brand block its
+          own full-width row above them, rather than the old 2×2 that paired the
+          brand with one link column and pushed the other two below it. */}
+      <Grid
+        cols={{ d: '1.4fr 1fr 1fr 1fr', t: 'repeat(3, 1fr)', m: '1fr' }}
+        gap={{ d: 60, t: 32, m: 28 }}
+        rowGap={{ d: 60, t: 44, m: 36 }}
+        alignItems="start">
+        <div className="col-span-full lg:col-auto">
           <Wordmark />
           <p
             className="serif"
@@ -93,11 +100,11 @@ export function Footer() {
             ))}
           </ul>
         </div>
+        {/* Was a flat 60/30. The section itself only has 32px of padding below it on
+            mobile, so a fixed 60px lead-in read as a gap rather than a rule. */}
         <div
+          className="col-span-full mt-[36px] pt-[24px] sm:mt-[60px] sm:pt-[30px]"
           style={{
-            gridColumn: '1 / -1',
-            marginTop: 60,
-            paddingTop: 30,
             borderTop: `1px solid ${color.hairline}`,
             display: 'flex',
             justifyContent: 'space-between',
