@@ -8,13 +8,17 @@ import { INQUIRY_BANDS, QUESTIONS, type AnswerKey } from './inquiryQuestions';
  * otherwise a lead who switched `builder` from Yes to No arrives in ClickUp with
  * a builder name attached.
  *
- * These are also the only keys omitted entirely from the task body when blank; a
- * gate that never opened means the question was never asked.
+ * These are also the only keys dropped entirely when blank; a gate that never
+ * opened means the question was never asked, which is different from a question
+ * that was asked and skipped.
  */
 const CONDITIONAL_KEYS = new Set<AnswerKey>(['projectTypeOther', 'builderName', 'builtBeforeNote', 'workedDesignerNote']);
 
 /** ClickUp rejects task names longer than this. */
 const MAX_TASK_NAME = 255;
+
+/** Shown for a question that was asked and left blank. */
+const BLANK = '—';
 
 const joinList = (values: readonly string[]) => values.join(', ');
 
@@ -71,46 +75,102 @@ export function normalizeAnswers(data: InquiryInput): Record<AnswerKey, string> 
   };
 }
 
+export type AnswerEntry = { key: AnswerKey; question: string; answer: string };
+export type AnswerBand = { numeral: string; label: string; entries: AnswerEntry[] };
+
 /**
- * `2026-08-15 14:22 UTC` — deliberately UTC rather than a guessed studio
- * timezone. ClickUp already shows task creation time in the viewer's own zone;
- * this line exists so the submission time survives in the body verbatim.
+ * The submission as ordered bands of question/answer pairs — the one shape both
+ * the markdown description and the PDF render from, so they can never disagree
+ * about what was asked or in what order.
  */
-function formatSubmittedAt(iso: string): string {
-  return `${iso.slice(0, 10)} ${iso.slice(11, 16)} UTC`;
+export function toAnswerBands(data: InquiryInput): AnswerBand[] {
+  const answers = normalizeAnswers(data);
+  return INQUIRY_BANDS.map(band => ({
+    numeral: band.numeral,
+    label: band.label,
+    entries: band.keys
+      .filter(key => answers[key].length > 0 || !CONDITIONAL_KEYS.has(key))
+      .map(key => ({ key, question: QUESTIONS[key], answer: answers[key] || BLANK }))
+  })).filter(band => band.entries.length > 0);
+}
+
+/** `<client> — <project types>`, capped to what ClickUp accepts. */
+export function toTaskName(data: InquiryInput): string {
+  const answers = normalizeAnswers(data);
+  const summary = answers.projectType || 'Website inquiry';
+  return `${answers.name} — ${summary}`.slice(0, MAX_TASK_NAME);
 }
 
 /**
- * Build the ClickUp task for one submission: a scannable name, and a markdown
- * body carrying every question and answer in the order the form asked them.
+ * `2026-08-15 14:22 UTC` — deliberately UTC rather than a guessed studio
+ * timezone. ClickUp already shows task creation time in the viewer's own zone;
+ * this exists so the submission time survives in the document verbatim.
+ */
+export function formatSubmittedAt(iso: string): string {
+  return `${iso.slice(0, 10)} ${iso.slice(11, 16)} UTC`;
+}
+
+// Markdown collapses runs of plain spaces and tabs, so a literal non-breaking
+// space is what carries the indent. Verified against ClickUp's own renderer.
+const INDENT = ' '.repeat(4);
+
+/** Indent an answer under its question, bolding each line. */
+function indent(value: string, bold: boolean): string {
+  return value
+    .split('\n')
+    .filter(line => line.trim() !== '')
+    .map(line => `${INDENT}${bold ? `**${line}**` : line}`)
+    .join('\n\n');
+}
+
+const isProse = (value: string) => value.includes('\n') || value.length > 70;
+
+/**
+ * The complete questionnaire as markdown. This is the **fallback** description,
+ * used when the PDF could not be produced — normally the task carries
+ * `toSummaryMarkdown` instead and the detail lives in the attachment.
  *
  * Answer text is inserted unescaped. This is a private task body written by a
  * prospective client in prose, and mangling their apostrophes and dashes to
  * defend against a stray `#` is the worse trade.
  */
-export function toClickUpTask(data: InquiryInput, submittedAt: string): { name: string; markdown: string } {
-  const answers = normalizeAnswers(data);
+export function toFullMarkdown(data: InquiryInput, submittedAt: string): string {
+  const out: string[] = [`**Inquiry received** ${formatSubmittedAt(submittedAt)}`];
 
-  const summary = answers.projectType || 'Website inquiry';
-  const name = `${answers.name} — ${summary}`.slice(0, MAX_TASK_NAME);
+  for (const band of toAnswerBands(data)) {
+    out.push('---', `## ${band.numeral} · ${band.label}`);
+    for (const entry of band.entries) {
+      // Two trailing spaces are a hard line break, so the answer sits directly
+      // under its question rather than a blank line below it.
+      out.push(`${entry.question}  \n${indent(entry.answer, !isProse(entry.answer))}`);
+    }
+  }
 
-  const lead = [
-    `**Submitted** ${formatSubmittedAt(submittedAt)}`,
-    `**Email** ${answers.email}`,
-    `**Phone** ${answers.phone}`,
-    `**Address** ${answers.address}`
-  ].join(' · ');
+  return out.join('\n\n');
+}
 
-  const sections = INQUIRY_BANDS.map(band => {
-    const entries = band.keys
-      .filter(key => answers[key].length > 0 || !CONDITIONAL_KEYS.has(key))
-      // Each answer sits on its own line so multi-line textarea content survives
-      // intact rather than collapsing into the bolded question.
-      .map(key => `**${QUESTIONS[key]}**\n\n${answers[key] || '—'}`);
+/**
+ * The scannable version: who they are and the handful of facts that decide
+ * whether this is a fit. Everything else is in the attached PDF.
+ */
+export function toSummaryMarkdown(data: InquiryInput, submittedAt: string): string {
+  const a = normalizeAnswers(data);
+  const line = (label: string, value: string) => `${label}  \n${INDENT}**${value || BLANK}**`;
 
-    if (entries.length === 0) return null;
-    return `## ${band.numeral} · ${band.label}\n\n${entries.join('\n\n')}`;
-  }).filter((section): section is string => section !== null);
-
-  return { name, markdown: [lead, ...sections].join('\n\n') };
+  return [
+    `**Inquiry received** ${formatSubmittedAt(submittedAt)}`,
+    '---',
+    `## ${a.name}`,
+    `${a.email} · ${a.phone}  \n${a.address}`,
+    '---',
+    line('Project type', [a.projectType, a.projectTypeOther].filter(Boolean).join(' · ')),
+    line('Areas', a.areas),
+    line('Anticipated investment', a.investment),
+    line('Design fee comfort', a.designInvestment),
+    line('Ideal start', a.beginTime),
+    line('Ideal completion', a.completion),
+    line('Heard about us via', a.howHeard),
+    '---',
+    '📎 **The full questionnaire is attached as a PDF.**'
+  ].join('\n\n');
 }
