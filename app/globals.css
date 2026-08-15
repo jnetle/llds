@@ -750,7 +750,7 @@ a {
   position: fixed;
   inset: 0;
   z-index: 100;
-  background: rgba(31, 58, 50, 0.96);
+  background: color-mix(in srgb, var(--navy) 96%, transparent);
   backdrop-filter: blur(20px);
   display: flex;
   align-items: center;
@@ -770,6 +770,12 @@ a {
   pointer-events: none;
   transform: translateY(-20px);
 }
+/* The global ring is `var(--ink)` — heritage green, which vanished against the
+   old green panel and does the same on navy. Ride currentColor instead. */
+.mobile-nav-overlay :focus-visible {
+  outline-color: currentColor;
+}
+
 .mobile-nav-overlay a,
 .mobile-nav-overlay button {
   color: var(--bg);
