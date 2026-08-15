@@ -63,14 +63,12 @@ function ProjectsView({ compact }: { compact: boolean }) {
 
 function ProjectsTile({ project, index }: { project: Project; index: number }) {
   const [ref, seen] = useReveal<HTMLElement>();
-  const [hovered, setHovered] = useState(false);
   const delay = `${(index % 2) * 0.08}s`;
 
   return (
     <article
       ref={ref}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
+      className="project-tile"
       style={{
         opacity: seen ? 1 : 0,
         transform: seen ? 'translateY(0)' : 'translateY(24px)',
@@ -84,17 +82,7 @@ function ProjectsTile({ project, index }: { project: Project; index: number }) {
             background: brand.modernTan,
             marginBottom: 22
           }}>
-          <div
-            style={{
-              width: '100%',
-              height: '100%',
-              backgroundImage: `url("${project.cover}")`,
-              backgroundSize: 'cover',
-              backgroundPosition: 'center',
-              transform: hovered ? 'scale(1.03)' : 'scale(1)',
-              transition: `transform 1.4s ${motion.ease}`
-            }}
-          />
+          <div className="project-tile__media" style={{ backgroundImage: `url("${project.cover}")` }} />
         </div>
         <h3
           className="serif"

@@ -347,7 +347,7 @@ export default function ServicesPage() {
             <li key={id} className="shrink-0 sm:shrink">
               <a
                 href={'#' + id}
-                className="micro-sm"
+                className="micro-sm quick-link"
                 onClick={e => {
                   e.preventDefault();
                   const el = document.getElementById(id);
@@ -355,23 +355,6 @@ export default function ServicesPage() {
                     const top = el.getBoundingClientRect().top + window.scrollY - 70;
                     window.scrollTo({ top, behavior: 'smooth' });
                   }
-                }}
-                style={{
-                  letterSpacing: '0.22em',
-                  textTransform: 'uppercase',
-                  color: color.ink,
-                  opacity: 0.7,
-                  paddingBottom: 4,
-                  borderBottom: '1px solid transparent',
-                  transition: 'all 0.3s'
-                }}
-                onMouseEnter={e => {
-                  e.currentTarget.style.opacity = '1';
-                  e.currentTarget.style.borderBottomColor = color.ink;
-                }}
-                onMouseLeave={e => {
-                  e.currentTarget.style.opacity = '0.7';
-                  e.currentTarget.style.borderBottomColor = 'transparent';
                 }}>
                 {label}
               </a>

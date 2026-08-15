@@ -14,7 +14,7 @@ import { Chip } from '@/components/ui/Chip';
 import { RadioPills } from '@/components/ui/RadioPills';
 import { RadioStack } from '@/components/ui/RadioStack';
 import { BandHeader } from './BandHeader';
-import { color, motion, text } from '@/lib/tokens';
+import { color, text } from '@/lib/tokens';
 import {
   inquirySchema,
   type InquiryInput,
@@ -53,7 +53,6 @@ const inputStyle: CSSProperties = {
   fontSize: 17,
   color: color.ink,
   fontFamily: 'inherit',
-  outline: 'none',
   width: '100%',
   minWidth: 0,
   transition: 'border-color 0.3s'
@@ -68,7 +67,6 @@ const textareaBaseStyle: CSSProperties = {
   fontSize: 17,
   color: color.ink,
   fontFamily: 'inherit',
-  outline: 'none',
   width: '100%',
   minWidth: 0,
   transition: 'border-color 0.3s',
@@ -961,20 +959,15 @@ export default function InquirePage() {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="w-full sm:w-auto"
+              className="btn-primary w-full sm:w-auto"
               style={{
                 padding: '16px 40px',
-                background: color.ink,
-                color: color.bg,
                 border: 'none',
                 borderRadius: 100,
-                cursor: isSubmitting ? 'wait' : 'pointer',
                 fontSize: 13,
                 letterSpacing: '0.28em',
                 textTransform: 'uppercase',
-                fontFamily: 'inherit',
-                opacity: isSubmitting ? 0.6 : 1,
-                transition: `opacity ${motion.durMed} ${motion.ease}`
+                fontFamily: 'inherit'
               }}>
               {isSubmitting ? 'Sending…' : 'Send Inquiry'}
             </button>
