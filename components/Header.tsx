@@ -12,6 +12,9 @@ const NAV = [
   { label: 'Press', href: '/press' }
 ];
 
+// Mobile only — the desktop bar gets Home from the logo, which the overlay hides.
+const MOBILE_NAV = [{ label: 'Home', href: '/' }, ...NAV];
+
 export function Header() {
   const [scrolled, setScrolled] = useState(false);
   const [hidden, setHidden] = useState(false);
@@ -165,7 +168,7 @@ export function Header() {
           style={{ position: 'absolute', top: 24, right: 24, fontSize: 22, padding: 12 }}>
           ✕
         </button>
-        {NAV.map(item => (
+        {MOBILE_NAV.map(item => (
           <Link key={item.label} href={item.href} onClick={() => setMenuOpen(false)}>
             {item.label}
           </Link>
