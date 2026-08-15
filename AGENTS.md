@@ -116,6 +116,33 @@ CSS Modules are available and unused. They're the right tool if a component ever
 
 ESLint uses the flat config format (`eslint.config.mjs`) with `eslint-config-next/core-web-vitals` and `eslint-config-next/typescript`. The legacy `.eslintrc` format is not used.
 
+## Inquiry form → ClickUp
+
+`/inquire` is the only route with a server round-trip, and `app/inquire/actions.ts` is the only `'use server'` file in the repo. A submission becomes **one ClickUp task with a PDF attached**. Needs `CLICKUP_API_TOKEN` (a `pk_…` personal token, sent bare in `Authorization` — no `Bearer`) and `CLICKUP_LIST_ID`.
+
+The order in `submitInquiry` is load-bearing: **render the PDF first**, then create the task, then attach. Rendering is local and can fail; doing it before anything is written means the description is chosen once, with certainty, and there is no state where both the PDF and the answers are missing.
+
+- PDF renders → task gets `toSummaryMarkdown` (contact, type, budget, timeline) and the PDF carries all 34 answers
+- PDF fails → task gets `toFullMarkdown` instead, so nothing is lost
+- PDF renders but the upload fails → the description is rewritten to `toFullMarkdown` via `updateTaskDescription`
+
+Only a failed _task creation_ fails the submission; the visitor then gets a retry prompt rather than a false success. There are no ClickUp custom fields in play, so this works against any list without setup. Statuses and notifications live in ClickUp (watch the list, or an Automation on task-created) — no code owns them.
+
+**The PDF** (`lib/pdf/inquiryDocument.tsx`) is `@react-pdf/renderer`, chosen because it handles wrapping and pagination across ~34 variable-length answers. Three things there are easy to break:
+
+- **Fonts are registered from a local path, never a URL.** react-pdf resolves `src` at render time and a network fetch there is a documented serverless cold-start failure that silently falls back to Helvetica. The TTFs are committed under `lib/pdf/fonts/` (SIL OFL, licenses alongside) and `next.config.ts` lists them plus `logo-long-navy.png` in `outputFileTracingIncludes` — nothing imports those files, so Vercel's tracer cannot find them on its own. **This fails only on Vercel, never locally.** If a deployed PDF looks wrong, check tracing first.
+- **`fontFamily` does not inherit from a `View` to its `Text` children.** Setting it on a wrapper silently falls back. Put it on the `Text`.
+- The brand hexes are written literally in that file. `lib/tokens.ts` resolves everything through CSS custom properties, and a PDF has no CSSOM.
+
+Adding or changing a question means four files, and TypeScript enforces three of them:
+
+- `lib/inquirySchema.ts` — the field, its validation, and any option list
+- `lib/inquiryQuestions.ts` — the question copy (`QUESTIONS`) and its band (`INQUIRY_BANDS`). `QUESTIONS` is a `Record<AnswerKey, string>`, so a schema field with no question text fails `tsc`
+- `lib/inquiryPayload.ts` — `normalizeAnswers` returns the same `Record`, so a new field fails `tsc` here too. Arrays get joined; conditionally-revealed fields get stripped when their gate is closed. `toAnswerBands` is the shape both the markdown and the PDF render from, so they cannot disagree about what was asked
+- `app/inquire/page.tsx` — the `defaultValues` entry (react-hook-form needs one per key) and the JSX. `<Field>` labels read from `QUESTIONS`, so the form and the ClickUp task always ask in the same words; band titles on `<FormBand>` are still literals and must match `INQUIRY_BANDS`
+
+`npm run typecheck` is what catches all of this — no script runs `tsc` implicitly, so run it before opening a PR.
+
 ## Design system
 
 The codebase has a small, opinionated design system. Prefer it over new CSS or ad-hoc inline styles. Spacing changes should be one-line edits — to a token in `lib/tokens.ts` or a prop on a primitive. If you're reaching for new CSS rules to fix spacing, something is wrong.

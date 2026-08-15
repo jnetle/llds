@@ -1,8 +1,30 @@
 'use server';
 
-import { inquirySchema } from '@/lib/inquirySchema';
+import { attachFileToTask, createInquiryTask, updateTaskDescription } from '@/lib/clickup';
+import { toFullMarkdown, toSummaryMarkdown, toTaskName } from '@/lib/inquiryPayload';
+import { inquirySchema, type InquiryInput } from '@/lib/inquirySchema';
 
 export type SubmitResult = { ok: true } | { ok: false; error: string };
+
+/**
+ * Render the questionnaire to PDF, or `null` if react-pdf cannot lay it out.
+ *
+ * The import is dynamic so `@react-pdf/renderer` and its fonts are only pulled
+ * in when someone actually submits, rather than on every request that touches
+ * this module.
+ */
+async function renderPdf(data: InquiryInput, submittedAt: string): Promise<{ filename: string; bytes: Buffer } | null> {
+  try {
+    const { renderInquiryPdf, inquiryPdfFilename } = await import('@/lib/pdf/inquiryDocument');
+    return {
+      filename: inquiryPdfFilename(data, submittedAt),
+      bytes: await renderInquiryPdf(data, submittedAt)
+    };
+  } catch (err) {
+    console.error('Failed to render the inquiry PDF; falling back to a full markdown description', err);
+    return null;
+  }
+}
 
 export async function submitInquiry(raw: unknown): Promise<SubmitResult> {
   const parsed = inquirySchema.safeParse(raw);
@@ -14,78 +36,50 @@ export async function submitInquiry(raw: unknown): Promise<SubmitResult> {
     return { ok: true };
   }
 
-  const url = process.env.SHEETS_WEBHOOK_URL;
-  const secret = process.env.INQUIRY_SHARED_SECRET;
-  if (!url || !secret) {
-    console.error('Inquiry submission failed: SHEETS_WEBHOOK_URL or INQUIRY_SHARED_SECRET is not set.');
+  const token = process.env.CLICKUP_API_TOKEN;
+  const listId = process.env.CLICKUP_LIST_ID;
+  if (!token || !listId) {
+    console.error('Inquiry submission failed: CLICKUP_API_TOKEN or CLICKUP_LIST_ID is not set.');
     return { ok: false, error: 'Inquiry system is not configured. Please email us directly.' };
   }
 
   const data = parsed.data;
+  const submittedAt = new Date().toISOString();
 
-  // Strip orphaned conditional-field values: if a gate field isn't in the revealing
-  // state, don't ship the dependent field's stored value.
-  const payload = {
-    name: data.name,
-    email: data.email,
-    phone: data.phone,
-    address: data.address,
-    projectType: data.projectType,
-    projectTypeOther: data.projectType.length > 0 ? data.projectTypeOther : '',
-    areas: data.areas,
-    size: data.size,
-    description: data.description,
-    builder: data.builder,
-    builderName: data.builder === 'Yes' ? data.builderName : '',
-    plans: data.plans,
-    beginTime: data.beginTime,
-    completion: data.completion,
-    deadlines: data.deadlines,
-    builtBefore: data.builtBefore,
-    builtBeforeNote: data.builtBefore === 'Yes' ? data.builtBeforeNote : '',
-    workedDesigner: data.workedDesigner,
-    workedDesignerNote: data.workedDesigner === 'Yes' ? data.workedDesignerNote : '',
-    investment: data.investment,
-    designBudgetAllocated: data.designBudgetAllocated,
-    designInvestment: data.designInvestment,
-    builderApproach: data.builderApproach,
-    designSupport: data.designSupport,
-    decisionMaker: data.decisionMaker,
-    decisionComfort: data.decisionComfort,
-    openToRecs: data.openToRecs,
-    involvement: data.involvement,
-    changesApproach: data.changesApproach,
-    style: data.style,
-    priorities: data.priorities,
-    structuredComm: data.structuredComm,
-    anythingElse: data.anythingElse,
-    howHeard: data.howHeard,
-    submittedAt: new Date().toISOString(),
-    __secret: secret
-  };
+  // Render before writing anything to ClickUp. Doing it in this order means the
+  // description can be chosen once, with certainty, instead of being patched
+  // after the fact — and there is no state where both the PDF and the answers
+  // are missing from the task.
+  const pdf = await renderPdf(data, submittedAt);
+  const fullMarkdown = toFullMarkdown(data, submittedAt);
 
-  try {
-    const res = await fetch(url, {
-      method: 'POST',
-      headers: { 'content-type': 'application/json' },
-      // Apps Script Web Apps cannot read arbitrary HTTP headers; the shared
-      // secret travels inside the body and is checked server-side there.
-      body: JSON.stringify(payload),
-      signal: AbortSignal.timeout(10000)
-    });
-    if (!res.ok) {
-      console.error('Apps Script webhook returned status', res.status);
-      return { ok: false, error: 'Could not reach our system. Please try again in a moment.' };
-    }
-    // Apps Script always returns HTTP 200 — auth/runtime errors live in the JSON body.
-    const body = (await res.json().catch(() => null)) as { ok?: boolean } | null;
-    if (!body || body.ok !== true) {
-      console.error('Apps Script webhook reported failure', body);
-      return { ok: false, error: 'Could not reach our system. Please try again in a moment.' };
-    }
-  } catch (err) {
-    console.error('Failed to forward inquiry to webhook', err);
+  const created = await createInquiryTask({
+    token,
+    listId,
+    name: toTaskName(data),
+    markdown: pdf ? toSummaryMarkdown(data, submittedAt) : fullMarkdown
+  });
+
+  if (!created.ok) {
+    // createInquiryTask has already logged the reason; the visitor gets a retry
+    // prompt rather than a false success, so a ClickUp outage never swallows a lead.
     return { ok: false, error: 'Could not reach our system. Please try again in a moment.' };
+  }
+
+  if (pdf) {
+    const attached = await attachFileToTask({
+      token,
+      taskId: created.taskId,
+      filename: pdf.filename,
+      bytes: pdf.bytes
+    });
+
+    // The task exists either way, so this is not worth failing the submission
+    // over — but the summary description alone would lose most of the answers,
+    // so put the full questionnaire back.
+    if (!attached) {
+      await updateTaskDescription({ token, taskId: created.taskId, markdown: fullMarkdown });
+    }
   }
 
   return { ok: true };

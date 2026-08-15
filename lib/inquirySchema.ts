@@ -78,7 +78,8 @@ export const inquirySchema = z.object({
     .string()
     .trim()
     .min(1, 'A few words about the project, please.')
-    .min(20, 'Could you share a little more? At least a sentence or two.'),
+    .min(20, 'Could you share a little more? At least a sentence or two.')
+    .max(2000, 'Please keep this under 2,000 characters — there’s room for more detail once we talk.'),
 
   // 03 — Project Team + Readiness
   builder: z.string().min(1, 'Please tell us whether a builder is selected.'),
@@ -88,7 +89,11 @@ export const inquirySchema = z.object({
   // 04 — Timeline
   beginTime: z.string().min(1, 'When would you ideally like to begin?'),
   completion: z.string().min(1, 'Please share an ideal completion timeframe.'),
-  deadlines: z.string().trim().min(1, 'If there are none, please write “none” — this field is required.'),
+  deadlines: z
+    .string()
+    .trim()
+    .min(1, 'If there are none, please write “none” — this field is required.')
+    .max(300, 'Please keep this under 300 characters.'),
 
   // 05 — Project Experience
   builtBefore: z.string().min(1, 'Have you previously built or renovated?'),
@@ -113,7 +118,7 @@ export const inquirySchema = z.object({
   changesApproach: z.string(),
 
   // 09 — Style + Priorities
-  style: z.string().trim().min(1, 'A few words on your style, please.'),
+  style: z.string().trim().min(1, 'A few words on your style, please.').max(800, 'Please keep this under 800 characters.'),
   priorities: z
     .array(z.enum(PRIORITIES))
     .min(1, 'Please choose at least one priority (up to three).')
@@ -123,8 +128,12 @@ export const inquirySchema = z.object({
   structuredComm: z.string().min(1, 'Please share your comfort with structured communication.'),
 
   // 11 — Final Details
-  anythingElse: z.string().trim().min(1, 'If nothing else, please write “nothing else” — this field is required.'),
-  howHeard: z.string().trim().min(1, 'How did you hear about Laurel Leaf?'),
+  anythingElse: z
+    .string()
+    .trim()
+    .min(1, 'If nothing else, please write “nothing else” — this field is required.')
+    .max(1200, 'Please keep this under 1,200 characters.'),
+  howHeard: z.string().trim().min(1, 'How did you hear about Laurel Leaf?').max(200, 'Please keep this under 200 characters.'),
 
   // Honeypot
   website: z.string()
