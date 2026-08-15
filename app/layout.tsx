@@ -20,9 +20,15 @@ const inter = Inter({
   display: 'swap'
 });
 
+// Pre-launch: keep the site out of search results. Set SITE_LIVE=true in Vercel Production
+// at launch to drop the noindex; anything else (including unset, the local default) keeps
+// it on, so the safe state is the one you get by doing nothing.
+const siteIsLive = process.env.SITE_LIVE === 'true';
+
 export const metadata: Metadata = {
   title: 'Laurel Leaf Design Studio',
-  description: 'Considered interiors for the long view.'
+  description: 'Considered interiors for the long view.',
+  ...(siteIsLive ? {} : { robots: { index: false, follow: false } })
 };
 
 export const viewport: Viewport = {
