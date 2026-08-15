@@ -116,6 +116,21 @@ CSS Modules are available and unused. They're the right tool if a component ever
 
 ESLint uses the flat config format (`eslint.config.mjs`) with `eslint-config-next/core-web-vitals` and `eslint-config-next/typescript`. The legacy `.eslintrc` format is not used.
 
+## Inquiry form → ClickUp
+
+`/inquire` is the only route with a server round-trip, and `app/inquire/actions.ts` is the only `'use server'` file in the repo. A submission becomes **one ClickUp task**: `submitInquiry` re-validates with `inquirySchema`, short-circuits the honeypot, then `lib/inquiryPayload.ts` renders every question and answer into markdown and `lib/clickup.ts` POSTs it to `POST /v2/list/{list_id}/task`. Needs `CLICKUP_API_TOKEN` (a `pk_…` personal token, sent bare in `Authorization` — no `Bearer`) and `CLICKUP_LIST_ID`.
+
+There are no ClickUp custom fields in play, so the integration works against any list without setup. Statuses and notifications live in ClickUp (watch the list, or an Automation on task-created) — no code owns them. A failed call surfaces a retry prompt to the visitor rather than a false success, so an outage never silently swallows a lead.
+
+Adding or changing a question means four files, and TypeScript enforces three of them:
+
+- `lib/inquirySchema.ts` — the field, its validation, and any option list
+- `lib/inquiryQuestions.ts` — the question copy (`QUESTIONS`) and its band (`INQUIRY_BANDS`). `QUESTIONS` is a `Record<AnswerKey, string>`, so a schema field with no question text fails `tsc`
+- `lib/inquiryPayload.ts` — `normalizeAnswers` returns the same `Record`, so a new field fails `tsc` here too. Arrays get joined; conditionally-revealed fields get stripped when their gate is closed
+- `app/inquire/page.tsx` — the `defaultValues` entry (react-hook-form needs one per key) and the JSX. `<Field>` labels read from `QUESTIONS`, so the form and the ClickUp task always ask in the same words; band titles on `<FormBand>` are still literals and must match `INQUIRY_BANDS`
+
+`npm run typecheck` is what catches all of this — no script runs `tsc` implicitly, so run it before opening a PR.
+
 ## Design system
 
 The codebase has a small, opinionated design system. Prefer it over new CSS or ad-hoc inline styles. Spacing changes should be one-line edits — to a token in `lib/tokens.ts` or a prop on a primitive. If you're reaching for new CSS rules to fix spacing, something is wrong.

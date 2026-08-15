@@ -39,6 +39,7 @@ import {
   PRIORITIES_MAX,
   STRUCTURED_COMM_OPTIONS
 } from '@/lib/inquirySchema';
+import { QUESTIONS } from '@/lib/inquiryQuestions';
 import { submitInquiry } from './actions';
 
 // `width`/`minWidth` are load-bearing, not cosmetic: a bare <input> carries an
@@ -349,10 +350,10 @@ export default function InquirePage() {
         {/* 01 — CONTACT INFORMATION */}
         <FormBand numeral="01" label="Contact Information">
           <Grid cols="minmax(0, 1fr) minmax(0, 1fr)" gap={36}>
-            <Field label="Full name" required name="name" error={errors.name?.message} registerRef={refSetters.name}>
+            <Field label={QUESTIONS.name} required name="name" error={errors.name?.message} registerRef={refSetters.name}>
               <input {...register('name')} aria-invalid={!!errors.name} style={{ ...inputStyle, ...errInputBorder('name') }} />
             </Field>
-            <Field label="Email address" required name="email" error={errors.email?.message} registerRef={refSetters.email}>
+            <Field label={QUESTIONS.email} required name="email" error={errors.email?.message} registerRef={refSetters.email}>
               <input
                 {...register('email')}
                 type="email"
@@ -360,7 +361,7 @@ export default function InquirePage() {
                 style={{ ...inputStyle, ...errInputBorder('email') }}
               />
             </Field>
-            <Field label="Phone number" required name="phone" error={errors.phone?.message} registerRef={refSetters.phone}>
+            <Field label={QUESTIONS.phone} required name="phone" error={errors.phone?.message} registerRef={refSetters.phone}>
               <input {...register('phone')} aria-invalid={!!errors.phone} style={{ ...inputStyle, ...errInputBorder('phone') }} />
             </Field>
           </Grid>
@@ -368,7 +369,7 @@ export default function InquirePage() {
 
         {/* 02 — PROJECT OVERVIEW */}
         <FormBand numeral="02" label="Project Overview">
-          <Field label="Project address" required name="address" error={errors.address?.message} registerRef={refSetters.address}>
+          <Field label={QUESTIONS.address} required name="address" error={errors.address?.message} registerRef={refSetters.address}>
             <input
               {...register('address')}
               placeholder="Street, city, state / postcode"
@@ -378,7 +379,7 @@ export default function InquirePage() {
           </Field>
 
           <Field
-            label="What type of project are you planning? — select all that apply"
+            label={QUESTIONS.projectType}
             required
             name="projectType"
             error={errors.projectType?.message}
@@ -404,12 +405,7 @@ export default function InquirePage() {
             </ShowWhen>
           </Field>
 
-          <Field
-            label="What areas are included? — select all that apply"
-            required
-            name="areas"
-            error={errors.areas?.message}
-            registerRef={refSetters.areas}>
+          <Field label={QUESTIONS.areas} required name="areas" error={errors.areas?.message} registerRef={refSetters.areas}>
             <Controller
               control={control}
               name="areas"
@@ -428,7 +424,7 @@ export default function InquirePage() {
             />
           </Field>
 
-          <Field label="Approximate size of the home or area involved">
+          <Field label={QUESTIONS.size}>
             <input
               {...register('size')}
               placeholder="Total square footage, or an estimate of the areas being renovated"
@@ -437,7 +433,7 @@ export default function InquirePage() {
           </Field>
 
           <Field
-            label="Please briefly describe your project and goals"
+            label={QUESTIONS.description}
             required
             name="description"
             error={errors.description?.message}
@@ -458,12 +454,7 @@ export default function InquirePage() {
 
         {/* 03 — PROJECT TEAM + READINESS */}
         <FormBand numeral="03" label="Project Team + Readiness">
-          <Field
-            label="Do you have a builder or contractor selected?"
-            required
-            name="builder"
-            error={errors.builder?.message}
-            registerRef={refSetters.builder}>
+          <Field label={QUESTIONS.builder} required name="builder" error={errors.builder?.message} registerRef={refSetters.builder}>
             <Controller
               control={control}
               name="builder"
@@ -474,17 +465,12 @@ export default function InquirePage() {
           </Field>
 
           <ShowWhen control={control} name="builder" when={v => v === 'Yes'}>
-            <Field label="If yes, who are you working with?">
+            <Field label={QUESTIONS.builderName}>
               <input {...register('builderName')} style={inputStyle} />
             </Field>
           </ShowWhen>
 
-          <Field
-            label="Are architectural plans completed?"
-            required
-            name="plans"
-            error={errors.plans?.message}
-            registerRef={refSetters.plans}>
+          <Field label={QUESTIONS.plans} required name="plans" error={errors.plans?.message} registerRef={refSetters.plans}>
             <Controller
               control={control}
               name="plans"
@@ -497,12 +483,7 @@ export default function InquirePage() {
 
         {/* 04 — TIMELINE */}
         <FormBand numeral="04" label="Timeline">
-          <Field
-            label="When would you ideally like to begin?"
-            required
-            name="beginTime"
-            error={errors.beginTime?.message}
-            registerRef={refSetters.beginTime}>
+          <Field label={QUESTIONS.beginTime} required name="beginTime" error={errors.beginTime?.message} registerRef={refSetters.beginTime}>
             <Controller
               control={control}
               name="beginTime"
@@ -513,7 +494,7 @@ export default function InquirePage() {
           </Field>
 
           <Field
-            label="What is your ideal project completion timeframe?"
+            label={QUESTIONS.completion}
             required
             name="completion"
             error={errors.completion?.message}
@@ -527,12 +508,7 @@ export default function InquirePage() {
             />
           </Field>
 
-          <Field
-            label="Are there any specific deadlines we should be aware of?"
-            required
-            name="deadlines"
-            error={errors.deadlines?.message}
-            registerRef={refSetters.deadlines}>
+          <Field label={QUESTIONS.deadlines} required name="deadlines" error={errors.deadlines?.message} registerRef={refSetters.deadlines}>
             <input
               {...register('deadlines')}
               placeholder='Move-in date, holiday, sale completion — or write "none"'
@@ -545,7 +521,7 @@ export default function InquirePage() {
         {/* 05 — PROJECT EXPERIENCE */}
         <FormBand numeral="05" label="Project Experience">
           <Field
-            label="Have you previously built or renovated a home?"
+            label={QUESTIONS.builtBefore}
             required
             name="builtBefore"
             error={errors.builtBefore?.message}
@@ -560,13 +536,13 @@ export default function InquirePage() {
           </Field>
 
           <ShowWhen control={control} name="builtBefore" when={v => v === 'Yes'}>
-            <Field label="If yes, how would you describe that experience?">
+            <Field label={QUESTIONS.builtBeforeNote}>
               <textarea {...register('builtBeforeNote')} rows={3} style={{ ...textareaBaseStyle, minHeight: 96 }} />
             </Field>
           </ShowWhen>
 
           <Field
-            label="Have you worked with a designer before?"
+            label={QUESTIONS.workedDesigner}
             required
             name="workedDesigner"
             error={errors.workedDesigner?.message}
@@ -581,7 +557,7 @@ export default function InquirePage() {
           </Field>
 
           <ShowWhen control={control} name="workedDesigner" when={v => v === 'Yes'}>
-            <Field label="If yes, how would you describe that experience?">
+            <Field label={QUESTIONS.workedDesignerNote}>
               <textarea {...register('workedDesignerNote')} rows={3} style={{ ...textareaBaseStyle, minHeight: 96 }} />
             </Field>
           </ShowWhen>
@@ -595,7 +571,7 @@ export default function InquirePage() {
           </p>
 
           <Field
-            label="Anticipated overall investment (construction + materials)"
+            label={QUESTIONS.investment}
             required
             name="investment"
             error={errors.investment?.message}
@@ -612,7 +588,7 @@ export default function InquirePage() {
           </Field>
 
           <Field
-            label="Have you allocated a budget for professional design services?"
+            label={QUESTIONS.designBudgetAllocated}
             required
             name="designBudgetAllocated"
             error={errors.designBudgetAllocated?.message}
@@ -632,7 +608,7 @@ export default function InquirePage() {
           </Field>
 
           <Field
-            label="What level of investment are you comfortable allocating toward design services?"
+            label={QUESTIONS.designInvestment}
             required
             name="designInvestment"
             error={errors.designInvestment?.message}
@@ -656,7 +632,7 @@ export default function InquirePage() {
         {/* 07 — PROJECT APPROACH */}
         <FormBand numeral="07" label="Project Approach">
           <Field
-            label="Will your project be:"
+            label={QUESTIONS.builderApproach}
             required
             name="builderApproach"
             error={errors.builderApproach?.message}
@@ -677,7 +653,7 @@ export default function InquirePage() {
           </Field>
 
           <Field
-            label="What level of design support are you looking for?"
+            label={QUESTIONS.designSupport}
             required
             name="designSupport"
             error={errors.designSupport?.message}
@@ -701,7 +677,7 @@ export default function InquirePage() {
         {/* 08 — DECISION-MAKING + EXPECTATIONS */}
         <FormBand numeral="08" label="Decision-Making + Expectations">
           <Field
-            label="Who will be the primary decision-maker for this project?"
+            label={QUESTIONS.decisionMaker}
             required
             name="decisionMaker"
             error={errors.decisionMaker?.message}
@@ -721,7 +697,7 @@ export default function InquirePage() {
           </Field>
 
           <Field
-            label="How comfortable are you making decisions within a defined timeline?"
+            label={QUESTIONS.decisionComfort}
             required
             name="decisionComfort"
             error={errors.decisionComfort?.message}
@@ -741,7 +717,7 @@ export default function InquirePage() {
           </Field>
 
           <Field
-            label="Are you open to professional recommendations, even if they differ from your initial ideas?"
+            label={QUESTIONS.openToRecs}
             required
             name="openToRecs"
             error={errors.openToRecs?.message}
@@ -756,7 +732,7 @@ export default function InquirePage() {
           </Field>
 
           <Field
-            label="How involved would you like to be in the selection process?"
+            label={QUESTIONS.involvement}
             required
             name="involvement"
             error={errors.involvement?.message}
@@ -770,7 +746,7 @@ export default function InquirePage() {
             />
           </Field>
 
-          <Field label="During a project, unexpected decisions and adjustments may arise. How do you typically approach these situations?">
+          <Field label={QUESTIONS.changesApproach}>
             <Controller
               control={control}
               name="changesApproach"
@@ -783,12 +759,7 @@ export default function InquirePage() {
 
         {/* 09 — STYLE + PRIORITIES */}
         <FormBand numeral="09" label="Style + Priorities">
-          <Field
-            label="How would you describe your style?"
-            required
-            name="style"
-            error={errors.style?.message}
-            registerRef={refSetters.style}>
+          <Field label={QUESTIONS.style} required name="style" error={errors.style?.message} registerRef={refSetters.style}>
             <textarea
               {...register('style')}
               rows={3}
@@ -803,7 +774,7 @@ export default function InquirePage() {
           </Field>
 
           <Field
-            label={`Top priorities for this project — select up to three (${priorities.length}/${PRIORITIES_MAX})`}
+            label={`${QUESTIONS.priorities} (${priorities.length}/${PRIORITIES_MAX})`}
             required
             name="priorities"
             error={errors.priorities?.message}
@@ -843,7 +814,7 @@ export default function InquirePage() {
           </p>
 
           <Field
-            label="Are you comfortable with structured communication and scheduled check-ins throughout the project?"
+            label={QUESTIONS.structuredComm}
             required
             name="structuredComm"
             error={errors.structuredComm?.message}
@@ -866,7 +837,7 @@ export default function InquirePage() {
         {/* 11 — FINAL DETAILS */}
         <FormBand numeral="11" label="Final Details">
           <Field
-            label="Is there anything else you'd like us to know about your project?"
+            label={QUESTIONS.anythingElse}
             required
             name="anythingElse"
             error={errors.anythingElse?.message}
@@ -884,12 +855,7 @@ export default function InquirePage() {
             />
           </Field>
 
-          <Field
-            label="How did you hear about Laurel Leaf Design Studio?"
-            required
-            name="howHeard"
-            error={errors.howHeard?.message}
-            registerRef={refSetters.howHeard}>
+          <Field label={QUESTIONS.howHeard} required name="howHeard" error={errors.howHeard?.message} registerRef={refSetters.howHeard}>
             <input
               {...register('howHeard')}
               placeholder="Press, Instagram, a referral, online search…"
