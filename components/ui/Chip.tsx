@@ -14,8 +14,10 @@ export function Chip({ label, active, onClick, disabled }: ChipProps) {
       onClick={onClick}
       disabled={disabled}
       aria-pressed={active}
-      className="micro-sm"
+      className="micro-sm pill"
       style={{
+        display: 'inline-flex',
+        alignItems: 'center',
         padding: '10px 18px',
         borderRadius: 100,
         border: '1px solid ' + (active ? color.ink : color.hairline),
