@@ -1,44 +1,49 @@
 'use client';
 
 import { useReveal } from '@/hooks/useReveal';
-import { useCols } from '@/hooks/useCompact';
+import { useCols, useCompact } from '@/hooks/useCompact';
 import { Eyebrow } from '@/components/ui/Eyebrow';
 import { Section } from '@/components/ui/Section';
 import { color, motion, text } from '@/lib/tokens';
+
+// TEMPORARY: these are the Instagram-resolution stills, served from public/ so the page has real
+// imagery before the photographer's originals exist. The keys below are exactly the R2 keys, so
+// finalising is a one-line swap back to `img` from '@/lib/img':
+//   const pressImg = (key: string) => img(`press/${key}`);
+// See AGENTS.md § Images before doing that — the files must move to the bucket, not stay here.
+const pressImg = (key: string) => `/images/press/${key}`;
 
 const AWARDS = [
   {
     category: 'Best Curb Appeal',
     subcategory: 'Custom Built Spec Home',
     year: '2026',
-    img: 'https://images.unsplash.com/photo-1568605114967-8130f3a36994?auto=format&fit=crop&w=1600&q=80',
-    caption: 'Front elevation, evening — limewash, standing-seam metal, mature hornbeam.'
+    img: pressImg('awards/best-curb-appeal.jpg'),
+    // TODO: describe the exterior in your own words.
+    caption: ''
   },
   {
     category: 'Best Kitchen',
     subcategory: 'Custom Built Spec Home',
     year: '2026',
-    img: 'https://images.unsplash.com/photo-1556912173-3bb406ef7e77?auto=format&fit=crop&w=1600&q=80',
-    caption: 'Plaster range hood, hand-glazed zellige, reclaimed Douglas fir island.'
+    img: pressImg('awards/best-kitchen.jpg'),
+    // TODO: describe the kitchen in your own words.
+    caption: ''
   }
 ];
 
-const GALLERY = [
-  'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1400&q=80',
-  'https://images.unsplash.com/photo-1600210492493-0946911123ea?auto=format&fit=crop&w=1400&q=80',
-  'https://images.unsplash.com/photo-1600121848594-d8644e57abab?auto=format&fit=crop&w=1400&q=80',
-  'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=1400&q=80',
-  'https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?auto=format&fit=crop&w=1400&q=80',
-  'https://images.unsplash.com/photo-1600585152220-90363fe7e115?auto=format&fit=crop&w=1400&q=80'
-];
+const GALLERY = [1, 2, 3, 4, 5].map(n => pressImg(`gallery/${n}.jpg`));
 
+// Every source frame is 4:5 portrait, so the tiles are sized to land near that ratio and
+// keep `background-size: cover` from cropping them into landscape bands. Against a 6-column
+// track at 160px auto-rows: `span 3 / span 4` ≈ 0.86:1 and `span 2 / span 3` ≈ 0.77:1.
+// Column spans must sum to 6 per row — two large tiles, then three smaller ones.
 const GALLERY_LAYOUTS = [
-  { col: 'span 3', row: 'span 2' },
-  { col: 'span 3', row: 'span 1' },
-  { col: 'span 2', row: 'span 1' },
-  { col: 'span 4', row: 'span 2' },
-  { col: 'span 3', row: 'span 1' },
-  { col: 'span 3', row: 'span 1' }
+  { col: 'span 3', row: 'span 4' },
+  { col: 'span 3', row: 'span 4' },
+  { col: 'span 2', row: 'span 3' },
+  { col: 'span 2', row: 'span 3' },
+  { col: 'span 2', row: 'span 3' }
 ];
 
 const FEATURE_META: [string, string][] = [
@@ -52,6 +57,9 @@ export default function PressPage() {
   const [ref, seen] = useReveal<HTMLDivElement>();
   const [refFeature, seenFeature] = useReveal<HTMLDivElement>();
   const cols = useCols();
+  // The gallery's row spans only mean anything in the 6-column track; once cols() collapses to
+  // '1fr' the tiles carry their own 4:5 ratio instead.
+  const compact = useCompact();
 
   return (
     <>
@@ -137,7 +145,7 @@ export default function PressPage() {
                 maxWidth: '38ch',
                 margin: 0
               }}>
-              A small studio, quietly recognised — a record of the awards, articles, and conversations the work has been part of.
+              A small studio, quietly recognized — a record of the awards, articles, and conversations the work has been part of.
             </p>
           </div>
 
@@ -165,16 +173,13 @@ export default function PressPage() {
               style={{
                 aspectRatio: '4/5',
                 minHeight: 180,
-                backgroundImage: `url("${AWARDS[0].img}")`,
+                backgroundImage: `url("${pressImg('awards/stellar-2026-card.jpg')}")`,
                 backgroundSize: 'cover',
                 backgroundPosition: 'center'
               }}
             />
             <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
               <div>
-                <Eyebrow size="sm" opacity={0.6} style={{ letterSpacing: '0.26em', marginBottom: 12 }}>
-                  Lead Story · p. 02
-                </Eyebrow>
                 <div
                   className="serif"
                   style={{
@@ -217,8 +222,14 @@ export default function PressPage() {
             <Eyebrow size="sm" opacity={0.65} style={{ letterSpacing: '0.26em', marginBottom: 14 }}>
               2026 · Stellar Awards
             </Eyebrow>
-            <Eyebrow size="sm" opacity={0.55} style={{ letterSpacing: '0.22em' }}>
+            <Eyebrow size="sm" opacity={0.55} style={{ letterSpacing: '0.22em', marginBottom: 14 }}>
+              Aiken-Augusta Region
+            </Eyebrow>
+            <Eyebrow size="sm" opacity={0.55} style={{ letterSpacing: '0.22em', marginBottom: 14 }}>
               Custom Built Spec Home
+            </Eyebrow>
+            <Eyebrow size="sm" opacity={0.55} style={{ letterSpacing: '0.22em' }}>
+              Built by Southern State Builders
             </Eyebrow>
           </div>
           <div>
@@ -233,13 +244,15 @@ export default function PressPage() {
                 marginBottom: 32,
                 marginTop: 0
               }}>
-              Laurel Leaf Design Studio was honoured at the <em style={{ fontWeight: 300 }}>Stellar Awards</em> with two recognitions in the
-              Custom Built Spec Home category — <em style={{ fontWeight: 300 }}>Best Curb Appeal</em> and{' '}
-              <em style={{ fontWeight: 300 }}>Best Kitchen</em>.
+              Laurel Leaf Design Studio was honored at the Home Builders Association&apos;s{' '}
+              <em style={{ fontWeight: 300 }}>Stellar Awards</em> with two recognitions in the Custom Built Spec Home category —{' '}
+              <em style={{ fontWeight: 300 }}>Best Curb Appeal</em> and <em style={{ fontWeight: 300 }}>Best Kitchen</em>.
             </h2>
             <p style={{ ...text.body, maxWidth: '58ch' }}>
-              The awards recognise homes built on speculation that nonetheless arrive with the considered detail of a bespoke commission.
-              Both honours were given for a single project — a four-bedroom new build completed late last year, photographed below.
+              Presented by the Home Builders Association of the Aiken-Augusta Region, the awards recognize homes built on speculation that
+              nonetheless arrive with the considered detail of a bespoke commission. Both honors were given for a single project, built with
+              Southern State Builders — a close collaboration on the exterior vision, with the studio leading the kitchen design and
+              interior detailing.
             </p>
           </div>
         </div>
@@ -281,7 +294,7 @@ export default function PressPage() {
               <Eyebrow opacity={0.65} style={{ marginBottom: 22, letterSpacing: '0.18em' }}>
                 {a.subcategory}
               </Eyebrow>
-              <p style={{ ...text.bodySm, fontSize: 15.5, lineHeight: 1.65, maxWidth: '42ch' }}>{a.caption}</p>
+              {a.caption && <p style={{ ...text.bodySm, fontSize: 15.5, lineHeight: 1.65, maxWidth: '42ch' }}>{a.caption}</p>}
             </article>
           ))}
         </div>
@@ -314,22 +327,24 @@ export default function PressPage() {
                 textTransform: 'uppercase',
                 margin: 0
               }}>
-              From the shoot
+              On site
             </h2>
           </div>
           <p style={{ ...text.body, fontSize: 16.5, maxWidth: '46ch' }}>
-            A small selection from the project&apos;s editorial photography. Full case study coming to the journal this autumn.
+            A small selection from the project — the elevation that took Best Curb Appeal, the kitchen that took Best Kitchen, and the
+            interior detailing around them.
           </p>
         </div>
-        <div style={{ display: 'grid', gridTemplateColumns: cols('repeat(6, 1fr)'), gap: 16, gridAutoRows: '180px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: cols('repeat(6, 1fr)'), gap: 16, gridAutoRows: compact ? 'auto' : '160px' }}>
           {GALLERY.map((src, i) => {
-            const l = GALLERY_LAYOUTS[i] ?? { col: 'span 2', row: 'span 1' };
+            const l = GALLERY_LAYOUTS[i] ?? { col: 'span 2', row: 'span 3' };
             return (
               <div
                 key={src + i}
                 style={{
-                  gridColumn: l.col,
-                  gridRow: l.row,
+                  gridColumn: compact ? 'auto' : l.col,
+                  gridRow: compact ? 'auto' : l.row,
+                  aspectRatio: compact ? '4/5' : undefined,
                   backgroundImage: `url("${src}")`,
                   backgroundSize: 'cover',
                   backgroundPosition: 'center'
@@ -339,7 +354,7 @@ export default function PressPage() {
           })}
         </div>
         <Eyebrow size="sm" style={{ marginTop: 32, letterSpacing: '0.22em' }}>
-          Photography: Studio archive · published on @laurelleaf.studio
+          Design: Laurel Leaf Design Studio · Builder: Southern State Builders · @laurelleafdesignstudio
         </Eyebrow>
       </Section>
 
