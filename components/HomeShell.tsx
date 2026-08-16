@@ -9,6 +9,7 @@ import { CoverPanel } from './CoverPanel';
 import { HeroGrid } from './HeroGrid';
 import { StatementSection } from './StatementSection';
 import { ProjectStrip } from './ProjectStrip';
+import { TestimonialsGrid } from './testimonials/TestimonialsGrid';
 
 /**
  * The cover panel is a splash: it belongs to arriving at the site, not to the
@@ -88,6 +89,7 @@ export function HomeShell() {
         <HeroGrid projects={PROJECTS} onOpen={openProject} pinnedLead coverStage={showCover} interlude={<StatementSection />} />
       </div>
       <ProjectStrip projects={PROJECTS} onOpen={openProject} />
+      <TestimonialsGrid />
     </>
   );
 }
