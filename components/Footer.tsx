@@ -1,28 +1,26 @@
 'use client';
 
 import Link from 'next/link';
+import type { IconType } from 'react-icons';
+import { PiFacebookLogoThin, PiInstagramLogoThin } from 'react-icons/pi';
 import { Eyebrow } from '@/components/ui/Eyebrow';
 import { Grid } from '@/components/ui/Grid';
 import { Section } from '@/components/ui/Section';
 import { color } from '@/lib/tokens';
 import { Wordmark } from './Wordmark';
 
-const COLUMNS: { h: string; items: { label: string; href?: string; target?: string }[] }[] = [
-  {
-    h: 'Studio',
-    items: [
-      { label: 'About', href: '/about' },
-      { label: 'Services', href: '/services' },
-      { label: 'Press', href: '/press' }
-    ]
-  },
-  {
-    h: 'Social',
-    items: [
-      { label: 'Instagram', target: '_blank', href: 'https://www.instagram.com/laurelleafdesignstudio' },
-      { label: 'Facebook', target: '_blank', href: 'https://www.facebook.com/laurelleafdesignstudio' }
-    ]
-  }
+const STUDIO_LINKS: { label: string; href: string }[] = [
+  { label: 'About', href: '/about' },
+  { label: 'Services', href: '/services' },
+  { label: 'Press', href: '/press' }
+];
+
+// Imported from the `react-icons/pi` barrel on purpose: Next lists every react-icons
+// subset in its default optimizePackageImports, so this is rewritten to direct paths
+// and only these two glyphs ship. A deep `react-icons/pi/index.mjs` path would skip that.
+const SOCIAL_LINKS: { label: string; href: string; Icon: IconType }[] = [
+  { label: 'Instagram', href: 'https://www.instagram.com/laurelleafdesignstudio', Icon: PiInstagramLogoThin },
+  { label: 'Facebook', href: 'https://www.facebook.com/laurelleafdesignstudio', Icon: PiFacebookLogoThin }
 ];
 
 export function Footer() {
@@ -53,12 +51,12 @@ export function Footer() {
         </div>
         <div>
           <Eyebrow opacity={0.5} style={{ marginBottom: 22 }}>
-            {COLUMNS[0].h}
+            Studio
           </Eyebrow>
           <ul style={{ listStyle: 'none', display: 'grid', gap: 10 }}>
-            {COLUMNS[0].items.map(it => (
+            {STUDIO_LINKS.map(it => (
               <li key={it.label} style={{ fontSize: 14, color: color.inkSoft }}>
-                {it.href ? <Link href={it.href}>{it.label}</Link> : it.label}
+                <Link href={it.href}>{it.label}</Link>
               </li>
             ))}
           </ul>
@@ -84,21 +82,34 @@ export function Footer() {
         </div>
         <div>
           <Eyebrow opacity={0.5} style={{ marginBottom: 22 }}>
-            {COLUMNS[1].h}
+            Social
           </Eyebrow>
-          <ul style={{ listStyle: 'none', display: 'grid', gap: 10 }}>
-            {COLUMNS[1].items.map(it => (
-              <li key={it.label} style={{ fontSize: 14, color: color.inkSoft }}>
-                {it.href ? (
-                  <a target={it.target || '_self'} rel={it.target === '_blank' ? 'noopener noreferrer' : undefined} href={it.href}>
-                    {it.label}
-                  </a>
-                ) : (
-                  it.label
-                )}
-              </li>
+          {/* The 28px box is the tap target; the glyph inside is smaller. Phosphor
+              already carries ~11% padding inside its 256 viewBox, so the drawn mark is
+              smaller again than the 26 below. react-icons emits no aria-hidden of its
+              own, so the svg is muted explicitly and the accessible name comes from the
+              anchor's aria-label. */}
+          <div style={{ display: 'flex', gap: 18 }}>
+            {SOCIAL_LINKS.map(({ label, href, Icon }) => (
+              <a
+                key={label}
+                className="social-icon"
+                href={href}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={label}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  width: 28,
+                  height: 28,
+                  color: color.inkSoft
+                }}>
+                <Icon size={26} aria-hidden="true" />
+              </a>
             ))}
-          </ul>
+          </div>
         </div>
         {/* Was a flat 60/30. The section itself only has 32px of padding below it on
             mobile, so a fixed 60px lead-in read as a gap rather than a rule. */}

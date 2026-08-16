@@ -519,6 +519,20 @@ a {
   border-bottom-color: var(--ink);
 }
 
+/* Footer social icons (components/Footer.tsx). The text links these replaced carried
+   their meaning without a hover state; a bare glyph needs one to read as a link.
+   0.8 rather than the 0.7 used above — Phosphor Thin is a lighter mark than any text
+   set at this size, and 0.7 washed it out against Bone White. */
+.social-icon {
+  opacity: 0.8;
+  transition: opacity var(--dur-fast) var(--ease-elegant);
+}
+
+.social-icon:hover,
+.social-icon:focus-visible {
+  opacity: 1;
+}
+
 /* ======================== RESPONSIVE ======================== */
 
 /* TABLET ≤ 1024px */
