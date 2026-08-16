@@ -11,11 +11,11 @@ type GridCellProps = {
 export function GridCell({ project, onOpen }: GridCellProps) {
   return (
     <div className="grid-cell" onClick={() => onOpen(project)}>
-      {/* inset 0, and scale(1) at rest: the layer sits at exactly `cover`, the
-          sharpest it can be. It used to be inset -20% to give a scroll parallax
-          somewhere to travel, but that oversize made every image render 1.4x
-          larger than it needed to and visibly soft. Hover still scales up —
-          growing past the frame crops outward and can't expose an edge. */}
+      {/* inset 0: the layer sits at exactly `cover`, the sharpest it can be. It
+          used to be inset -20% to give a scroll parallax somewhere to travel,
+          but that oversize made every image render 1.4x larger than it needed
+          to and visibly soft. Hover no longer scales, so nothing needs the
+          extra bleed. */}
       <div className="grid-cell__media" style={{ backgroundImage: `url("${project.cover}")` }} />
 
       <div
