@@ -24,11 +24,11 @@ export function StatementSection() {
   const [ref, seen] = useReveal<HTMLElement>();
 
   return (
-    <Section ref={ref} padTop="xl" padBottom="2xl" topBorder>
+    <Section ref={ref} padY="xxs" topBorder>
       <Eyebrow
         opacity={seen ? 0.5 : 0}
         style={{
-          marginBottom: 80,
+          marginBottom: 24,
           transform: seen ? 'translateY(0)' : 'translateY(20px)',
           transition: `all ${motion.durSlow} ease`
         }}>
@@ -49,7 +49,7 @@ export function StatementSection() {
           </Fragment>
         ))}
       </Heading>
-      <Container maxWidth={1100} style={{ marginTop: 100 }}>
+      <Container maxWidth={1100} style={{ marginTop: 30 }}>
         <Grid
           cols="1fr 1fr"
           gap={80}
