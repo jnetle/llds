@@ -412,20 +412,29 @@ a {
   background: #1a1a1a;
 }
 
+/* Hover darkens the photo in place — no zoom. The media layer sits at exactly
+   `cover`, so any scale would resample the source upward and soften it. Copies
+   the studioashby.com home-page treatment: a flat scrim fading in over a still
+   image, timed to --dur-med so it moves with the caption below it. */
 .grid-cell__media {
   position: absolute;
   inset: 0;
   background-size: cover;
   background-position: center;
-  transform: scale(1);
-  transition:
-    transform var(--dur-slow) var(--ease-elegant),
-    filter var(--dur-med) ease;
 }
 
-.grid-cell:hover .grid-cell__media,
-.grid-cell:focus-within .grid-cell__media {
-  transform: scale(1.08);
+.grid-cell__media::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.2);
+  opacity: 0;
+  transition: opacity var(--dur-med) ease;
+}
+
+.grid-cell:hover .grid-cell__media::after,
+.grid-cell:focus-within .grid-cell__media::after {
+  opacity: 1;
 }
 
 .grid-cell__caption {

@@ -161,19 +161,6 @@ export function HeroGrid({ projects, onOpen, pinnedLead = false, coverStage = fa
           style={{
             position: 'absolute',
             bottom: 24,
-            left: 36,
-            zIndex: 20,
-            color: color.bg,
-            mixBlendMode: 'difference'
-          }}>
-          <div className="micro-sm" style={{ opacity: 0.85 }}>
-            Index of Projects · 07
-          </div>
-        </div>
-        <div
-          style={{
-            position: 'absolute',
-            bottom: 24,
             right: 36,
             zIndex: 20,
             color: color.bg,
