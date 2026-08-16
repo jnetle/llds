@@ -75,7 +75,7 @@ are deterministic from data:
   about/profile-1.jpg … profile-3.jpg                # profile shots
   about/hero.jpg                                       # if/when added
   press/awards/<award-slug>.jpg                        # one per award
-  press/gallery/1.jpg … 6.jpg                          # the strip, in order
+  press/gallery/1.jpg … N.jpg                          # the strip, in order (5 today)
   services/<section-slug>/hero.jpg                     # one per Services section
   shared/…                                             # genuine cross-page one-offs
 ```
@@ -88,6 +88,7 @@ are deterministic from data:
 - Replace-in-place keeps the URL stable, but the CDN caches by TTL — purge the object in Cloudflare, or append `?v=2`, for an immediate swap.
 - Project grid/detail images render via CSS `backgroundImage`, so `next/image` does not optimize them — pre-compression above is what keeps them small. Pages that do use `next/image` (e.g. About) need the R2 hostname added to `next.config.ts` `images.remotePatterns`.
 - SVGs stay in `public/` (not on R2).
+- **TODO — Press photos are temporarily in the repo, not the bucket.** `public/images/press/{awards,gallery}/` holds eight images saved off the studio's Stellar Awards Instagram post — seven stills (1024–1280 px, 174–199 KB each) plus `awards/stellar-2026-card.jpg`, the post's overlaid title card, used as the hero lead-story thumbnail. `app/press/page.tsx` reads all of them through a local `pressImg()` helper instead of `img`. The seven stills are Instagram-resolution re-compressions standing in until the photographer's originals arrive; the title card is finished artwork and won't be superseded. **When the originals land:** compress them, upload everything under the `press/…` keys above, delete `public/images/press/`, and change `pressImg` back to `img(\`press/${key}\`)` — the helper's keys are already exactly the bucket keys, so nothing else moves.
 - The brand mark is the exception to "rasters live on R2": `public/logo-long-{navy,bone}.png` are versioned code assets, cropped to identical tight bounds so `components/LogoLong.tsx` can stack them and crossfade between the two — a raster mark can't be recolored via `currentColor` the way the rest of the header is.
 
 ## Architecture
