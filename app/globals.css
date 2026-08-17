@@ -807,3 +807,355 @@ a {
   text-transform: uppercase;
   padding: 12px 20px;
 }
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   MAGAZINE READER — the Aiken Hound & Home feature on /press
+   (components/press/MagazineReader.tsx)
+
+   A tall track with a sticky 100svh stage; scroll progress inside the pinned
+   range drives each leaf's rotateY about its left edge, so pages sweep out of
+   frame to the left like a magazine held in one hand.
+
+   The transforms are written inline per frame by JS. Everything geometric and
+   every breakpoint lives here, keyed off classes only — a `[style*=…]` selector
+   would flip on and off as React rewrites the style attribute mid-scroll, which
+   is exactly what scripts/check-css.mjs rejects.
+   ──────────────────────────────────────────────────────────────────────────── */
+
+.mag-track {
+  /* One turn of scroll per page turned. The stage is 100svh, so the track pins
+     for exactly `4 * --mag-turn` with five leaves. */
+  --mag-turn: 78svh;
+  position: relative;
+  height: calc(100svh + 4 * var(--mag-turn));
+}
+
+.mag-stage {
+  position: sticky;
+  top: 0;
+  height: 100svh;
+  /* `clip`, never `hidden` — hidden would make this a scroll container and kill
+     sticky on every descendant. See the html/body rule above. */
+  overflow: clip;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  gap: 4vw;
+}
+
+/* No gutter on the stage itself: overflow clips at the padding box, so a gutter
+   here would slice the turning page off at 8vw instead of the viewport edge.
+   The left column's spare width IS the arc the page turns through. */
+.mag-stage__book {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.mag-stage__aside {
+  padding-inline: var(--gutter);
+  align-self: center;
+}
+
+.mag-book {
+  position: relative;
+  display: block;
+  perspective: 2200px;
+  aspect-ratio: 612 / 792;
+  height: min(66svh, 52vw);
+}
+
+.mag-leaf {
+  position: absolute;
+  inset: 0;
+  transform-origin: left center;
+  transform-style: preserve-3d;
+  will-change: transform;
+  /* The resting/turning shadow is assigned per frame in MagazineReader — five identical
+     stacked shadows would compound into a halo around the untouched stack. */
+}
+
+/* First paint, before the scroll callback has run once: only the top of the resting stack casts
+   a shadow. JS inline styles take over from here. */
+.mag-leaf:first-child {
+  box-shadow:
+    0 26px 54px -26px rgb(31 58 50 / 0.34),
+    0 4px 14px -8px rgb(31 58 50 / 0.2);
+}
+
+.mag-leaf__face,
+.mag-leaf__back {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+  overflow: hidden;
+}
+
+.mag-leaf__face img {
+  user-select: none;
+}
+
+.mag-leaf__shade {
+  position: absolute;
+  inset: 0;
+  background: var(--navy-ink);
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* The reverse of page 8 is page 7 — not ours to show. Plain warm stock instead. */
+.mag-leaf__back {
+  transform: rotateY(180deg);
+  background: linear-gradient(100deg, var(--modern-tan) 0%, color-mix(in srgb, var(--modern-tan) 78%, var(--warm-stone)) 100%);
+}
+
+.mag-book__hint {
+  position: absolute;
+  left: 50%;
+  bottom: 18px;
+  /* translateZ lifts it clear of the leaves in the book's 3D rendering context,
+     where plain z-index alone is not enough to win against a rotated sibling. */
+  transform: translate(-50%, 0) translateZ(1px);
+  z-index: 40;
+  padding: 8px 16px;
+  color: var(--bone-white);
+  background: color-mix(in srgb, var(--navy-ink) 72%, transparent);
+  backdrop-filter: blur(6px);
+  opacity: 0;
+  transition: opacity var(--dur-fast) var(--ease-elegant);
+  pointer-events: none;
+}
+
+.mag-book:hover .mag-book__hint,
+.mag-book:focus-visible .mag-book__hint {
+  opacity: 1;
+}
+
+.mag-quotes {
+  display: grid;
+}
+
+/* All quotes share one grid cell so the block is as tall as the longest and the
+   swap is a crossfade rather than a reflow. */
+.mag-quote {
+  grid-area: 1 / 1;
+  margin: 0;
+  font-size: clamp(22px, 2.2vw, 34px);
+  font-weight: 300;
+  font-style: italic;
+  line-height: 1.35;
+  letter-spacing: 0.005em;
+  text-wrap: pretty;
+  max-width: 22ch;
+}
+
+.mag-dots {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 36px;
+}
+
+.mag-dot {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+}
+
+.mag-dot::after {
+  content: '';
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  border: 1px solid var(--ink);
+  opacity: 0.5;
+  transition:
+    background-color var(--dur-fast) var(--ease-elegant),
+    opacity var(--dur-fast) var(--ease-elegant);
+}
+
+.mag-dot[data-active]::after {
+  background: var(--ink);
+  opacity: 1;
+}
+
+/* ── Lightbox ──────────────────────────────────────────────────────────────── */
+
+.mag-lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: grid;
+  place-items: center;
+  padding: 5svh 6vw;
+  background: color-mix(in srgb, var(--navy) 94%, transparent);
+  backdrop-filter: blur(8px);
+  animation: mag-fade var(--dur-fast) var(--ease-elegant) both;
+}
+
+@keyframes mag-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Width-driven so aspect-ratio derives the height: giving both an explicit height
+   and a max-width would distort the box instead of scaling it. */
+.mag-lightbox__frame {
+  position: relative;
+  width: min(88vw, 64svh);
+  aspect-ratio: 612 / 792;
+  box-shadow: 0 40px 90px -30px rgb(0 0 0 / 0.7);
+  user-select: none;
+}
+
+.mag-lightbox__bar {
+  position: absolute;
+  bottom: max(16px, 2svh);
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.mag-lightbox__btn,
+.mag-lightbox__close {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  color: var(--bone-white);
+  border: 1px solid color-mix(in srgb, var(--bone-white) 34%, transparent);
+  font-size: 22px;
+  line-height: 1;
+  transition:
+    border-color var(--dur-fast) var(--ease-elegant),
+    background-color var(--dur-fast) var(--ease-elegant);
+}
+
+.mag-lightbox__btn:hover:not(:disabled),
+.mag-lightbox__close:hover {
+  background: color-mix(in srgb, var(--bone-white) 14%, transparent);
+  border-color: var(--bone-white);
+}
+
+.mag-lightbox__btn:disabled {
+  opacity: 0.25;
+  cursor: default;
+}
+
+.mag-lightbox__close {
+  position: absolute;
+  top: max(16px, 2svh);
+  right: max(16px, 2vw);
+  font-size: 16px;
+}
+
+/* ── Tablet / mobile ───────────────────────────────────────────────────────── */
+
+@media (max-width: 1024px) {
+  .mag-track {
+    --mag-turn: 62svh;
+  }
+
+  .mag-stage {
+    grid-template-columns: 1fr;
+    align-content: center;
+    gap: 28px;
+  }
+
+  .mag-stage__book {
+    justify-content: center;
+  }
+
+  .mag-book {
+    height: min(52svh, 104vw);
+  }
+
+  .mag-stage__aside {
+    text-align: center;
+  }
+
+  .mag-quote {
+    max-width: 26ch;
+    margin-inline: auto;
+  }
+
+  .mag-dots {
+    justify-content: center;
+    margin-top: 20px;
+  }
+}
+
+/* ── Fallback: no pin, no 3D, just the pages ───────────────────────────────────
+   Handled entirely in CSS rather than by branching on usePrefersReducedMotion()
+   or useCompact() in the component — both initialise to `false`, so a JS branch
+   would render the animated layout first and swap after hydrate. The
+   `!important` is required because JS writes `transform` inline every frame.
+   The (scripting: none) arm mirrors the cover-panel escape hatch above. */
+@media (prefers-reduced-motion: reduce), (scripting: none) {
+  .mag-track {
+    height: auto;
+  }
+
+  .mag-stage {
+    position: static;
+    height: auto;
+    overflow: visible;
+    display: block;
+    padding-inline: var(--gutter);
+  }
+
+  .mag-stage__book {
+    display: block;
+  }
+
+  .mag-book {
+    height: auto;
+    aspect-ratio: auto;
+    perspective: none;
+    width: 100%;
+    max-width: 720px;
+    margin-inline: auto;
+  }
+
+  .mag-leaf {
+    position: relative;
+    inset: auto;
+    transform: none !important;
+    opacity: 1 !important;
+    box-shadow: 0 20px 44px -24px rgb(31 58 50 / 0.3) !important;
+    display: block;
+    margin-bottom: 20px;
+  }
+
+  /* next/image `fill` renders an absolutely-positioned img, so the face needs an
+     intrinsic ratio of its own to have any height once it leaves the fixed-height
+     stage. Every page is a 612×792pt letter page. */
+  .mag-leaf__face {
+    position: relative;
+    inset: auto;
+    aspect-ratio: 612 / 792;
+  }
+
+  /* The aside exists to give the pinned stage something to say while one page is
+     on top. With every page laid out in full there is no "current" page to
+     caption, and the quotes share a single grid cell so they would overlap —
+     drop the whole column rather than reflow it. */
+  .mag-leaf__back,
+  .mag-leaf__shade,
+  .mag-book__hint,
+  .mag-stage__aside {
+    display: none;
+  }
+
+  .mag-lightbox {
+    animation: none;
+  }
+}
