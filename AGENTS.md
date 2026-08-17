@@ -76,6 +76,10 @@ are deterministic from data:
   about/hero.jpg                                       # if/when added
   press/awards/<award-slug>.jpg                        # one per award
   press/gallery/1.jpg … N.jpg                          # the strip, in order (5 today)
+  press/magazine/cover.jpg                             # the issue cover
+  press/magazine/page-1.jpg … page-4.jpg               # the spread, in reading order
+  press/magazine/hh-masthead.png                       # the publication's own lockup
+  press/magazine/portrait.jpg                          # the designer in the featured room
   services/<section-slug>/hero.jpg                     # one per Services section
   shared/…                                             # genuine cross-page one-offs
 ```
@@ -84,11 +88,13 @@ are deterministic from data:
 
 - Folder = feature/route; leaf = role (`cover`, `hero`, `gallery-N`, `profile-N`). Numbered variants are plain 1-based.
 - Compress before upload with `node scripts/compress-images.mjs <in> <out>`: target ≤ 200 KB per image, max 2400 px wide, output `.jpg`.
+- **Magazine spread pages are the one deliberate exception to the 200 KB target.** `press/magazine/page-{1,2}.jpg` are documents, not photographs — page 2 is two columns of 9pt body copy, and the reader's lightbox is meant to be read, not just looked at. They run 1500–1800 px and ~270/370 KB. The photo pages and the cover hold the normal budget.
+- A third party's masthead is displayed with `mix-blend-mode: multiply` over Bone White rather than an alpha-knockout PNG (see the `press/magazine/hh-masthead.png` usage in `app/press/page.tsx`). The artwork is black on white, so multiply removes the box for free — and leaves the publication's mark in its own color, which recoloring to `ink` would not.
 - Rename on upload to meaningful slugs — don't carry `photo-160058…` IDs over.
 - Replace-in-place keeps the URL stable, but the CDN caches by TTL — purge the object in Cloudflare, or append `?v=2`, for an immediate swap.
 - Project grid/detail images render via CSS `backgroundImage`, so `next/image` does not optimize them — pre-compression above is what keeps them small. Pages that do use `next/image` (e.g. About) need the R2 hostname added to `next.config.ts` `images.remotePatterns`.
 - SVGs stay in `public/` (not on R2).
-- **TODO — Press photos are temporarily in the repo, not the bucket.** `public/images/press/{awards,gallery}/` holds eight images saved off the studio's Stellar Awards Instagram post — seven stills (1024–1280 px, 174–199 KB each) plus `awards/stellar-2026-card.jpg`, the post's overlaid title card, used as the hero lead-story thumbnail. `app/press/page.tsx` reads all of them through a local `pressImg()` helper instead of `img`. The seven stills are Instagram-resolution re-compressions standing in until the photographer's originals arrive; the title card is finished artwork and won't be superseded. **When the originals land:** compress them, upload everything under the `press/…` keys above, delete `public/images/press/`, and change `pressImg` back to `img(\`press/${key}\`)` — the helper's keys are already exactly the bucket keys, so nothing else moves.
+- **TODO — Press photos are temporarily in the repo, not the bucket.** `public/images/press/{awards,gallery,magazine}/` holds eight images saved off the studio's Stellar Awards Instagram post — seven stills (1024–1280 px, 174–199 KB each) plus `awards/stellar-2026-card.jpg`, the post's overlaid title card, used as the hero lead-story thumbnail. `app/press/page.tsx` reads all of them through a local `pressImg()` helper instead of `img`. The seven stills are Instagram-resolution re-compressions standing in until the photographer's originals arrive; the title card is finished artwork and won't be superseded. `magazine/` holds seven more — the Winter 2024 Aiken Hound & Home feature, rasterised from the issue PDF plus the two high-res originals the studio has — and unlike the stills these are **final**; they are only in the repo to keep one migration rather than two. **When the originals land:** compress them, upload everything under the `press/…` keys above, delete `public/images/press/`, and change `pressImg` back to `img(\`press/${key}\`)` — the helper's keys are already exactly the bucket keys, so nothing else moves.
 - The brand mark is the exception to "rasters live on R2": `public/logo-long-{navy,bone}.png` are versioned code assets, cropped to identical tight bounds so `components/LogoLong.tsx` can stack them and crossfade between the two — a raster mark can't be recolored via `currentColor` the way the rest of the header is.
 
 ## Architecture
@@ -109,7 +115,8 @@ CSS Modules are available and unused. They're the right tool if a component ever
 - `app/layout.tsx` — root layout; loads Cormorant Garamond (serif) and Inter (sans) via `next/font/google` and exposes them as the `--font-cormorant` / `--font-inter` CSS vars. These are **not** the logo's fonts — see "Logo typography" below before changing them
 - `app/page.tsx` — home route (`/`)
 - `components/ui/` — design system primitives (`Section`, `Grid`, `Container`, `Heading`, `Eyebrow`)
-- `components/` — feature components (`Header`, `Footer`, `HeroGrid`, `GridCell`, `ProjectsGrid`, `ProjectDetail`, `StatementSection`, `ProjectStrip`, `Wordmark`, `HomeShell`)
+- `components/` — feature components (`Header`, `Footer`, `HeroGrid`, `GridCell`, `ProjectsGrid`, `ProjectDetail`, `StatementSection`, `ProjectStrip`, `Wordmark`, `HomeShell`); route-scoped ones sit in a subfolder (`components/press/`, `components/testimonials/`)
+- **Scroll-scrubbed sections** (today only `components/press/MagazineReader.tsx`) follow one pattern: a tall track with a `position: sticky; top: 0; height: 100svh` stage, and `hooks/useTrackProgress.ts` reporting 0→1 across the pinned range. That hook takes a **callback**, not state, on purpose — `useScrollY` re-renders its whole consuming subtree once per scroll frame, so anything driving more than a couple of properties should write to DOM nodes through refs and keep React state for discrete values only (the reader re-renders ~5 times per pass, when the page index changes). Reduced-motion and no-JS fallbacks belong in CSS, not a `usePrefersReducedMotion()` / `useCompact()` branch: both initialise `false`, so a JS branch renders the animated layout first and swaps after hydrate. See the `@media (prefers-reduced-motion: reduce), (scripting: none)` block under `.mag-*` in `globals.css`.
 - `hooks/` — React hooks, one per file. File name matches the hook name (e.g. `useScrollY.ts` exports `useScrollY`). Import as `@/hooks/useFoo`. Do not bundle multiple hooks into a single file.
 - `lib/tokens.ts` — single source of truth for color, spacing, typography, motion tokens
 - `public/` — static assets served at `/`

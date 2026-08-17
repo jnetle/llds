@@ -1,7 +1,9 @@
 'use client';
 
+import Image from 'next/image';
 import { useReveal } from '@/hooks/useReveal';
 import { useCols, useCompact } from '@/hooks/useCompact';
+import { MagazineReader, type MagazinePage } from '@/components/press/MagazineReader';
 import { Eyebrow } from '@/components/ui/Eyebrow';
 import { Section } from '@/components/ui/Section';
 import { color, motion, text } from '@/lib/tokens';
@@ -46,11 +48,47 @@ const GALLERY_LAYOUTS = [
   { col: 'span 2', row: 'span 3' }
 ];
 
+// The Winter 2024 feature in Aiken Hound & Home, in reading order: the issue cover, then the
+// four pages of the spread. Printed folios read 8, 9, — , 10 (the full-bleed shower page carries
+// no folio), so the labels count the spread rather than claim a page range.
+const MAGAZINE_PAGES: MagazinePage[] = [
+  {
+    src: pressImg('magazine/cover.jpg'),
+    label: 'Cover',
+    alt: 'Cover of Aiken Hound & Home Magazine, Winter Issue 2024'
+  },
+  {
+    src: pressImg('magazine/page-1.jpg'),
+    label: 'Page one',
+    alt: 'Opening page of the feature — the home’s exterior under a live oak, titled “Understated Luxury: A Bathroom Transformed”',
+    quote: 'I love to weave together modern needs with timeless elegance.'
+  },
+  {
+    src: pressImg('magazine/page-2.jpg'),
+    label: 'Page two',
+    alt: 'The article text alongside a wide photograph of the finished bathroom',
+    quote: 'The first challenge? Bringing in more light.'
+  },
+  {
+    src: pressImg('magazine/page-3.jpg'),
+    label: 'Page three',
+    alt: 'Full-page photograph of the marble shower with brass fittings and a hexagonal tile inset',
+    quote: 'The centerpiece was the freestanding tub — a true focal point of relaxation.'
+  },
+  {
+    src: pressImg('magazine/page-4.jpg'),
+    label: 'Page four',
+    alt: 'Closing page — a grid of photographs of the tub, vanity, and dressing area',
+    quote: 'For the clients, it became a sanctuary of light, warmth, and elegance.'
+  }
+];
+
 const FEATURE_META: [string, string][] = [
-  ['Publication', 'To be announced'],
-  ['Issue', 'Forthcoming'],
-  ['Format', 'Print & digital · 8 pages'],
-  ['Photography', 'Studio archive']
+  ['Publication', 'Aiken Hound & Home Magazine'],
+  ['Issue', 'Winter 2024'],
+  ['Words', 'Maria Rhinehart'],
+  ['Photography', 'River Magnolia Photography'],
+  ['Builder', 'Southern State Builders']
 ];
 
 export default function PressPage() {
@@ -65,7 +103,7 @@ export default function PressPage() {
     <>
       {/* Hero — title stack + lead-story preview */}
       <Section
-        padTop="md"
+        padTop="sm"
         padBottom="none"
         style={{
           position: 'relative',
@@ -205,7 +243,7 @@ export default function PressPage() {
       </Section>
 
       {/* Stellar Awards intro */}
-      <Section id="sec-stellar" padTop="md" padBottom="xs" style={{ borderBottom: `1px solid ${color.hairline}`, scrollMarginTop: 24 }}>
+      <Section id="sec-stellar" padTop="sm" padBottom="xxs" style={{ borderBottom: `1px solid ${color.hairline}`, scrollMarginTop: 24 }}>
         <div
           ref={ref}
           style={{
@@ -259,7 +297,7 @@ export default function PressPage() {
       </Section>
 
       {/* Award cards */}
-      <Section padY="sm" style={{ borderBottom: `1px solid ${color.hairline}` }}>
+      <Section padY="xs" style={{ borderBottom: `1px solid ${color.hairline}` }}>
         <div style={{ display: 'grid', gridTemplateColumns: cols('repeat(2, 1fr)'), gap: 60 }}>
           {AWARDS.map(a => (
             <article key={a.category} style={{ display: 'flex', flexDirection: 'column' }}>
@@ -302,7 +340,7 @@ export default function PressPage() {
 
       {/* Project gallery */}
       <Section
-        padY="lg"
+        padY="sm"
         style={{
           background: 'rgba(31,58,50,0.04)',
           borderBottom: `1px solid ${color.hairline}`
@@ -358,92 +396,39 @@ export default function PressPage() {
         </Eyebrow>
       </Section>
 
-      {/* Magazine feature */}
-      <Section padY="lg">
-        <Eyebrow style={{ marginBottom: 60 }}>— Editorial · Forthcoming</Eyebrow>
+      {/* Magazine feature — Aiken Hound & Home, Winter 2024 */}
+      <Section id="sec-magazine" padTop="xxs" padBottom="none" style={{ scrollMarginTop: 'var(--scroll-offset)' }}>
+        <Eyebrow style={{ marginBottom: 60 }}>— Editorial · Winter 2024</Eyebrow>
         <div
           ref={refFeature}
           style={{
             display: 'grid',
-            gridTemplateColumns: cols('1fr 1.2fr'),
-            gap: 90,
-            alignItems: 'center',
+            gridTemplateColumns: cols('0.9fr 1.6fr'),
+            gap: 80,
+            alignItems: 'start',
             opacity: seenFeature ? 1 : 0,
             transform: seenFeature ? 'translateY(0)' : 'translateY(28px)',
             transition: `all ${motion.durXSlow} ${motion.ease}`
           }}>
-          <div style={{ position: 'relative' }}>
-            <div
-              style={{
-                aspectRatio: '3/4',
-                background: 'linear-gradient(165deg, #d8cfbf 0%, #b8ad97 60%, #968a72 100%)',
-                position: 'relative',
-                overflow: 'hidden',
-                boxShadow: '0 30px 60px -20px rgba(31,58,50,0.35), 0 8px 20px -8px rgba(31,58,50,0.25)'
-              }}>
-              <div
-                style={{
-                  position: 'absolute',
-                  inset: 0,
-                  background: 'repeating-linear-gradient(90deg, transparent 0 60px, rgba(31,58,50,0.025) 60px 61px)'
-                }}
-              />
-              <div
-                style={{
-                  position: 'absolute',
-                  top: 36,
-                  left: 36,
-                  right: 36,
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'baseline',
-                  color: color.ink
-                }}>
-                <div className="serif" style={{ fontSize: 36, fontWeight: 400, letterSpacing: '-0.01em', fontStyle: 'italic' }}>
-                  Magazine
-                </div>
-                <Eyebrow size="sm" opacity={0.7} style={{ letterSpacing: '0.22em' }}>
-                  ISSUE TBC
-                </Eyebrow>
-              </div>
-              <div style={{ position: 'absolute', left: 36, right: 36, bottom: 44, color: color.ink }}>
-                <Eyebrow size="sm" opacity={0.65} style={{ letterSpacing: '0.26em', marginBottom: 14 }}>
-                  COVER STORY · TBA
-                </Eyebrow>
-                <div
-                  className="serif"
-                  style={{
-                    fontSize: 'clamp(22px, 2.4vw, 34px)',
-                    fontWeight: 300,
-                    lineHeight: 1.1,
-                    letterSpacing: '-0.005em',
-                    textTransform: 'uppercase'
-                  }}>
-                  Title to be confirmed
-                </div>
-              </div>
-              <div
-                style={{
-                  position: 'absolute',
-                  inset: '38% 28% 38% 28%',
-                  border: '1px dashed rgba(31,58,50,0.4)',
-                  display: 'grid',
-                  placeItems: 'center'
-                }}>
-                <Eyebrow size="sm" style={{ letterSpacing: '0.28em', textAlign: 'center', color: color.ink }}>
-                  Image
-                  <br />
-                  placeholder
-                </Eyebrow>
-              </div>
-            </div>
-            <Eyebrow size="sm" style={{ marginTop: 18, letterSpacing: '0.24em', textAlign: 'center' }}>
-              [ Awaiting publication artwork ]
+          <div>
+            {/* The masthead artwork is black on a white field. Multiply over Bone White knocks
+                the box out with no alpha channel and no image processing — and keeps the
+                publication's own mark in its own color, which a recolor would not. */}
+            <Image
+              src={pressImg('magazine/hh-masthead.png')}
+              alt="Aiken Hound &amp; Home Magazine"
+              width={622}
+              height={186}
+              style={{ width: 'min(240px, 70%)', height: 'auto', mixBlendMode: 'multiply', display: 'block', marginBottom: 26 }}
+            />
+            <Eyebrow size="sm" opacity={0.65} style={{ letterSpacing: '0.26em', marginBottom: 14 }}>
+              Winter Issue 2024
+            </Eyebrow>
+            <Eyebrow size="sm" opacity={0.55} style={{ letterSpacing: '0.22em' }}>
+              Aiken, South Carolina
             </Eyebrow>
           </div>
-
           <div>
-            <Eyebrow style={{ marginBottom: 24, letterSpacing: '0.26em' }}>Magazine feature · placeholder</Eyebrow>
             <h2
               className="serif"
               style={{
@@ -452,21 +437,43 @@ export default function PressPage() {
                 lineHeight: 1.05,
                 letterSpacing: '-0.012em',
                 textWrap: 'balance',
-                marginBottom: 32,
-                marginTop: 0
+                marginTop: 0,
+                marginBottom: 32
               }}>
-              An <em style={{ fontWeight: 300 }}>upcoming feature</em> with a national interiors title.
+              Understated Luxury: <em style={{ fontWeight: 300 }}>a bathroom transformed</em>
             </h2>
-            <p style={{ ...text.body, maxWidth: '52ch', marginBottom: 28 }}>
-              Details, cover artwork, and the full editorial spread will be added here once embargo lifts. The piece focuses on the
-              studio&apos;s approach to spec homes that read as bespoke — and how restraint, rather than flourish, carried both
-              award-winning rooms.
+            <p style={{ ...text.body, maxWidth: '54ch', margin: 0 }}>
+              Four pages in the winter issue of Aiken Hound &amp; Home, written by the studio&apos;s founder. A dark, hard-working master
+              bath was opened back up to the light — the shower wall lowered, marble laid in a custom-cut pattern over heated floors, and a
+              freestanding tub set where it could become the room&apos;s centre of gravity.
             </p>
+          </div>
+        </div>
+      </Section>
+
+      {/* The reader sits outside <Section> — it is a full-bleed pinned stage, not a padded
+          content block, and the pages need the unpadded width to turn through. */}
+      <MagazineReader pages={MAGAZINE_PAGES} />
+
+      <Section padTop="xs" padBottom="sm">
+        <div style={{ display: 'grid', gridTemplateColumns: cols('0.85fr 1.15fr'), gap: 80, alignItems: 'center' }}>
+          <div
+            style={{
+              aspectRatio: '2/3',
+              backgroundImage: `url("${pressImg('magazine/portrait.jpg')}")`,
+              backgroundSize: 'cover',
+              backgroundPosition: 'center'
+            }}
+          />
+          <div>
+            <Eyebrow style={{ marginBottom: 26, letterSpacing: '0.26em' }}>— The feature</Eyebrow>
             <ul
               style={{
                 listStyle: 'none',
                 display: 'grid',
                 gap: 14,
+                margin: 0,
+                padding: 0,
                 borderTop: `1px solid ${color.hairline}`,
                 paddingTop: 22
               }}>
@@ -475,7 +482,7 @@ export default function PressPage() {
                   key={k}
                   style={{
                     display: 'grid',
-                    gridTemplateColumns: cols('180px 1fr'),
+                    gridTemplateColumns: cols('160px 1fr'),
                     gap: 24,
                     paddingBottom: 14,
                     borderBottom: `1px solid ${color.hairline}`,
@@ -490,6 +497,9 @@ export default function PressPage() {
                 </li>
               ))}
             </ul>
+            <Eyebrow size="sm" style={{ marginTop: 30, letterSpacing: '0.22em' }}>
+              Maria Rhinehart in the finished room · Photography by River Magnolia Photography
+            </Eyebrow>
           </div>
         </div>
       </Section>
