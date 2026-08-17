@@ -809,6 +809,40 @@ a {
 }
 
 /* ─────────────────────────────────────────────────────────────────────────────
+   PRESS IMAGE REVEAL — the same entrance the project tiles use
+   (app/press/page.tsx)
+
+   Each image fades and rises the first time it enters the viewport. JS only
+   adds `.is-in`; the hidden state, the timing, and the fallbacks are all here,
+   because the hidden state is what a visitor is stuck with if the reveal never
+   fires. `--reveal-delay` is set inline per tile to stagger a row.
+   ──────────────────────────────────────────────────────────────────────────── */
+
+.press-reveal {
+  opacity: 0;
+  transform: translateY(24px);
+  transition:
+    opacity var(--dur-xslow) var(--ease-elegant) var(--reveal-delay, 0s),
+    transform var(--dur-xslow) var(--ease-elegant) var(--reveal-delay, 0s);
+}
+
+.press-reveal.is-in {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Reduced motion drops the entrance; (scripting: none) is the load-bearing arm —
+   with no JS nothing ever adds `.is-in`, so without this the images would sit at
+   opacity 0 permanently. Mirrors the cover-panel and .mag-* escape hatches. */
+@media (prefers-reduced-motion: reduce), (scripting: none) {
+  .press-reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
    MAGAZINE READER — the Aiken Hound & Home feature on /press
    (components/press/MagazineReader.tsx)
 

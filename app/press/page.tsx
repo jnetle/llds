@@ -1,6 +1,7 @@
 'use client';
 
 import Image from 'next/image';
+import type { CSSProperties } from 'react';
 import { useReveal } from '@/hooks/useReveal';
 import { useCols, useCompact } from '@/hooks/useCompact';
 import { MagazineReader, type MagazinePage } from '@/components/press/MagazineReader';
@@ -90,6 +91,29 @@ const FEATURE_META: [string, string][] = [
   ['Photography', 'River Magnolia Photography'],
   ['Builder', 'Southern State Builders']
 ];
+
+// The same entrance the project tiles get in ProjectsGrid, applied to every image on the page.
+// Only `.is-in` is decided here — see the `.press-reveal` rules in globals.css for the hidden
+// state and the reduced-motion / no-JS fallbacks. `index` staggers tiles within a row.
+function RevealImage({ src, index = 0, style }: { src: string; index?: number; style?: CSSProperties }) {
+  const [ref, seen] = useReveal<HTMLDivElement>();
+
+  return (
+    <div
+      ref={ref}
+      className={seen ? 'press-reveal is-in' : 'press-reveal'}
+      style={
+        {
+          backgroundImage: `url("${src}")`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          '--reveal-delay': `${index * 0.08}s`,
+          ...style
+        } as CSSProperties
+      }
+    />
+  );
+}
 
 export default function PressPage() {
   const [ref, seen] = useReveal<HTMLDivElement>();
@@ -207,15 +231,7 @@ export default function PressPage() {
               color: color.ink,
               textDecoration: 'none'
             }}>
-            <div
-              style={{
-                aspectRatio: '4/5',
-                minHeight: 180,
-                backgroundImage: `url("${pressImg('awards/stellar-2026-card.jpg')}")`,
-                backgroundSize: 'cover',
-                backgroundPosition: 'center'
-              }}
-            />
+            <RevealImage src={pressImg('awards/stellar-2026-card.jpg')} style={{ aspectRatio: '4/5', minHeight: 180 }} />
             <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
               <div>
                 <div
@@ -299,17 +315,9 @@ export default function PressPage() {
       {/* Award cards */}
       <Section padY="xs" style={{ borderBottom: `1px solid ${color.hairline}` }}>
         <div style={{ display: 'grid', gridTemplateColumns: cols('repeat(2, 1fr)'), gap: 60 }}>
-          {AWARDS.map(a => (
+          {AWARDS.map((a, i) => (
             <article key={a.category} style={{ display: 'flex', flexDirection: 'column' }}>
-              <div
-                style={{
-                  aspectRatio: '4/5',
-                  marginBottom: 32,
-                  backgroundImage: `url("${a.img}")`,
-                  backgroundSize: 'cover',
-                  backgroundPosition: 'center'
-                }}
-              />
+              <RevealImage src={a.img} index={i} style={{ aspectRatio: '4/5', marginBottom: 32 }} />
               <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 18 }}>
                 <span style={{ fontSize: 22, lineHeight: 1 }}>★</span>
                 <Eyebrow size="sm" opacity={0.6} style={{ letterSpacing: '0.24em' }}>
@@ -377,15 +385,15 @@ export default function PressPage() {
           {GALLERY.map((src, i) => {
             const l = GALLERY_LAYOUTS[i] ?? { col: 'span 2', row: 'span 3' };
             return (
-              <div
+              <RevealImage
                 key={src + i}
+                src={src}
+                // The first two tiles are their own row; the stagger restarts on the row of three below.
+                index={i < 2 ? i : i - 2}
                 style={{
                   gridColumn: compact ? 'auto' : l.col,
                   gridRow: compact ? 'auto' : l.row,
-                  aspectRatio: compact ? '4/5' : undefined,
-                  backgroundImage: `url("${src}")`,
-                  backgroundSize: 'cover',
-                  backgroundPosition: 'center'
+                  aspectRatio: compact ? '4/5' : undefined
                 }}
               />
             );
@@ -457,14 +465,7 @@ export default function PressPage() {
 
       <Section padTop="xs" padBottom="sm">
         <div style={{ display: 'grid', gridTemplateColumns: cols('0.85fr 1.15fr'), gap: 80, alignItems: 'center' }}>
-          <div
-            style={{
-              aspectRatio: '2/3',
-              backgroundImage: `url("${pressImg('magazine/portrait.jpg')}")`,
-              backgroundSize: 'cover',
-              backgroundPosition: 'center'
-            }}
-          />
+          <RevealImage src={pressImg('magazine/portrait.jpg')} style={{ aspectRatio: '2/3' }} />
           <div>
             <Eyebrow style={{ marginBottom: 26, letterSpacing: '0.26em' }}>— The feature</Eyebrow>
             <ul
