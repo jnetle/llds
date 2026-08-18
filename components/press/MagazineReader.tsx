@@ -210,9 +210,6 @@ export function MagazineReader({ pages }: { pages: MagazinePage[] }) {
                   aria-current={i === index ? 'true' : undefined}
                 />
               ))}
-              <Eyebrow size="sm" as="span" opacity={0.6} style={{ marginLeft: 14, letterSpacing: '0.24em' }}>
-                {pages[index]?.label}
-              </Eyebrow>
             </nav>
           </div>
         </div>
