@@ -67,7 +67,10 @@ export function Footer() {
           <ul style={{ listStyle: 'none', display: 'grid', gap: 10 }}>
             {STUDIO_LINKS.map(it => (
               <li key={it.label} style={{ fontSize: 14, color: color.inkSoft }}>
-                <Link href={it.href}>{it.label}</Link>
+                <Link href={it.href} className="nav-link" style={{ display: 'inline-block', position: 'relative' }}>
+                  {it.label}
+                  <span className="nav-underline" />
+                </Link>
               </li>
             ))}
           </ul>
@@ -78,13 +81,16 @@ export function Footer() {
           </Eyebrow>
           <Link
             href="/inquire"
+            className="nav-link"
             style={{
               display: 'inline-block',
+              position: 'relative',
               fontSize: 14,
               color: color.inkSoft,
               marginBottom: 20
             }}>
             Tell us about your project
+            <span className="nav-underline" />
           </Link>
           <div style={{ fontSize: 13, color: color.inkSoft, lineHeight: 1.7, opacity: 0.75 }}>
             <div>By appointment only</div>
