@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import type { IconType } from 'react-icons';
-import { PiFacebookLogoThin, PiInstagramLogoThin } from 'react-icons/pi';
+import { PiFacebookLogoFill, PiFacebookLogoThin, PiInstagramLogoFill, PiInstagramLogoThin } from 'react-icons/pi';
 import { Eyebrow } from '@/components/ui/Eyebrow';
 import { Grid } from '@/components/ui/Grid';
 import { Section } from '@/components/ui/Section';
@@ -17,10 +17,21 @@ const STUDIO_LINKS: { label: string; href: string }[] = [
 
 // Imported from the `react-icons/pi` barrel on purpose: Next lists every react-icons
 // subset in its default optimizePackageImports, so this is rewritten to direct paths
-// and only these two glyphs ship. A deep `react-icons/pi/index.mjs` path would skip that.
-const SOCIAL_LINKS: { label: string; href: string; Icon: IconType }[] = [
-  { label: 'Instagram', href: 'https://www.instagram.com/laurelleafdesignstudio', Icon: PiInstagramLogoThin },
-  { label: 'Facebook', href: 'https://www.facebook.com/laurelleafdesignstudio', Icon: PiFacebookLogoThin }
+// and only these four glyphs ship. A deep `react-icons/pi/index.mjs` path would skip that.
+// Each entry carries both weights: the Thin mark at rest, the solid Fill on hover/focus.
+const SOCIAL_LINKS: { label: string; href: string; Icon: IconType; IconFill: IconType }[] = [
+  {
+    label: 'Instagram',
+    href: 'https://www.instagram.com/laurelleafdesignstudio',
+    Icon: PiInstagramLogoThin,
+    IconFill: PiInstagramLogoFill
+  },
+  {
+    label: 'Facebook',
+    href: 'https://www.facebook.com/laurelleafdesignstudio',
+    Icon: PiFacebookLogoThin,
+    IconFill: PiFacebookLogoFill
+  }
 ];
 
 export function Footer() {
@@ -87,10 +98,15 @@ export function Footer() {
           {/* The 28px box is the tap target; the glyph inside is smaller. Phosphor
               already carries ~11% padding inside its 256 viewBox, so the drawn mark is
               smaller again than the 26 below. react-icons emits no aria-hidden of its
-              own, so the svg is muted explicitly and the accessible name comes from the
-              anchor's aria-label. */}
+              own, so both svgs are muted explicitly and the accessible name comes from
+              the anchor's aria-label.
+
+              Both weights render at once, stacked into one grid cell by `.social-icon`,
+              and cross-fade on hover — so the swap costs no layout and no JS. The
+              anchor's `display` therefore lives in globals.css, not here: an inline
+              `display: inline-flex` would outrank the stylesheet's grid. */}
           <div style={{ display: 'flex', gap: 18 }}>
-            {SOCIAL_LINKS.map(({ label, href, Icon }) => (
+            {SOCIAL_LINKS.map(({ label, href, Icon, IconFill }) => (
               <a
                 key={label}
                 className="social-icon"
@@ -99,14 +115,12 @@ export function Footer() {
                 rel="noopener noreferrer"
                 aria-label={label}
                 style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
                   width: 28,
                   height: 28,
                   color: color.inkSoft
                 }}>
-                <Icon size={26} aria-hidden="true" />
+                <Icon className="social-icon__line" size={26} aria-hidden="true" />
+                <IconFill className="social-icon__fill" size={26} aria-hidden="true" />
               </a>
             ))}
           </div>
