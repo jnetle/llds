@@ -1,5 +1,7 @@
 'use client';
 
+import Image from 'next/image';
+
 import { useEffect, useRef, useState } from 'react';
 import type { Project } from '@/lib/projects';
 import { useScrollY } from '@/hooks/useScrollY';
@@ -80,7 +82,20 @@ export function ProjectStrip({ projects, onOpen }: Props) {
               textAlign: 'left',
               cursor: 'pointer'
             }}>
-            <div className="strip-tile__media" style={{ backgroundImage: `url("${p.cover}")` }} />
+            {/* Stays a <div>: it owns the 580px box and the brightness hover, and a
+                filter on the wrapper applies to the image inside it. */}
+            <div className="strip-tile__media">
+              <Image
+                src={p.cover.src}
+                alt={p.cover.alt}
+                fill
+                // Fixed `flex: 0 0 460px` at every viewport, so there is nothing responsive
+                // to express — but `sizes` is still required for `fill`.
+                sizes="460px"
+                style={{ objectFit: 'cover' }}
+                draggable={false}
+              />
+            </div>
             <div
               style={{
                 display: 'flex',

@@ -7,6 +7,7 @@ import { Eyebrow } from '@/components/ui/Eyebrow';
 import { Grid } from '@/components/ui/Grid';
 import { Section } from '@/components/ui/Section';
 import { color } from '@/lib/tokens';
+import { SITE, type SocialLabel } from '@/lib/site';
 import { Wordmark } from './Wordmark';
 
 const STUDIO_LINKS: { label: string; href: string }[] = [
@@ -19,20 +20,21 @@ const STUDIO_LINKS: { label: string; href: string }[] = [
 // subset in its default optimizePackageImports, so this is rewritten to direct paths
 // and only these four glyphs ship. A deep `react-icons/pi/index.mjs` path would skip that.
 // Each entry carries both weights: the Thin mark at rest, the solid Fill on hover/focus.
-const SOCIAL_LINKS: { label: string; href: string; Icon: IconType; IconFill: IconType }[] = [
-  {
-    label: 'Instagram',
-    href: 'https://www.instagram.com/laurelleafdesignstudio',
-    Icon: PiInstagramLogoThin,
-    IconFill: PiInstagramLogoFill
-  },
-  {
-    label: 'Facebook',
-    href: 'https://www.facebook.com/laurelleafdesignstudio',
-    Icon: PiFacebookLogoThin,
-    IconFill: PiFacebookLogoFill
-  }
-];
+// The URLs come from SITE.social, which is also what the studio's schema.org node emits
+// as `sameAs` — structured data that names a profile the site does not link is the kind
+// of drift that only shows up in a validator months later. Only the glyph pairing lives
+// here, keyed by the label.
+// Keyed by SocialLabel, so this map is exhaustive by construction: adding a network to
+// SITE.social widens the union and fails `tsc` here until a glyph pair is supplied. The
+// previous version filtered unmatched labels out, which meant a new network would publish
+// its URL in the studio's `sameAs` while the footer link silently disappeared — exactly
+// the drift moving these into lib/site.ts was meant to prevent.
+const SOCIAL_ICONS: Record<SocialLabel, { Icon: IconType; IconFill: IconType }> = {
+  Instagram: { Icon: PiInstagramLogoThin, IconFill: PiInstagramLogoFill },
+  Facebook: { Icon: PiFacebookLogoThin, IconFill: PiFacebookLogoFill }
+};
+
+const SOCIAL_LINKS = SITE.social.map(link => ({ ...link, ...SOCIAL_ICONS[link.label] }));
 
 export function Footer() {
   return (
@@ -94,6 +96,9 @@ export function Footer() {
           </Link>
           <div style={{ fontSize: 13, color: color.inkSoft, lineHeight: 1.7, opacity: 0.75 }}>
             <div>By appointment only</div>
+            {/* Deliberately not derived from SITE.areaServed: this is display copy that
+                drops the repeated state abbreviation for rhythm. SITE.areaServed is the
+                machine-readable list and names all eight places the studio has worked. */}
             <div>Augusta, GA · North Augusta · Aiken, SC</div>
           </div>
         </div>
@@ -143,7 +148,7 @@ export function Footer() {
             gap: 16
           }}>
           <Eyebrow size="sm" opacity={0.5}>
-            ©{new Date().getFullYear()} Laurel Leaf Design Studio · All rights reserved
+            ©{new Date().getFullYear()} {SITE.name} · All rights reserved
           </Eyebrow>
           <Eyebrow size="sm" opacity={0.5}>
             Site built by jnetle

@@ -1,15 +1,17 @@
 import type { Metadata } from 'next';
 import { PropsWithChildren } from 'react';
+import { pageOpenGraph } from '@/lib/seo';
 
 export const metadata: Metadata = {
-  title: 'About — Laurel Leaf Design Studio',
+  title: 'About',
   description:
     'Laurel Leaf Design Studio, founded by Maria Rhinehart in 2020, is an interior design practice based in the Augusta, Georgia and Aiken, South Carolina area.',
-  openGraph: {
+  alternates: { canonical: '/about' },
+  openGraph: pageOpenGraph({
     title: 'About — Laurel Leaf Design Studio',
     description: 'A measured, intentional approach to the spaces we call home.',
-    type: 'website'
-  }
+    path: '/about'
+  })
 };
 
 export default function AboutLayout({ children }: PropsWithChildren) {

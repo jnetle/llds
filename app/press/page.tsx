@@ -134,19 +134,37 @@ export default function PressPage() {
           overflow: 'hidden'
         }}>
         <div style={{ position: 'relative' }}>
-          <h1
-            className="serif"
-            style={{
-              fontSize: 'clamp(72px, 11vw, 184px)',
-              fontWeight: 300,
-              lineHeight: 0.84,
-              letterSpacing: '-0.035em',
-              textTransform: 'uppercase',
-              textWrap: 'balance',
-              margin: 0
-            }}>
-            Press
+          {/* One <h1> holding both display lines. They were two h1 elements — a page with
+              two of them tells a crawler it is about two things, and this is one phrase
+              set across two lines. Each line keeps its own size and style on a block-level
+              span, so nothing about the typesetting moves. */}
+          <h1 className="serif" style={{ fontWeight: 300, margin: 0 }}>
+            <span
+              style={{
+                display: 'block',
+                fontSize: 'clamp(72px, 11vw, 184px)',
+                lineHeight: 0.84,
+                letterSpacing: '-0.035em',
+                textTransform: 'uppercase',
+                textWrap: 'balance'
+              }}>
+              Press
+            </span>
+            <span
+              style={{
+                display: 'block',
+                fontSize: 'clamp(58px, 9vw, 148px)',
+                lineHeight: 0.84,
+                fontStyle: 'italic',
+                letterSpacing: '-0.025em',
+                marginTop: 4,
+                marginLeft: '0.4em'
+              }}>
+              recognition
+            </span>
           </h1>
+          {/* Sits over the pair, so it stays a sibling of the heading rather than living
+              inside it — it is decoration, and aria-hidden keeps it out of the h1's name. */}
           <div
             className="serif"
             aria-hidden
@@ -164,20 +182,6 @@ export default function PressPage() {
             }}>
             &amp;
           </div>
-          <h1
-            className="serif"
-            style={{
-              fontSize: 'clamp(58px, 9vw, 148px)',
-              fontWeight: 300,
-              lineHeight: 0.84,
-              fontStyle: 'italic',
-              letterSpacing: '-0.025em',
-              marginTop: 4,
-              marginBottom: 0,
-              marginLeft: '0.4em'
-            }}>
-            recognition
-          </h1>
         </div>
 
         {/* Lower deck: standfirst + clickable lead-story preview card */}

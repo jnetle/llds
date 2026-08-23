@@ -1,14 +1,16 @@
 import type { Metadata } from 'next';
 import { PropsWithChildren } from 'react';
+import { pageOpenGraph } from '@/lib/seo';
 
 export const metadata: Metadata = {
-  title: 'Press — Laurel Leaf Design Studio',
+  title: 'Press',
   description: 'Awards, recognition, and published work from Laurel Leaf Design Studio.',
-  openGraph: {
+  alternates: { canonical: '/press' },
+  openGraph: pageOpenGraph({
     title: 'Press — Laurel Leaf Design Studio',
     description: 'Awards, recognition, and published work.',
-    type: 'website'
-  }
+    path: '/press'
+  })
 };
 
 export default function PressLayout({ children }: PropsWithChildren) {
