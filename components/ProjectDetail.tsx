@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { PROJECTS, type Project } from '@/lib/projects';
@@ -8,7 +9,7 @@ import { Eyebrow } from '@/components/ui/Eyebrow';
 import { Grid } from '@/components/ui/Grid';
 import { Heading } from '@/components/ui/Heading';
 import { Section } from '@/components/ui/Section';
-import { color, motion, text } from '@/lib/tokens';
+import { brand, color, motion, text } from '@/lib/tokens';
 
 type Props = {
   project: Project;
@@ -57,17 +58,31 @@ export function ProjectDetail({ project }: Props) {
         </Link>
       </div>
 
-      {/* Hero image */}
+      {/* Hero image. The opening scale stays on the wrapper, not the <img>: the wrapper
+          is also what gives `fill` its containing block, and transforming it scales the
+          absolutely-positioned child exactly as it used to scale the painted background.
+          No `overflow: hidden` here — the 1.05 bleed is meant to show. */}
       <div
         style={{
+          position: 'relative',
           height: '85vh',
-          backgroundImage: `url("${project.gallery[imgIndex]}")`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
+          background: brand.modernTan,
           transform: opening ? 'scale(1.05)' : 'scale(1)',
           transition: `transform ${motion.durXSlow} ${motion.ease}`
-        }}
-      />
+        }}>
+        {/* No `key` on this: clicking a plate mutates src on the existing element, and
+            the browser keeps painting the current image until the next one has fully
+            decoded. A key would remount and blank the box mid-swap. */}
+        <Image
+          src={project.gallery[imgIndex].src}
+          alt={project.gallery[imgIndex].alt}
+          fill
+          preload
+          sizes="100vw"
+          style={{ objectFit: 'cover' }}
+          draggable={false}
+        />
+      </div>
 
       {/* Title block */}
       <Section padY="xxs">
@@ -87,21 +102,30 @@ export function ProjectDetail({ project }: Props) {
 
       {/* Gallery */}
       <Section padTop="none" padBottom="sm" style={{ display: 'grid', gap: 24 }}>
-        {project.gallery.map((src, i) => (
+        {project.gallery.map((image, i) => (
           <button
-            key={src + i}
+            key={image.src + i}
             onClick={() => setImgIndex(i)}
             aria-label={`View plate ${i + 1} of ${project.title}`}
             aria-pressed={imgIndex === i}
             style={{ cursor: 'pointer', textAlign: 'left', padding: 0, background: 'none', border: 'none' }}>
-            <div
-              style={{
-                height: i === 1 ? '60vh' : '80vh',
-                backgroundImage: `url("${src}")`,
-                backgroundSize: 'cover',
-                backgroundPosition: 'center'
-              }}
-            />
+            <div style={{ position: 'relative', height: i === 1 ? '60vh' : '80vh', background: brand.modernTan }}>
+              {/* The button's aria-label already names the action, and it overrides the
+                  button's contents for the accessibility tree — so this alt is not read
+                  out twice. It is here for crawlers, which read alt and not aria-label.
+                  Do not "de-duplicate" it to alt="". */}
+              <Image
+                src={image.src}
+                alt={image.alt}
+                fill
+                // Deliberately 100vw rather than the ~84vw these actually occupy: it makes
+                // the srcset candidate identical to the hero's, so clicking a plate swaps
+                // the hero straight from cache instead of fetching a near-identical width.
+                sizes="100vw"
+                style={{ objectFit: 'cover' }}
+                draggable={false}
+              />
+            </div>
           </button>
         ))}
         <Eyebrow opacity={0.6}>Built by {project.builder}</Eyebrow>

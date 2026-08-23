@@ -416,11 +416,12 @@ a {
    `cover`, so any scale would resample the source upward and soften it. Copies
    the studioashby.com home-page treatment: a flat scrim fading in over a still
    image, timed to --dur-med so it moves with the caption below it. */
+/* A wrapper, not the <img>: the ::after below is the hover scrim, and pseudo-elements
+   do not render on replaced elements. next/image's `fill` sits inside it — absolute
+   positioning is a valid containing block, so this needs no `position: relative`. */
 .grid-cell__media {
   position: absolute;
   inset: 0;
-  background-size: cover;
-  background-position: center;
 }
 
 .grid-cell__media::after {
@@ -477,11 +478,11 @@ a {
 /* Projects index tile (components/ProjectsGrid.tsx). Same useState-per-tile
    pattern as above. :focus-within earns its keep here — the tile wraps a
    <Link>, so tabbing to it now previews the same way hovering does. */
+/* Unlike the two rules either side of it, this class lands on the <img> next/image
+   renders. `fill` supplies the box inline and the component supplies object-fit, so all
+   that is left here is the hover zoom — which works because `transform` does apply to
+   replaced elements. (`::after` would not; see .grid-cell__media.) */
 .project-tile__media {
-  width: 100%;
-  height: 100%;
-  background-size: cover;
-  background-position: center;
   transform: scale(1);
   transition: transform 1.4s var(--ease-elegant);
 }
@@ -495,11 +496,13 @@ a {
    e.currentTarget.style.filter directly — DOM mutations React does not know
    about, and which never fired for keyboard users. The transition was `all`;
    only filter ever changed. */
+/* Also stays a wrapper: it owns the 580px box, and `filter` on it applies to the image
+   inside. `position: relative` is required — <button> is static, so without it the
+   `fill` image would escape to <body>, which is itself positioned. */
 .strip-tile__media {
+  position: relative;
   width: 100%;
   height: 580px;
-  background-size: cover;
-  background-position: center;
   transition: filter var(--dur-med) ease;
 }
 

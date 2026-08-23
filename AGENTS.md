@@ -91,8 +91,12 @@ are deterministic from data:
 - **Magazine spread pages are the one deliberate exception to the 200 KB target.** `press/magazine/page-{1,2}.jpg` are documents, not photographs — page 2 is two columns of 9pt body copy, and the reader's lightbox is meant to be read, not just looked at. They run 1500–1800 px and ~270/370 KB. The photo pages and the cover hold the normal budget.
 - A third party's masthead is displayed with `mix-blend-mode: multiply` over Bone White rather than an alpha-knockout PNG (see the `press/magazine/hh-masthead.png` usage in `app/press/page.tsx`). The artwork is black on white, so multiply removes the box for free — and leaves the publication's mark in its own color, which recoloring to `ink` would not.
 - Rename on upload to meaningful slugs — don't carry `photo-160058…` IDs over.
+- **Project photos are switched on per project, not globally.** `lib/projects.ts` derives every R2 key from the project's slug, so uploading `projects/<slug>/cover.jpg` and `gallery-1..3.jpg` and setting `assetsReady: true` on that one record is the entire migration — no URL is ever pasted into the data. Until the flag is set, that project renders from the Unsplash placeholder pool. When every record carries it, delete `PLACEHOLDER_ASSETS` and drop `images.unsplash.com` from `next.config.ts`.
 - Replace-in-place keeps the URL stable, but the CDN caches by TTL — purge the object in Cloudflare, or append `?v=2`, for an immediate swap.
-- Project grid/detail images render via CSS `backgroundImage`, so `next/image` does not optimize them — pre-compression above is what keeps them small. Pages that do use `next/image` (e.g. About) need the R2 hostname added to `next.config.ts` `images.remotePatterns`.
+- **Every image on the site now renders through `next/image`**, project imagery included — so all of it gets a `srcset`, lazy loading, and WebP. Pre-compression on upload still matters (it is what the optimizer fetches), but it is no longer the only defence. Any new image host needs its hostname in `next.config.ts` `images.remotePatterns`.
+- `next/image` with `fill` emits an absolutely-positioned `<img>`, so **its wrapper must be positioned**. `body` is itself `position: relative`, so a missing `position` on the wrapper does not fail quietly — the photo escapes and covers the whole page.
+- An `<img>` is a replaced element and **renders no pseudo-elements**. Two of the three `__media` classes in `globals.css` therefore stay on a wrapper `<div>` rather than moving onto the image: `.grid-cell__media` because its `::after` is the entire hover scrim, and `.strip-tile__media` because it owns the tile's box. Only `.project-tile__media` sits on the `<img>`, because all it carries is a `transform`, which replaced elements do honour. Hover states do not show up in a screenshot diff — check them by hovering.
+- **`priority` is deprecated in Next 16** in favour of `preload`, and the docs prefer `loading="eager"` + `fetchPriority="high"` over either when more than one image could be the LCP. New call sites use the latter; `priority` survives in `app/about/page.tsx`, `components/CoverPanel.tsx`, and `components/press/MagazineReader.tsx` and should be migrated when those files are next touched.
 - SVGs stay in `public/` (not on R2).
 - **TODO — Press photos are temporarily in the repo, not the bucket.** `public/images/press/{awards,gallery,magazine}/` holds eight images saved off the studio's Stellar Awards Instagram post — seven stills (1024–1280 px, 174–199 KB each) plus `awards/stellar-2026-card.jpg`, the post's overlaid title card, used as the hero lead-story thumbnail. `app/press/page.tsx` reads all of them through a local `pressImg()` helper instead of `img`. The seven stills are Instagram-resolution re-compressions standing in until the photographer's originals arrive; the title card is finished artwork and won't be superseded. `magazine/` holds seven more — the Winter 2024 Aiken Hound & Home feature, rasterised from the issue PDF plus the two high-res originals the studio has — and unlike the stills these are **final**; they are only in the repo to keep one migration rather than two. **When the originals land:** compress them, upload everything under the `press/…` keys above, delete `public/images/press/`, and change `pressImg` back to `img(\`press/${key}\`)` — the helper's keys are already exactly the bucket keys, so nothing else moves.
 - The brand mark is the exception to "rasters live on R2": `public/logo-long-{navy,bone}.png` are versioned code assets, cropped to identical tight bounds so `components/LogoLong.tsx` can stack them and crossfade between the two — a raster mark can't be recolored via `currentColor` the way the rest of the header is.
@@ -150,6 +154,55 @@ Adding or changing a question means four files, and TypeScript enforces three of
 - `app/inquire/page.tsx` — the `defaultValues` entry (react-hook-form needs one per key) and the JSX. `<Field>` labels read from `QUESTIONS`, so the form and the ClickUp task always ask in the same words; band titles on `<FormBand>` are still literals and must match `INQUIRY_BANDS`
 
 `npm run typecheck` is what catches all of this — no script runs `tsc` implicitly, so run it before opening a PR.
+
+## SEO
+
+The machinery is built; the content is not. Real project names, descriptions, and
+photography are still outstanding, and everything below is wired so that importing them
+is a data edit rather than a code change.
+
+**`lib/site.ts` is the identity singleton.** Studio name, tagline, founder, service area,
+and social URLs live there and nowhere else. `components/Footer.tsx` reads its social row
+from it, and `lib/schema.ts` emits the same values as structured data — markup that
+contradicts the page it sits on is worse than no markup. Display copy that deliberately
+differs (the footer's shortened service-area line) says so in a comment.
+
+**The site origin is `NEXT_PUBLIC_SITE_URL`**, falling back to Vercel's deployment URL and
+then to localhost. It feeds `metadataBase`, every canonical, the sitemap, and the absolute
+OG image URLs. An unset value does not fail the build — it emits canonicals pointing at
+localhost, so verify on a deployed preview, never in dev.
+
+**Two independent pre-launch gates, both keyed on `SITE_LIVE`:**
+
+- `app/layout.tsx` sets `robots: { index: false }` at the root, and metadata merges down — so no child route may set its own `robots` key without clobbering the guard for that route. `app/not-found.tsx` is the one deliberate exception.
+- `app/robots.ts` repeats the check. It is a Route Handler, so the layout's metadata never reaches it; a `robots.txt` saying `Allow: /` while every page says `noindex` is a contradiction crawlers resolve unpredictably.
+
+Unset is the safe state in both. At launch: set `SITE_LIVE=true` on Vercel **Production
+only** (Preview keeps it unset; Vercel sends its own `X-Robots-Tag: noindex` there).
+
+**Titles use a template.** The root sets `title.template = '%s — Laurel Leaf Design
+Studio'`, so child routes set the bare page name (`title: 'Projects'`) and must **not**
+repeat the suffix or it doubles. `openGraph.title` has no template and keeps the full
+string. A page that must opt out uses `title: { absolute: '…' }`.
+
+**Structured data** is built in `lib/schema.ts` and rendered by `components/seo/JsonLd.tsx`,
+which escapes `<` per the Next docs. The studio node is emitted once at the root with a
+stable `@id`; per-page nodes reference it rather than restating it. There is deliberately
+**no `Review` or `AggregateRating`** — every quote in `lib/testimonials.ts` is invented
+placeholder copy, and marking invented testimonials up as structured data is both false
+and a documented manual-action trigger. Add them when there are real client words.
+
+**OG images** are generated by `ImageResponse` from a shared card in `lib/og.tsx`. Two
+constraints there mirror the inquiry PDF, for the same reason — neither renderer has a
+CSSOM: brand hexes are written literally (`lib/tokens.ts` resolves through CSS vars), and
+fonts are read from disk at module scope, never fetched. The TTFs are the same ones the
+PDF uses, and both OG routes are listed in `next.config.ts` `outputFileTracingIncludes`.
+**Nothing imports those files, so getting the tracing wrong fails only on Vercel** — the
+route 500s in production and renders perfectly in dev.
+
+**One `<h1>` per page.** `/press` sets one display phrase across two block-level spans
+inside a single `h1`; `/projects` carries an `sr-only` one because the design has no room
+for a visible heading above the grid.
 
 ## Design system
 

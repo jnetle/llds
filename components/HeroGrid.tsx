@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import { type ReactNode } from 'react';
 import type { Project } from '@/lib/projects';
 import { useCompact } from '@/hooks/useCompact';
@@ -9,10 +10,10 @@ import { GridCell } from './GridCell';
 // Home hero. Placeholder pending real photography — migrates to
 // shared/home-hero.jpg on R2 under the convention in AGENTS.md.
 //
-// w=3200 so the full-bleed lead still has pixels to spare on a 1440px viewport
-// at DPR 2 (2880 device px). These render as CSS background images, so next/image
-// never sees them and there is no srcset — one width has to serve every screen.
-const HERO_IMAGE = 'https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?auto=format&fit=crop&w=3200&q=80';
+// w=2400 matches the compression ceiling in AGENTS.md. It used to be 3200 because these
+// rendered as CSS backgrounds, where one width had to serve every screen; next/image now
+// generates a srcset, so an oversized source only doubles what the optimizer has to fetch.
+const HERO_IMAGE = 'https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?auto=format&fit=crop&w=2400&q=80';
 
 type HeroGridProps = {
   projects: Project[];
@@ -53,19 +54,27 @@ function Stage({ active, height, children }: { active: boolean; height: string; 
 /**
  * The lead image. Deliberately not a GridCell — it belongs to no project, so it
  * carries no caption, no click-through and no hover state. Plain `cover` at
- * exactly the frame size, like the reference mock's <img>: nothing moves, and
- * the image renders as sharp as its source allows.
+ * exactly the frame size: nothing moves, and the image renders as sharp as its
+ * source allows.
  */
 function HeroLead() {
   return (
-    <div
-      style={{
-        position: 'absolute',
-        inset: 0,
-        backgroundImage: `url("${HERO_IMAGE}")`,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center'
-      }}
+    // `loading="eager"` + `fetchPriority="high"` rather than `preload`, which is what
+    // replaced the deprecated `priority` in Next 16. Note this does NOT avoid a preload
+    // link: React 19 emits one for any eager, high-priority image, so the rendered head
+    // carries four image preloads here (this plus CoverPanel's logo layers). What it does
+    // avoid is Next emitting a second, competing one of its own. The wrapper in HeroGrid
+    // is sticky-or-relative with an explicit height, so `fill` has its containing block
+    // on both branches.
+    <Image
+      src={HERO_IMAGE}
+      alt="A Laurel Leaf Design Studio interior"
+      fill
+      loading="eager"
+      fetchPriority="high"
+      sizes="100vw"
+      style={{ objectFit: 'cover' }}
+      draggable={false}
     />
   );
 }

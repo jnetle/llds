@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import type { Project } from '@/lib/projects';
 import { color } from '@/lib/tokens';
 
@@ -16,7 +17,21 @@ export function GridCell({ project, onOpen }: GridCellProps) {
           but that oversize made every image render 1.4x larger than it needed
           to and visibly soft. Hover no longer scales, so nothing needs the
           extra bleed. */}
-      <div className="grid-cell__media" style={{ backgroundImage: `url("${project.cover}")` }} />
+      {/* The media layer stays a <div>. Its ::after is the entire hover scrim, and
+          pseudo-elements do not render on an <img> — moving the class onto the image
+          would delete the hover treatment silently, since hover states do not show up
+          in a screenshot diff. The div is already absolute/inset-0, which is a valid
+          containing block for `fill`. */}
+      <div className="grid-cell__media">
+        <Image
+          src={project.cover.src}
+          alt={project.cover.alt}
+          fill
+          sizes="(max-width: 1024px) 100vw, 50vw"
+          style={{ objectFit: 'cover' }}
+          draggable={false}
+        />
+      </div>
 
       <div
         style={{

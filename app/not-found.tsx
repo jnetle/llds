@@ -1,11 +1,19 @@
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import { Section } from '@/components/ui/Section';
 import { Container } from '@/components/ui/Container';
 import { Eyebrow } from '@/components/ui/Eyebrow';
 import { color, space, text } from '@/lib/tokens';
 
-export const metadata = {
-  title: 'Page not found · Laurel Leaf Design Studio'
+export const metadata: Metadata = {
+  // `absolute` opts out of the root title template — a 404 should not read as a page
+  // the site offers, and appending the studio name would make it look like one.
+  title: { absolute: 'Page not found — Laurel Leaf Design Studio' },
+  // Explicitly null, not omitted: the root sets `canonical: '/'`, and metadata inherits —
+  // so without this a 404 declares itself a duplicate of the home page, which is how soft
+  // 404s get folded into `/` in the index. Next already emits its own noindex here, so
+  // there is no `robots` key: a second one would just duplicate the tag.
+  alternates: { canonical: null }
 };
 
 export default function NotFound() {
