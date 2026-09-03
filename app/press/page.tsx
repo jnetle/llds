@@ -503,7 +503,7 @@ export default function PressPage() {
               ))}
             </ul>
             <Eyebrow size="sm" style={{ marginTop: 30, letterSpacing: '0.22em' }}>
-              Maria Rhinehart in the finished room · Photography by River Magnolia Photography
+              Photography by River Magnolia Photography
             </Eyebrow>
           </div>
         </div>
