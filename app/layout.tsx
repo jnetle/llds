@@ -3,6 +3,7 @@ import { Cormorant_Garamond, Inter } from 'next/font/google';
 import './globals.css';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
+import { ScrollToTop } from '@/components/ScrollToTop';
 import { GoogleAnalytics } from '@next/third-parties/google';
 import { JsonLd } from '@/components/seo/JsonLd';
 import { studioSchema, websiteSchema } from '@/lib/schema';
@@ -84,6 +85,7 @@ export default function RootLayout({
         <Header />
         <main className="flex-1">{children}</main>
         <Footer />
+        <ScrollToTop />
       </body>
       {gaId && <GoogleAnalytics gaId={gaId} />}
     </html>

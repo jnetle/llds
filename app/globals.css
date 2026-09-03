@@ -1226,3 +1226,75 @@ a {
     animation: none;
   }
 }
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   BACK TO TOP — floating action button (components/ScrollToTop.tsx)
+
+   Bottom-right, above the page and under both overlays (mobile nav 100,
+   magazine lightbox 200). Visibility rides `data-visible` rather than an inline
+   style so the reduced-motion and no-JS cases can be handled here, in CSS —
+   a JS branch would render the animated state first and swap after hydrate.
+   ──────────────────────────────────────────────────────────────────────────── */
+
+.scroll-top {
+  position: fixed;
+  right: 28px;
+  /* viewportFit: 'cover' means the home indicator can sit over the corner. */
+  bottom: calc(28px + env(safe-area-inset-bottom));
+  z-index: 40;
+  width: 46px;
+  height: 46px;
+  display: grid;
+  place-items: center;
+  border-radius: 100px;
+  background-color: color-mix(in srgb, var(--navy) 88%, transparent);
+  backdrop-filter: blur(10px);
+  color: var(--bone-white);
+  box-shadow: 0 10px 30px -14px rgb(15 26 43 / 0.55);
+
+  opacity: 0;
+  transform: translateY(10px);
+  pointer-events: none;
+  transition:
+    opacity var(--dur-med) var(--ease-elegant),
+    transform var(--dur-med) var(--ease-elegant),
+    background-color var(--dur-fast) var(--ease-elegant);
+}
+
+.scroll-top[data-visible] {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.scroll-top:hover {
+  background-color: var(--navy);
+}
+
+@media (max-width: 600px) {
+  .scroll-top {
+    right: 18px;
+    bottom: calc(18px + env(safe-area-inset-bottom));
+    width: 42px;
+    height: 42px;
+  }
+}
+
+/* No transition to animate, and with no JS the button can never become visible —
+   so take it out of the layout entirely rather than leave an inert control. */
+@media (prefers-reduced-motion: reduce) {
+  .scroll-top {
+    transition: none;
+    transform: none;
+  }
+
+  .scroll-top[data-visible] {
+    transform: none;
+  }
+}
+
+@media (scripting: none) {
+  .scroll-top {
+    display: none;
+  }
+}
