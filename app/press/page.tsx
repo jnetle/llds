@@ -276,7 +276,7 @@ export default function PressPage() {
               Custom Built Spec Home
             </Eyebrow>
             <Eyebrow size="sm" opacity={0.55} style={{ letterSpacing: '0.22em' }}>
-              Built by Southern State Builders
+              Design by Laurel Leaf Design Studio
             </Eyebrow>
           </div>
           <div>
@@ -291,15 +291,14 @@ export default function PressPage() {
                 marginBottom: 32,
                 marginTop: 0
               }}>
-              Laurel Leaf Design Studio was honored at the Home Builders Association&apos;s{' '}
-              <em style={{ fontWeight: 300 }}>Stellar Awards</em> with two recognitions in the Custom Built Spec Home category —{' '}
-              <em style={{ fontWeight: 300 }}>Best Curb Appeal</em> and <em style={{ fontWeight: 300 }}>Best Kitchen</em>.
+              One house designed by Laurel Leaf Design Studio, two <em style={{ fontWeight: 300 }}>Stellar Awards</em> from the Home
+              Builders Association — <em style={{ fontWeight: 300 }}>Best Curb Appeal</em> and{' '}
+              <em style={{ fontWeight: 300 }}>Best Kitchen</em>.
             </h2>
             <p style={{ ...text.body, maxWidth: '58ch' }}>
-              Presented by the Home Builders Association of the Aiken-Augusta Region, the awards recognize homes built on speculation that
-              nonetheless arrive with the considered detail of a bespoke commission. Both honors were given for a single project, built with
-              Southern State Builders — a close collaboration on the exterior vision, with the studio leading the kitchen design and
-              interior detailing.
+              Presented by the Home Builders Association of the Aiken-Augusta Region, the awards recognize homes built before there is a
+              buyer, finished with the same care as a custom home. Both honors were given for a single project, built with Southern State
+              Builders — a close collaboration on the exterior vision, with the studio leading the kitchen design and interior detailing.
             </p>
           </div>
         </div>
@@ -337,6 +336,9 @@ export default function PressPage() {
             </article>
           ))}
         </div>
+        <Eyebrow size="sm" style={{ marginTop: 32, letterSpacing: '0.22em' }}>
+          Design by Laurel Leaf Design Studio · Built with Southern State Builders
+        </Eyebrow>
       </Section>
 
       {/* Project gallery */}

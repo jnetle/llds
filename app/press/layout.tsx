@@ -4,11 +4,11 @@ import { pageOpenGraph } from '@/lib/seo';
 
 export const metadata: Metadata = {
   title: 'Press',
-  description: 'Awards, recognition, and published work from Laurel Leaf Design Studio.',
+  description: 'Recognition, collaboration, and published work from Laurel Leaf Design Studio.',
   alternates: { canonical: '/press' },
   openGraph: pageOpenGraph({
     title: 'Press — Laurel Leaf Design Studio',
-    description: 'Awards, recognition, and published work.',
+    description: 'Recognition, collaboration, and published work.',
     path: '/press'
   })
 };

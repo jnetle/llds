@@ -49,11 +49,8 @@ export function studioSchema(): Node {
     ...(SITE.telephone ? { telephone: SITE.telephone } : {}),
     ...(SITE.email ? { email: SITE.email } : {}),
     ...(SITE.address ? { address: { '@type': 'PostalAddress', ...SITE.address } } : {}),
-    /** Mirrors what `/press` renders; update both together. */
-    award: [
-      'Best Curb Appeal, Custom Built Spec Home — 2026 Stellar Awards, HBA of the Aiken-Augusta Region',
-      'Best Kitchen, Custom Built Spec Home — 2026 Stellar Awards, HBA of the Aiken-Augusta Region'
-    ],
+    // No `award`: the 2026 Stellar Awards named on `/press` were presented to Southern State Builders, the studio's build
+    // partner. The studio designed the home, but `award` asserts the recipient — so it stays off this node.
     subjectOf: {
       '@type': 'Article',
       headline: 'Understated Luxury: A Bathroom Transformed',
