@@ -16,19 +16,9 @@ const STUDIO_LINKS: { label: string; href: string }[] = [
   { label: 'Press', href: '/press' }
 ];
 
-// Imported from the `react-icons/pi` barrel on purpose: Next lists every react-icons
-// subset in its default optimizePackageImports, so this is rewritten to direct paths
-// and only these four glyphs ship. A deep `react-icons/pi/index.mjs` path would skip that.
-// Each entry carries both weights: the Thin mark at rest, the solid Fill on hover/focus.
-// The URLs come from SITE.social, which is also what the studio's schema.org node emits
-// as `sameAs` — structured data that names a profile the site does not link is the kind
-// of drift that only shows up in a validator months later. Only the glyph pairing lives
-// here, keyed by the label.
-// Keyed by SocialLabel, so this map is exhaustive by construction: adding a network to
-// SITE.social widens the union and fails `tsc` here until a glyph pair is supplied. The
-// previous version filtered unmatched labels out, which meant a new network would publish
-// its URL in the studio's `sameAs` while the footer link silently disappeared — exactly
-// the drift moving these into lib/site.ts was meant to prevent.
+// Imported from the `react-icons/pi` barrel on purpose — Next's optimizePackageImports rewrites it to direct paths,
+// so only these four glyphs ship; a deep path would skip that. Keyed by SocialLabel, so adding a network to
+// SITE.social fails `tsc` here until it has a glyph pair, rather than publishing a `sameAs` URL with no footer link.
 const SOCIAL_ICONS: Record<SocialLabel, { Icon: IconType; IconFill: IconType }> = {
   Instagram: { Icon: PiInstagramLogoThin, IconFill: PiInstagramLogoFill },
   Facebook: { Icon: PiFacebookLogoThin, IconFill: PiFacebookLogoFill }
@@ -39,9 +29,7 @@ const SOCIAL_LINKS = SITE.social.map(link => ({ ...link, ...SOCIAL_ICONS[link.la
 export function Footer() {
   return (
     <Section as="footer" padY="xs" topBorder>
-      {/* Tablet keeps the desktop's three link columns and gives the brand block its
-          own full-width row above them, rather than the old 2×2 that paired the
-          brand with one link column and pushed the other two below it. */}
+      {/* Tablet keeps the three link columns and gives the brand block its own full-width row above them. */}
       <Grid
         cols={{ d: '1.4fr 1fr 1fr 1fr', t: 'repeat(3, 1fr)', m: '1fr' }}
         gap={{ d: 60, t: 32, m: 28 }}
@@ -96,9 +84,7 @@ export function Footer() {
           </Link>
           <div style={{ fontSize: 13, color: color.inkSoft, lineHeight: 1.7, opacity: 0.75 }}>
             <div>By appointment only</div>
-            {/* Deliberately not derived from SITE.areaServed: this is display copy that
-                drops the repeated state abbreviation for rhythm. SITE.areaServed is the
-                machine-readable list and names all eight places the studio has worked. */}
+            {/* Not derived from SITE.areaServed — display copy, dropping the repeated state abbreviation for rhythm. */}
             <div>Augusta, GA · North Augusta · Aiken, SC</div>
           </div>
         </div>
@@ -106,16 +92,9 @@ export function Footer() {
           <Eyebrow opacity={0.5} style={{ marginBottom: 22 }}>
             Social
           </Eyebrow>
-          {/* The 28px box is the tap target; the glyph inside is smaller. Phosphor
-              already carries ~11% padding inside its 256 viewBox, so the drawn mark is
-              smaller again than the 26 below. react-icons emits no aria-hidden of its
-              own, so both svgs are muted explicitly and the accessible name comes from
-              the anchor's aria-label.
-
-              Both weights render at once, stacked into one grid cell by `.social-icon`,
-              and cross-fade on hover — so the swap costs no layout and no JS. The
-              anchor's `display` therefore lives in globals.css, not here: an inline
-              `display: inline-flex` would outrank the stylesheet's grid. */}
+          {/* The 28px box is the tap target; the glyph is smaller. Both weights render at once, stacked into one grid cell
+              by `.social-icon`, and cross-fade on hover — so the anchor's `display` lives in globals.css, since an inline
+              one would outrank the stylesheet's grid. */}
           <div style={{ display: 'flex', gap: 18 }}>
             {SOCIAL_LINKS.map(({ label, href, Icon, IconFill }) => (
               <a
@@ -136,8 +115,7 @@ export function Footer() {
             ))}
           </div>
         </div>
-        {/* Was a flat 60/30. The section itself only has 32px of padding below it on
-            mobile, so a fixed 60px lead-in read as a gap rather than a rule. */}
+        {/* The section has only 32px of padding below it on mobile, so a flat 60px lead-in read as a gap. */}
         <div
           className="col-span-full mt-[36px] pt-[24px] sm:mt-[60px] sm:pt-[30px]"
           style={{
@@ -147,9 +125,23 @@ export function Footer() {
             flexWrap: 'wrap',
             gap: 16
           }}>
-          <Eyebrow size="sm" opacity={0.5}>
-            ©{new Date().getFullYear()} {SITE.name} · All rights reserved
-          </Eyebrow>
+          {/* All three carry `.micro-sm` so their line boxes match — an unclassed child would inherit the 16px body font
+              and sit off the shared baseline. */}
+          <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'baseline', gap: 10 }}>
+            <Eyebrow as="span" size="sm" opacity={0.5}>
+              ©{new Date().getFullYear()} {SITE.name} · All rights reserved
+            </Eyebrow>
+            <span aria-hidden className="micro-sm" style={{ opacity: 0.35 }}>
+              ·
+            </span>
+            <Link
+              href="/privacy"
+              className="micro-sm nav-link"
+              style={{ display: 'inline-block', position: 'relative', opacity: 0.5, color: color.ink }}>
+              Privacy
+              <span className="nav-underline" />
+            </Link>
+          </div>
           <Eyebrow size="sm" opacity={0.5}>
             Site built by jnetle
           </Eyebrow>

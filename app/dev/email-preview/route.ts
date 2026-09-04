@@ -1,16 +1,10 @@
 import { confirmationHtml, confirmationSubject, confirmationText } from '@/lib/inquiryEmail';
 
 /**
- * Local preview for the inquiry confirmation email. **Development only.**
+ * Local preview for the inquiry confirmation email — renders the same builders the server action uses, with hot
+ * reload, so iterating on `COPY` doesn't mean answering 34 questions and writing a live ClickUp task each pass.
  *
- * Iterating on `COPY` in lib/inquiryEmail.ts through the real form is miserable:
- * every pass means answering 34 questions, and it writes a live ClickUp task.
- * This renders the same builders the server action uses, straight to the browser,
- * with hot reload — edit the copy, refresh, see it.
- *
- * It 404s whenever `NODE_ENV` is `production`, which on Vercel covers Preview
- * deployments as well as Production, so the route never exists anywhere public.
- * Nothing here can send an email; it only renders.
+ * 404s whenever `NODE_ENV` is `production`, which covers Vercel Preview as well as Production.
  *
  *   /dev/email-preview                    → the HTML version
  *   /dev/email-preview?format=text        → the plain-text version

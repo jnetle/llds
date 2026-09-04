@@ -11,13 +11,7 @@ import { inquirySchema, type InquiryInput } from '@/lib/inquirySchema';
 
 export type SubmitResult = { ok: true } | { ok: false; error: string };
 
-/**
- * Render the questionnaire to PDF, or `null` if react-pdf cannot lay it out.
- *
- * The import is dynamic so `@react-pdf/renderer` and its fonts are only pulled
- * in when someone actually submits, rather than on every request that touches
- * this module.
- */
+/** Render the questionnaire to PDF, or `null` if react-pdf cannot lay it out. Dynamic import so it loads on submit only. */
 async function renderPdf(data: InquiryInput, submittedAt: string): Promise<{ filename: string; bytes: Buffer } | null> {
   try {
     const { renderInquiryPdf, inquiryPdfFilename } = await import('@/lib/pdf/inquiryDocument');
@@ -51,10 +45,8 @@ export async function submitInquiry(raw: unknown): Promise<SubmitResult> {
   const data = parsed.data;
   const submittedAt = new Date().toISOString();
 
-  // Render before writing anything to ClickUp. Doing it in this order means the
-  // description can be chosen once, with certainty, instead of being patched
-  // after the fact — and there is no state where both the PDF and the answers
-  // are missing from the task.
+  // Render before writing to ClickUp: the description is then chosen once, with certainty, and there is no state
+  // where both the PDF and the answers are missing from the task.
   const pdf = await renderPdf(data, submittedAt);
   const fullMarkdown = toFullMarkdown(data, submittedAt);
 
@@ -66,8 +58,7 @@ export async function submitInquiry(raw: unknown): Promise<SubmitResult> {
   });
 
   if (!created.ok) {
-    // createInquiryTask has already logged the reason; the visitor gets a retry
-    // prompt rather than a false success, so a ClickUp outage never swallows a lead.
+    // Already logged by createInquiryTask. A retry prompt beats a false success — an outage must not swallow a lead.
     return { ok: false, error: 'Could not reach our system. Please try again in a moment.' };
   }
 
@@ -79,24 +70,17 @@ export async function submitInquiry(raw: unknown): Promise<SubmitResult> {
       bytes: pdf.bytes
     });
 
-    // The task exists either way, so this is not worth failing the submission
-    // over — but the summary description alone would lose most of the answers,
-    // so put the full questionnaire back.
+    // Not worth failing the submission over, but the summary alone would lose most of the answers.
     if (!attached) {
       await updateTaskDescription({ token, taskId: created.taskId, markdown: fullMarkdown });
     }
   }
 
-  // Throttled here rather than inside `sendConfirmation` so the check runs in the
-  // request, where the headers are. Note what is *not* throttled: the ClickUp
-  // write above always happens. Dropping a real lead is the worst outcome this
-  // form has, and a throttled resubmission still reaches the studio — it just
-  // does not send a second email.
+  // Throttled here, not in `sendConfirmation`, so the check runs where the headers are. The ClickUp write above is
+  // deliberately never throttled: losing a real lead is the worst outcome this form has, so a throttled resubmission
+  // still reaches the studio and only skips the second email.
   if (await mayEmail(data.email)) {
-    // Deferred past the response. The lead is already saved, so there is no reason
-    // to hold the visitor's success panel open for a Resend round-trip that can
-    // take the full 10s timeout. `after` is the supported way to do this — a bare
-    // un-awaited promise risks the serverless function being frozen mid-flight.
+    // `after`, not a bare un-awaited promise — the serverless function can be frozen the moment the response is sent.
     after(() => sendConfirmation(data, submittedAt));
   }
 
@@ -104,26 +88,17 @@ export async function submitInquiry(raw: unknown): Promise<SubmitResult> {
 }
 
 /**
- * Whether this submission should trigger a confirmation email.
- *
- * `to:` is an address the submitter chose, so once the studio domain is verified
- * an unthrottled form lets anyone make it mail a stranger on demand — and burn
- * the free tier's 100/day ceiling, which would silently stop real confirmations.
- * The honeypot in `submitInquiry` only catches bots that fill hidden fields.
- *
- * Two dimensions, because they stop different things: per-IP catches one script
- * working through a list of victims, per-recipient catches a rotating-IP attack
- * aimed at a single victim. A real person submits once, occasionally twice, so
- * these ceilings are far above legitimate use and no visitor should ever meet one.
+ * `to:` is an address the submitter chose, so an unthrottled form lets anyone make the verified studio domain mail a
+ * stranger, and burn the 100/day ceiling so real confirmations stop. Two dimensions because they stop different
+ * attacks: per-IP catches one script working a list of victims, per-recipient a rotating-IP attack on one victim.
  */
 const RATE_WINDOW_MS = 60 * 60 * 1000;
 const MAX_EMAILS_PER_IP = 3;
 const MAX_EMAILS_PER_RECIPIENT = 2;
 
 async function mayEmail(email: string): Promise<boolean> {
-  // `x-forwarded-for` is a client-settable header everywhere except behind a
-  // proxy that overwrites it — which Vercel does. Locally it is absent and every
-  // submission shares the `unknown` bucket, which is correct for dev.
+  // `x-forwarded-for` is client-settable except behind a proxy that overwrites it, which Vercel does. Locally it is
+  // absent and every submission shares the `unknown` bucket, which is correct for dev.
   const h = await headers();
   const ip = (h.get('x-forwarded-for') ?? '').split(',')[0].trim() || h.get('x-real-ip') || 'unknown';
 
@@ -141,17 +116,10 @@ async function mayEmail(email: string): Promise<boolean> {
 }
 
 /**
- * Email the visitor a confirmation.
+ * Email the visitor a confirmation. Last, and unable to fail the submission: the mail says the inquiry arrived, so it
+ * must not precede the task — and once the task exists the lead is safe, so a send failure is worth a log and no more.
  *
- * Deliberately last, and deliberately unable to fail the submission. The mail
- * says the inquiry arrived, so it must not go out before the ClickUp task
- * actually exists — and once the task does exist the lead is safe, so a bounce
- * or a Resend outage is worth a log line and nothing more. Same contract as the
- * attachment upload above.
- *
- * Missing configuration is a *skip*, not an error, unlike the ClickUp guard in
- * `submitInquiry`: unset is the correct state on Preview and in local dev, and
- * must not degrade the form for anyone.
+ * Missing config is a *skip*, not an error, unlike the ClickUp guard in `submitInquiry`: unset is correct on Preview.
  */
 async function sendConfirmation(data: InquiryInput, submittedAt: string): Promise<void> {
   try {
@@ -173,10 +141,9 @@ async function sendConfirmation(data: InquiryInput, submittedAt: string): Promis
       text: confirmationText(data, submittedAt)
     });
   } catch (err) {
-    // `sendEmail` guards its own fetch, but rendering the bodies is local work
-    // that can still throw — `absoluteUrl()` rejects a malformed
-    // NEXT_PUBLIC_SITE_URL, for one. Without this the "never fails the
-    // submission" contract above would be a comment rather than a fact.
+    // Load-bearing: `sendEmail` guards only its own fetch, but rendering the bodies can throw on its own —
+    // `absoluteUrl()` rejects a malformed NEXT_PUBLIC_SITE_URL. An escape here would make the visitor's retry
+    // file the lead twice.
     console.error('Could not send the inquiry confirmation email', err);
   }
 }

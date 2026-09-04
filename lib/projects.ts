@@ -1,19 +1,12 @@
 import { img } from '@/lib/img';
 
-/**
- * One rendered photograph. `alt` is always present so no renderer has to decide what to
- * do without it — but until real per-photo copy arrives it is derived from the project's
- * facts (see `deriveAlt` below), which is an accessibility baseline, not finished work.
- */
+/** One rendered photograph. `alt` is always present; until real copy arrives it is derived — see `deriveAlt`. */
 export type ProjectImage = {
   src: string;
   alt: string;
 };
 
-/**
- * A project as the site consumes it. Every field is required here; the optional ones
- * live on `ProjectRecord` below, which is what you actually author.
- */
+/** A project as the site consumes it. `ProjectRecord` below is what you actually author. */
 export type Project = {
   id: string;
   title: string;
@@ -28,17 +21,11 @@ export type Project = {
   gallery: [ProjectImage, ProjectImage, ProjectImage];
   /** ISO date. Feeds `lastModified` in app/sitemap.ts; falls back to build time. */
   updatedAt?: string;
-  /**
-   * False while `cover`/`gallery` are still the shared Unsplash placeholders. Anything
-   * that would publish these images as depictions of the studio's work — structured
-   * data, share cards — must check this first.
-   */
+  /** False while the images are shared Unsplash placeholders. Anything publishing them as the studio's work checks this. */
   hasRealAssets: boolean;
 };
 
-// Placeholder imagery. These are the original Unsplash sets, kept as a small
-// pool and cycled across every project (`i % POOL.length`) until real assets
-// land on R2 under `projects/<slug>/` per the AGENTS.md bucket layout.
+// Unsplash placeholders, cycled across every project until real assets land on R2 under `projects/<slug>/`.
 type PlaceholderAssets = { cover: string; gallery: [string, string, string] };
 
 const PLACEHOLDER_ASSETS: PlaceholderAssets[] = [
@@ -100,16 +87,11 @@ const PLACEHOLDER_ASSETS: PlaceholderAssets[] = [
   }
 ];
 
-// Core project metadata. Titles are the street name (a working placeholder until
-// final names are chosen); the owner's surname is intentionally omitted from
-// every value and every slug for privacy. The `// <surname>` comments are for
-// internal mapping only and are stripped from the production bundle — remove
-// them if you'd rather not keep surnames in source at all.
+// Titles are the street name; owners' surnames are kept out of every value and slug for privacy, and survive only as
+// the `// <surname>` mapping comments below, which are stripped from the production bundle.
 /**
- * What you author. Only the first five fields are required — everything below them is a
- * slot for content that has not arrived yet, and is derived from the facts above until
- * it does. Importing a finished project is therefore an edit to one record, never a
- * change to a component.
+ * What you author. Only the first five fields are required; the rest are slots for content that has not arrived and is
+ * derived until it does — so importing a finished project is an edit to one record, never to a component.
  */
 type ProjectRecord = {
   id: string;
@@ -117,11 +99,7 @@ type ProjectRecord = {
   location: string;
   year: string;
   builder: string;
-  /**
-   * Flip to `true` once the four photographs are on R2 under `projects/<id>/` —
-   * `cover.jpg` and `gallery-1.jpg` … `gallery-3.jpg`. The URLs are derived from the id,
-   * so there is nothing to paste: upload the files, add one word.
-   */
+  /** Flip once `cover.jpg` and `gallery-1..3.jpg` are on R2 under `projects/<id>/`. URLs derive from the id. */
   assetsReady?: boolean;
   /** Real lede copy. Omitted -> derived from location/year/builder. */
   intro?: string;
@@ -133,9 +111,8 @@ type ProjectRecord = {
   updatedAt?: string;
 };
 
-// Ordered newest-first. This array is the single ordering source for the
-// Projects index, the home hero/strip, and detail-page prev/next — keep it
-// sorted by `year` descending when adding work.
+// The single ordering source for the Projects index, the home hero/strip, and detail-page prev/next.
+// Keep sorted by `year` descending.
 const PROJECT_META: ProjectRecord[] = [
   // Shuford
   { id: 'yucca-ave', title: 'Yucca Ave', location: 'North Augusta, SC', year: '2026', builder: 'Southern State Builders' },
@@ -170,24 +147,14 @@ const PROJECT_META: ProjectRecord[] = [
 ];
 
 // ── Derivation ──────────────────────────────────────────────────────────────
-// Everything below fills the gaps in a ProjectRecord. Each fallback is written to be
-// obviously provisional, so that a page rendering derived copy reads as unfinished
-// rather than as a deliberate editorial choice.
+// Fills the gaps in a ProjectRecord. Each fallback is deliberately provisional-sounding, so a page rendering derived
+// copy reads as unfinished rather than as an editorial choice.
 
-// Neutral placeholder intro copy derived from the facts we have. Replace by setting
-// `intro` on the record.
 const deriveIntro = (m: ProjectRecord): string => `A home in ${m.location}, completed in ${m.year} with ${m.builder}.`;
 
-/**
- * Derived alt text. This is a floor, not a finish: search engines discount formulaic
- * alt text, and a description generated from a street name and a county says nothing
- * about what is actually in the frame. Its value is that the field exists and every
- * renderer already reads it, so real copy is a data edit — set `alt` on the record.
- */
+/** Derived alt text — a floor, not a finish. Search engines discount formulaic alt text; set `alt` on the record. */
 const deriveAlt = (m: ProjectRecord, index: number | 'cover'): string => {
-  // While the photo is a placeholder, the alt text must not claim it depicts this
-  // project — it is a stock interior, and the same one appears under two other project
-  // names. Describe the tile's role instead, which is true either way.
+  // A placeholder must not claim to depict this project: it is a stock interior reused under other project names.
   if (!m.assetsReady) return `Placeholder interior photograph for ${m.title}`;
   return index === 'cover'
     ? `${m.title} — interior design in ${m.location} by Laurel Leaf Design Studio`
@@ -228,11 +195,7 @@ export const PROJECTS: Project[] = PROJECT_META.map(buildProject);
 /** Lookup by slug. The id *is* the slug — hand-authored, never generated. */
 export const getProject = (slug: string): Project | undefined => PROJECTS.find(p => p.id === slug);
 
-/**
- * `"Aiken, SC"` -> `{ city: 'Aiken', region: 'SC' }`, for the `locationCreated` node in
- * lib/schema.ts. Every `location` in PROJECT_META follows that shape; anything that does
- * not degrades to the whole string as the city rather than throwing.
- */
+/** `"Aiken, SC"` → `{ city: 'Aiken', region: 'SC' }`. Anything not in that shape degrades to the whole string as city. */
 export const splitLocation = (location: string): { city: string; region?: string } => {
   const [city, region] = location.split(',').map(part => part.trim());
   return region ? { city, region } : { city };

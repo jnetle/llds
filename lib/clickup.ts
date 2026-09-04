@@ -1,6 +1,5 @@
 const CLICKUP_API = 'https://api.clickup.com/api/v2';
 
-/** Matches the timeout the previous Sheets webhook used. */
 const REQUEST_TIMEOUT_MS = 10000;
 
 /** Uploads carry bytes, so they get more room than the JSON calls. */
@@ -11,15 +10,8 @@ export type ClickUpResult = { ok: true; taskId: string } | { ok: false };
 /**
  * Create one task in a ClickUp list.
  *
- * Auth is a personal API token (`pk_…`) sent bare in `Authorization` — ClickUp
- * does not want a `Bearer` prefix for these. `markdown_content` carries the
- * rendered body and overrides `description` when both are present; we send
- * `description` too so the content still lands as plain text if that field is
- * ever renamed out from under us.
- *
- * Failures are logged with ClickUp's own `err`/`ECODE` (a bad list id and a bad
- * token are indistinguishable from the status alone) and reported to the caller
- * as a bare `{ ok: false }` — nothing from ClickUp reaches the visitor.
+ * The `pk_…` personal token goes bare in `Authorization` — ClickUp rejects a `Bearer` prefix. `markdown_content`
+ * overrides `description` when both are sent; `description` is sent anyway so the content survives a field rename.
  */
 export async function createInquiryTask(args: { token: string; listId: string; name: string; markdown: string }): Promise<ClickUpResult> {
   const { token, listId, name, markdown } = args;
@@ -53,19 +45,16 @@ export async function createInquiryTask(args: { token: string; listId: string; n
 
     return { ok: true, taskId: body.id };
   } catch (err) {
-    // Network failure or the 10s timeout tripping.
     console.error('Could not reach the ClickUp API', err);
     return { ok: false };
   }
 }
 
 /**
- * Attach a file to an existing task. Has to be a second call — ClickUp has no
- * way to create a task with an attachment in one request.
+ * Attach a file to an existing task — necessarily a second call, as ClickUp cannot create a task with an attachment.
  *
- * `Content-Type` is deliberately not set: `fetch` writes it itself, including
- * the multipart boundary, and setting it by hand produces a body ClickUp cannot
- * parse. Uploads get a longer timeout than the JSON calls since they carry bytes.
+ * Do not set `Content-Type`: `fetch` writes it with the multipart boundary, and setting it by hand yields a body
+ * ClickUp cannot parse.
  */
 export async function attachFileToTask(args: {
   token: string;
@@ -77,9 +66,7 @@ export async function attachFileToTask(args: {
   const { token, taskId, filename, bytes, contentType = 'application/pdf' } = args;
 
   try {
-    // Copy into a plainly ArrayBuffer-backed view. A Node Buffer is typed as
-    // Uint8Array<ArrayBufferLike>, which BlobPart will not accept because it
-    // could in principle be SharedArrayBuffer-backed.
+    // BlobPart rejects a Node Buffer (typed Uint8Array<ArrayBufferLike>, so possibly SharedArrayBuffer-backed).
     const body = new Uint8Array(bytes.byteLength);
     body.set(bytes);
 
@@ -104,10 +91,7 @@ export async function attachFileToTask(args: {
   }
 }
 
-/**
- * Rewrite a task's description. Used only to restore the full questionnaire when
- * the PDF upload failed, so the answers are never absent from ClickUp entirely.
- */
+/** Rewrite a task's description — used only to restore the full questionnaire when the PDF upload failed. */
 export async function updateTaskDescription(args: { token: string; taskId: string; markdown: string }): Promise<boolean> {
   const { token, taskId, markdown } = args;
 

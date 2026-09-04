@@ -20,9 +20,8 @@ export function Header() {
   const [hidden, setHidden] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const isCompact = useCompact();
-  // 600px, not the 1024px default above: it matches the media query in
-  // globals.css that pins header padding to `16px 18px`, which is what decides
-  // how much room the mark actually has.
+  // 600px, not the 1024px default: it matches the globals.css media query that pins header padding to `16px 18px`,
+  // which is what decides how much room the mark has.
   const isMobile = useCompact(600);
 
   useEffect(() => {
@@ -51,11 +50,8 @@ export function Header() {
     };
   }, [menuOpen]);
 
-  // The header foreground is owned by `.site-header` in globals.css so it can
-  // flip with the fill (cream over the photo scrim → ink once filled, since
-  // warm stone is too light to carry cream text). Nothing below may set an
-  // inline `color` — inline wins the cascade and would freeze the flip. Children
-  // inherit, or use currentColor where they need the value on another property.
+  // The header foreground is owned by `.site-header` in globals.css so it can flip with the fill. Nothing below may
+  // set an inline `color` — inline wins the cascade and would freeze the flip. Inherit, or use currentColor.
   return (
     <>
       <header
@@ -67,11 +63,8 @@ export function Header() {
           left: 0,
           right: 0,
           zIndex: 50,
-          // One size on every route. The bar used to open taller and shrink on
-          // scroll, but the home page never showed that state — the cover panel
-          // suppresses the header until 0.92 of a viewport, by which point it is
-          // already compact. Home set the standard, so the compact size is now
-          // the only size. `scrolled` still drives the fill; just not the sizing.
+          // One size on every route. The bar used to shrink on scroll, but the cover panel suppresses the header until 0.92
+          // of a viewport, by which point it is already compact. `scrolled` still drives the fill, just not the sizing.
           padding: '18px 36px',
           transform: hidden ? 'translateY(-100%)' : 'translateY(0)',
           opacity: hidden ? 0 : 1,

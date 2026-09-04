@@ -1,15 +1,9 @@
 // Batch-compress project photos for hosting on R2.
 //
-// Walks <inputDir> recursively, caps each image's width at MAX_WIDTH, and steps
-// JPEG quality down until the file is <= MAX_BYTES, writing .jpg files that mirror
-// the input tree into <outputDir>. Matches the CLAUDE.md target (<=200 KB, <=2400 px)
-// and the slug convention consumed by lib/projects.ts (projects/<slug>/cover.jpg, etc.).
+// Walks <inputDir> recursively, caps width at MAX_WIDTH, and steps JPEG quality down until the file is <= MAX_BYTES,
+// mirroring the input tree into <outputDir>. Matches the <=200 KB / <=2400 px target in AGENTS.md.
 //
-// Usage:
-//   node scripts/compress-images.mjs <inputDir> <outputDir>
-//
-// Example (originals grouped by slug, output ready to upload to R2):
-//   node scripts/compress-images.mjs ./raw-photos ./dist-photos
+// Usage: node scripts/compress-images.mjs <inputDir> <outputDir>
 
 import { readdir, mkdir } from 'node:fs/promises';
 import { join, relative, dirname, extname, basename } from 'node:path';

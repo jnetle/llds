@@ -1,13 +1,11 @@
-// Design tokens — single source of truth for color, spacing, typography, motion.
-// CSS-side mirrors live in app/globals.css (`:root`). Prefer importing from here
-// in components; reach for var(--…) directly only in plain CSS or className contexts.
+// Design tokens. CSS-side mirrors live in app/globals.css (`:root`); reach for var(--…)
+// directly only in plain CSS or className contexts.
 
 import type { CSSProperties } from 'react';
 
 // ── Brand palette ─────────────────────────────────────────────────────────────
-// The nine colors of the 2026 Laurel Leaf brand book, verbatim. Prefer the
-// semantic `color` tokens below — reach in here only for a deliberate brand
-// accent that no semantic token covers.
+// The 2026 brand book verbatim. Prefer the semantic `color` tokens below; reach in here
+// only for a deliberate accent no semantic token covers.
 export const brand = {
   saddleLeather: 'var(--saddle-leather)', // #8a5a32
   navyInk: 'var(--navy-ink)', // #0f1a2b
@@ -21,8 +19,7 @@ export const brand = {
 } as const;
 
 // ── Color ─────────────────────────────────────────────────────────────────────
-// Semantic roles. All values resolve through CSS vars — which in turn resolve to
-// `brand` above — so a palette change is one file.
+// Semantic roles, resolving through CSS vars to `brand` above, so a palette change is one file.
 export const color = {
   bg: 'var(--bg)', // bone white
   ink: 'var(--ink)', // heritage green
@@ -35,7 +32,6 @@ export const color = {
 } as const;
 
 // ── Spacing (px) ──────────────────────────────────────────────────────────────
-// Use as raw numbers in inline styles: `padding: space[5]` etc.
 export const space = {
   1: 4,
   2: 8,
@@ -51,11 +47,9 @@ export const space = {
 } as const;
 
 // ── Section vertical padding (px) ─────────────────────────────────────────────
-// `d` = desktop / tablet (>600px), `m` = mobile (≤600px). This table is the
-// source of truth, but <Section> can't read it at runtime — Tailwind only emits
-// classes it can find as literal source text, so components/ui/Section.tsx
-// restates each preset as a complete class string. scripts/check-css.mjs fails
-// the build if the two drift apart; edit them together.
+// `d` = desktop/tablet (>600px), `m` = mobile (≤600px). <Section> restates this table as
+// literal Tailwind class strings because Tailwind scans source text; scripts/check-css.mjs
+// fails the build if the two drift. Edit them together.
 export const sectionPadY = {
   none: { d: 0, m: 0 },
   xxs: { d: 60, m: 24 },
@@ -69,17 +63,12 @@ export const sectionPadY = {
 
 export type SectionPad = keyof typeof sectionPadY;
 
-// Horizontal page rhythm. Mobile tightens to 24px to match the previous
-// behavior of the `section[style*='8vw']` rule.
+// Horizontal page rhythm.
 export const gutter = { d: '8vw', m: '24px' } as const;
 
 // ── Typography scale ──────────────────────────────────────────────────────────
-// `display`  — page hero h1
-// `section`  — section h2
-// `card`     — block / list-item h3
-// `body`     — long-form copy (17/1.7)
-// `bodySm`   — caption / dense copy (15/1.7)
-// Eyebrows use the existing `.micro` / `.micro-sm` classes via <Eyebrow>.
+// display → hero h1, section → h2, card → h3, body/bodySm → copy. Eyebrows go through
+// <Eyebrow> and the `.micro` classes instead.
 export const text: Record<'display' | 'section' | 'card' | 'body' | 'bodySm', CSSProperties> = {
   display: {
     fontSize: 'clamp(44px, 5.2vw, 84px)',
@@ -111,7 +100,6 @@ export const text: Record<'display' | 'section' | 'card' | 'body' | 'bodySm', CS
 };
 
 // ── Motion ────────────────────────────────────────────────────────────────────
-// String values resolve to CSS vars; safe to compose into transition declarations.
 export const motion = {
   ease: 'var(--ease-elegant)',
   durFast: 'var(--dur-fast)',

@@ -1,11 +1,8 @@
-// The LL monogram, lifted verbatim from the master logo artwork (viewBox 0 0 1159 1500).
-// Kept in its own file because the path data is ~5 KB of coordinates; nothing here
-// should be hand-edited. The wrapping <g> carries the flip-and-scale transform the
-// artwork was exported with (PostScript y-up -> SVG y-down).
+// The LL monogram, verbatim from the master logo artwork (viewBox 0 0 1159 1500). The path data is ~5 KB of
+// coordinates and should not be hand-edited; the wrapping <g> carries the artwork's y-up → y-down transform.
 //
-// Rendered once as a zero-size <defs> holder so consumers can stamp copies with
-// <use href="#ll-glyph" />, which is how CoverPanel draws the pair that seat into
-// the arch. Two <use> elements share one path rather than duplicating 5 KB twice.
+// Rendered once as a zero-size <defs> holder so consumers stamp copies with <use href="#ll-glyph" />, which is how
+// CoverPanel draws its pair from one path rather than duplicating 5 KB.
 
 const LL_GLYPH_PATH =
   'M11670 29295 l0 -225 180 0 c153 0 180 -2 180 -15 0 -12 20 -15 120 -15 100 0 120 -2 120 -15 0 -12 15 -15 75 -15 60 0 75 -3 75 ' +

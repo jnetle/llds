@@ -4,15 +4,11 @@ import { useEffect, useRef } from 'react';
 import type { RefObject } from 'react';
 
 /**
- * Reports 0 → 1 progress across a tall track element's *pinned* range — the distance a
- * `position: sticky` child of height 100svh stays stuck, which is `trackHeight - viewportHeight`.
+ * Reports 0 → 1 across a track's *pinned* range — `trackHeight - viewportHeight`.
  *
- * Callback-based rather than state-based on purpose. `useScrollY` re-renders its whole consuming
- * subtree once per scroll frame (ProjectStrip pays that today); a magazine reader driving five
- * 3D transforms wants to write straight to the DOM through refs and re-render only when a
- * discrete value — the current page index — actually changes.
- *
- * `onProgress` is held in a ref, so callers don't have to memoize it to avoid re-subscribing.
+ * Callback-based, not state-based: `useScrollY` re-renders its whole subtree once per scroll frame, so anything
+ * driving more than a couple of properties should write to the DOM through refs and re-render only on a discrete
+ * change. `onProgress` is held in a ref, so callers need not memoize it.
  */
 export function useTrackProgress(trackRef: RefObject<HTMLElement | null>, onProgress: (progress: number) => void) {
   const cb = useRef(onProgress);
@@ -22,8 +18,7 @@ export function useTrackProgress(trackRef: RefObject<HTMLElement | null>, onProg
 
   useEffect(() => {
     let raf: number | null = null;
-    // Measured rather than read per frame: getBoundingClientRect in the scroll handler would
-    // force layout on every frame. Same measure-once approach as ProjectStrip.
+    // Measured once — getBoundingClientRect in the scroll handler would force layout every frame.
     let top = 0;
     let range = 1;
 
@@ -31,8 +26,7 @@ export function useTrackProgress(trackRef: RefObject<HTMLElement | null>, onProg
       const el = trackRef.current;
       if (!el) return;
       top = el.getBoundingClientRect().top + window.scrollY;
-      // Guard against 0 — a track shorter than the viewport (the reduced-motion / no-JS
-      // fallback collapses it to auto height) would otherwise divide by zero.
+      // A track shorter than the viewport (the reduced-motion / no-JS fallback) would divide by zero.
       range = Math.max(1, el.offsetHeight - window.innerHeight);
     };
 

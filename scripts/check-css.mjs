@@ -32,10 +32,8 @@ for (const match of stripped.matchAll(ruleRegex)) {
   const targetsRoot = selectors.some(s => s === 'html' || s === 'body' || s === ':root');
   if (!targetsRoot) continue;
 
-  // Body declares overflow / overflow-x / overflow-y: hidden (NOT clip).
-  // `hidden` creates a scroll container and breaks position: sticky on descendants;
-  // `clip` does not (per spec) — so `overflow-x: clip` is the safe way to suppress
-  // horizontal overflow at the root.
+  // Body declares overflow / overflow-x / overflow-y: hidden (NOT clip). `hidden` creates a scroll container and
+  // breaks position: sticky on descendants; `clip` does not, so it is the safe way to suppress root overflow.
   if (/\boverflow(-x|-y)?\s*:\s*hidden\b/i.test(body)) {
     offenders.push({ selector, body: body.trim() });
   }
@@ -57,10 +55,9 @@ if (offenders.length > 0) {
 }
 
 // ── 2. No selectors that match against inline-style text ─────────────────────
-// `[style*='…']` couples CSS to the exact serialisation of a style attribute.
-// React emits `height:100vh` (unspaced) during SSR but the CSSOM re-serialises
-// to `height: 100vh` (spaced) once React updates that element, so such a rule
-// can switch on mid-session. Style a class instead.
+// `[style*='…']` couples CSS to the exact serialisation of a style attribute. React emits `height:100vh` unspaced
+// during SSR, but the CSSOM re-serialises it spaced once React updates the element, so such a rule switches on
+// mid-session. Style a class instead.
 
 const attrSelectors = [...stripped.matchAll(/[^{}]*\[style\*=[^\]]*\][^{}]*(?=\{)/g)].map(m => m[0].trim());
 
@@ -76,9 +73,8 @@ if (attrSelectors.length > 0) {
 }
 
 // ── 3. Section's padding classes match the sectionPadY token table ───────────
-// components/ui/Section.tsx hard-codes its padding as complete Tailwind class
-// strings, because Tailwind only emits classes it can find as literal source
-// text. That duplicates lib/tokens.ts, so assert the two stay in step.
+// Section.tsx hard-codes its padding as complete Tailwind class strings, because Tailwind only emits classes it can
+// find as literal source text. That duplicates lib/tokens.ts, so assert the two stay in step.
 
 const tokens = readFileSync(resolve(root, 'lib', 'tokens.ts'), 'utf8');
 const section = readFileSync(resolve(root, 'components', 'ui', 'Section.tsx'), 'utf8');

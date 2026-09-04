@@ -7,12 +7,8 @@ import { useCompact } from '@/hooks/useCompact';
 import { color } from '@/lib/tokens';
 import { GridCell } from './GridCell';
 
-// Home hero. Placeholder pending real photography — migrates to
-// shared/home-hero.jpg on R2 under the convention in AGENTS.md.
-//
-// w=2400 matches the compression ceiling in AGENTS.md. It used to be 3200 because these
-// rendered as CSS backgrounds, where one width had to serve every screen; next/image now
-// generates a srcset, so an oversized source only doubles what the optimizer has to fetch.
+// Placeholder pending real photography — migrates to shared/home-hero.jpg on R2.
+// w=2400 matches the compression ceiling in AGENTS.md; oversizing only doubles what the optimizer fetches.
 const HERO_IMAGE = 'https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?auto=format&fit=crop&w=2400&q=80';
 
 type HeroGridProps = {
@@ -20,26 +16,14 @@ type HeroGridProps = {
   onOpen: (p: Project) => void;
   /** Rendered between the lead and row 2 — the studio statement, in practice. */
   interlude?: ReactNode;
-  /**
-   * Hold the lead still as a backdrop for the cover panel that sits over it (see
-   * HomeShell). The panel is absolutely positioned at document 0 and rides up
-   * with the page; pinning the lead underneath is what turns that into a reveal
-   * rather than the panel and the hero scrolling away together.
-   */
+  /** Hold the lead still under the cover panel, which turns the panel's rise into a reveal rather than a scroll-away. */
   pinnedLead?: boolean;
-  /**
-   * Reserve the extra viewport of scroll the cover panel rides up through. Set
-   * only while the panel is mounted — once it is dismissed, or on a return visit
-   * that never shows it, that scroll room would be a dead viewport above the
-   * hero where nothing moves.
-   */
+  /** Reserve the scroll the panel rides up through. Only while it is mounted, or it becomes a dead viewport. */
   coverStage?: boolean;
 };
 
-// A `top: 0` sticky child of height 100svh stays pinned for (stage − 100svh).
-// 235svh therefore holds the lead for 135svh: the first 100 are spent under the
-// lifting panel, the remaining 35 are a solo beat before it releases. The
-// number is the reference mock's container height, kept verbatim.
+// A `top: 0` sticky child of 100svh stays pinned for (stage − 100svh), so 235svh holds the lead for 135svh: 100
+// under the lifting panel, then a 35svh solo beat before it releases.
 const COVER_STAGE = '235svh';
 
 // The same stage minus the panel's viewport: the 35svh solo beat on its own.
@@ -51,21 +35,11 @@ function Stage({ active, height, children }: { active: boolean; height: string; 
   return <div style={{ position: 'relative', height }}>{children}</div>;
 }
 
-/**
- * The lead image. Deliberately not a GridCell — it belongs to no project, so it
- * carries no caption, no click-through and no hover state. Plain `cover` at
- * exactly the frame size: nothing moves, and the image renders as sharp as its
- * source allows.
- */
+/** The lead image. Not a GridCell — it belongs to no project, so no caption, click-through or hover state. */
 function HeroLead() {
   return (
-    // `loading="eager"` + `fetchPriority="high"` rather than `preload`, which is what
-    // replaced the deprecated `priority` in Next 16. Note this does NOT avoid a preload
-    // link: React 19 emits one for any eager, high-priority image, so the rendered head
-    // carries four image preloads here (this plus CoverPanel's logo layers). What it does
-    // avoid is Next emitting a second, competing one of its own. The wrapper in HeroGrid
-    // is sticky-or-relative with an explicit height, so `fill` has its containing block
-    // on both branches.
+    // `loading="eager"` + `fetchPriority="high"` rather than Next 16's `preload`. React 19 still emits a preload
+    // link for any eager high-priority image; what this avoids is Next emitting a second, competing one.
     <Image
       src={HERO_IMAGE}
       alt="A Laurel Leaf Design Studio interior"
@@ -82,8 +56,7 @@ function HeroLead() {
 export function HeroGrid({ projects, onOpen, pinnedLead = false, coverStage = false, interlude }: HeroGridProps) {
   const isCompact = useCompact();
 
-  // The lead shows HERO_IMAGE, not a project, so the rows start from the top of
-  // the list rather than skipping one.
+  // The lead shows HERO_IMAGE rather than a project, so the rows start from the top of the list.
   const row2 = projects.slice(0, 2);
   const row3 = projects.slice(2, 4);
 

@@ -9,11 +9,9 @@ import { Eyebrow } from '@/components/ui/Eyebrow';
 import { Section } from '@/components/ui/Section';
 import { color, motion, text } from '@/lib/tokens';
 
-// TEMPORARY: these are the Instagram-resolution stills, served from public/ so the page has real
-// imagery before the photographer's originals exist. The keys below are exactly the R2 keys, so
-// finalising is a one-line swap back to `img` from '@/lib/img':
-//   const pressImg = (key: string) => img(`press/${key}`);
-// See AGENTS.md § Images before doing that — the files must move to the bucket, not stay here.
+// TEMPORARY: Instagram-resolution stills served from public/ until the photographer's originals exist. The keys
+// below are exactly the R2 keys, so finalising is a one-line swap back to `img('press/' + key)` — but the files
+// must move to the bucket first. See AGENTS.md § Images.
 const pressImg = (key: string) => `/images/press/${key}`;
 
 const AWARDS = [
@@ -37,10 +35,8 @@ const AWARDS = [
 
 const GALLERY = [1, 2, 3, 4, 5].map(n => pressImg(`gallery/${n}.jpg`));
 
-// Every source frame is 4:5 portrait, so the tiles are sized to land near that ratio and
-// keep `background-size: cover` from cropping them into landscape bands. Against a 6-column
-// track at 160px auto-rows: `span 3 / span 4` ≈ 0.86:1 and `span 2 / span 3` ≈ 0.77:1.
-// Column spans must sum to 6 per row — two large tiles, then three smaller ones.
+// Every source frame is 4:5 portrait, so tiles are sized near that ratio to keep `cover` from cropping them into
+// landscape bands. Column spans must sum to 6 per row — two large tiles, then three smaller ones.
 const GALLERY_LAYOUTS = [
   { col: 'span 3', row: 'span 4' },
   { col: 'span 3', row: 'span 4' },
@@ -49,9 +45,8 @@ const GALLERY_LAYOUTS = [
   { col: 'span 2', row: 'span 3' }
 ];
 
-// The Winter 2024 feature in Aiken Hound & Home, in reading order: the issue cover, then the
-// four pages of the spread. Printed folios read 8, 9, — , 10 (the full-bleed shower page carries
-// no folio), so the labels count the spread rather than claim a page range.
+// The Winter 2024 Aiken Hound & Home feature in reading order. Printed folios read 8, 9, — , 10 (the full-bleed
+// shower page carries none), so the labels count the spread rather than claim a page range.
 const MAGAZINE_PAGES: MagazinePage[] = [
   {
     src: pressImg('magazine/cover.jpg'),
@@ -92,9 +87,8 @@ const FEATURE_META: [string, string][] = [
   ['Builder', 'Southern State Builders']
 ];
 
-// The same entrance the project tiles get in ProjectsGrid, applied to every image on the page.
-// Only `.is-in` is decided here — see the `.press-reveal` rules in globals.css for the hidden
-// state and the reduced-motion / no-JS fallbacks. `index` staggers tiles within a row.
+// The same entrance the project tiles get in ProjectsGrid. Only `.is-in` is decided here — see `.press-reveal` in
+// globals.css for the hidden state and the reduced-motion / no-JS fallbacks. `index` staggers tiles within a row.
 function RevealImage({ src, index = 0, style }: { src: string; index?: number; style?: CSSProperties }) {
   const [ref, seen] = useReveal<HTMLDivElement>();
 
@@ -119,8 +113,7 @@ export default function PressPage() {
   const [ref, seen] = useReveal<HTMLDivElement>();
   const [refFeature, seenFeature] = useReveal<HTMLDivElement>();
   const cols = useCols();
-  // The gallery's row spans only mean anything in the 6-column track; once cols() collapses to
-  // '1fr' the tiles carry their own 4:5 ratio instead.
+  // The row spans only mean anything in the 6-column track; once collapsed to '1fr' the tiles carry their own ratio.
   const compact = useCompact();
 
   return (
@@ -134,10 +127,7 @@ export default function PressPage() {
           overflow: 'hidden'
         }}>
         <div style={{ position: 'relative' }}>
-          {/* One <h1> holding both display lines. They were two h1 elements — a page with
-              two of them tells a crawler it is about two things, and this is one phrase
-              set across two lines. Each line keeps its own size and style on a block-level
-              span, so nothing about the typesetting moves. */}
+          {/* One <h1> holding both display lines. */}
           <h1 className="serif" style={{ fontWeight: 300, margin: 0 }}>
             <span
               style={{
@@ -163,8 +153,7 @@ export default function PressPage() {
               recognition
             </span>
           </h1>
-          {/* Sits over the pair, so it stays a sibling of the heading rather than living
-              inside it — it is decoration, and aria-hidden keeps it out of the h1's name. */}
+          {/* Sits over the pair, so it stays a sibling of the heading. */}
           <div
             className="serif"
             aria-hidden
@@ -423,9 +412,8 @@ export default function PressPage() {
             transition: `all ${motion.durXSlow} ${motion.ease}`
           }}>
           <div>
-            {/* The masthead artwork is black on a white field. Multiply over Bone White knocks
-                the box out with no alpha channel and no image processing — and keeps the
-                publication's own mark in its own color, which a recolor would not. */}
+            {/* The masthead is black on white, so multiply over Bone White knocks the box out for free and leaves the
+                publication's mark in its own color. */}
             <Image
               src={pressImg('magazine/hh-masthead.png')}
               alt="Aiken Hound &amp; Home Magazine"
@@ -463,8 +451,7 @@ export default function PressPage() {
         </div>
       </Section>
 
-      {/* The reader sits outside <Section> — it is a full-bleed pinned stage, not a padded
-          content block, and the pages need the unpadded width to turn through. */}
+      {/* The reader sits outside <Section> — a full-bleed pinned stage, not a padded block. */}
       <MagazineReader pages={MAGAZINE_PAGES} />
 
       <Section padTop="xs" padBottom="sm">

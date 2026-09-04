@@ -1,19 +1,11 @@
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
-// Aliased: unqualified `Image` is configured as next/image for jsx-a11y, which
-// then demands an `alt` prop that react-pdf's element does not have.
+// Aliased because unqualified `Image` is configured as next/image for jsx-a11y, which then demands an `alt` prop.
 import { Document, Font, Image as PdfImage, Page, StyleSheet, Text, View, renderToBuffer } from '@react-pdf/renderer';
 import type { InquiryInput } from '../inquirySchema';
 import { formatSubmittedAt, toAnswerBands, toTaskName } from '../inquiryPayload';
 
-/**
- * Brand hexes, verbatim from the 2026 brand book.
- *
- * `lib/tokens.ts` is the source of truth for the site, but every value there
- * resolves through a CSS custom property, and a PDF has no CSSOM to resolve
- * them against. These are the same nine colors written literally; if the
- * palette ever moves, both files change together.
- */
+/** Brand hexes, literal because a PDF has no CSSOM to resolve `lib/tokens.ts`'s CSS vars against. Move both together. */
 const ink = '#0f1a2b'; // navy ink
 const paper = '#f4f1ea'; // bone white
 const muted = '#a89f96'; // warm stone
@@ -21,11 +13,8 @@ const accent = '#8a5a32'; // saddle leather
 
 const asset = (...segments: string[]) => path.join(process.cwd(), 'lib', 'pdf', ...segments);
 
-// Fonts are registered from a local path, never a URL. react-pdf resolves `src`
-// at render time, and a network fetch there is a documented serverless
-// cold-start failure that silently falls back to a default face. A path off
-// `process.cwd()` needs the files traced into the deployment — see
-// `outputFileTracingIncludes` in next.config.ts.
+// From a local path, never a URL: react-pdf resolves `src` at render time, and a network fetch there is a documented
+// serverless cold-start failure that silently falls back to Helvetica. The files need tracing — see next.config.ts.
 Font.register({
   family: 'Cormorant Garamond',
   fonts: [
@@ -42,15 +31,12 @@ Font.register({
   ]
 });
 
-// react-pdf hyphenates at line ends by default. Returning the word whole turns
-// that off: an email address or a street name broken across lines with a hyphen
-// reads as a typo in a document someone may forward to a builder.
+// Turns off react-pdf's default hyphenation: a street name broken with a hyphen reads as a typo in a forwarded document.
 Font.registerHyphenationCallback(word => [word]);
 
 const logo = readFileSync(path.join(process.cwd(), 'public', 'logo-long-navy.png'));
 
-// Cormorant's ascenders are tall and its x-height small, so prose needs a looser
-// leading here than the same size would on the web.
+// Cormorant's tall ascenders and small x-height need looser leading here than the same size would on the web.
 const styles = StyleSheet.create({
   page: { backgroundColor: paper, color: ink, paddingTop: 48, paddingBottom: 56, paddingHorizontal: 56 },
   logo: { width: 132, marginBottom: 28 },
@@ -68,8 +54,7 @@ const styles = StyleSheet.create({
   answer: { fontFamily: 'Cormorant Garamond', fontWeight: 300, fontSize: 12.5, lineHeight: 1.45 },
 
   footer: { position: 'absolute', bottom: 28, left: 56, right: 56, flexDirection: 'row', justifyContent: 'space-between' },
-  // fontFamily does not inherit from a View to its Text children in react-pdf —
-  // leaving it on the row silently falls back to Helvetica.
+  // fontFamily does not inherit View → Text in react-pdf; leaving it on the row silently falls back to Helvetica.
   footerText: { fontFamily: 'Inter', fontSize: 7, letterSpacing: 0.6, color: muted }
 });
 
@@ -87,8 +72,7 @@ function InquiryDocument({ data, submittedAt }: { data: InquiryInput; submittedA
         <View style={styles.rule} />
 
         {bands.map(band => (
-          // `wrap` stays on so a long band can break across pages, but the heading
-          // is kept with at least the first entry rather than stranded at a page foot.
+          // `wrap` stays on so a long band can break across pages, but the heading keeps its first entry.
           <View key={band.numeral} style={styles.band}>
             <View style={styles.bandHead} minPresenceAhead={40}>
               <Text style={styles.bandNumeral}>{band.numeral}</Text>

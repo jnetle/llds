@@ -2,15 +2,11 @@ import type { InquiryInput } from './inquirySchema';
 import { INQUIRY_BANDS, QUESTIONS, type AnswerKey } from './inquiryQuestions';
 
 /**
- * Fields the form only reveals when a gate field is in a particular state. Their
- * stored value survives a client changing their mind (react-hook-form keeps the
- * text after the input unmounts), so it has to be stripped rather than shipped —
- * otherwise a lead who switched `builder` from Yes to No arrives in ClickUp with
- * a builder name attached.
+ * Fields revealed only when a gate field is in a particular state. react-hook-form keeps their text after the input
+ * unmounts, so a client who switched `builder` from Yes to No would otherwise reach ClickUp with a builder name.
  *
- * These are also the only keys dropped entirely when blank; a gate that never
- * opened means the question was never asked, which is different from a question
- * that was asked and skipped.
+ * They are also the only keys dropped entirely when blank: a gate that never opened means the question was never
+ * asked, which differs from one asked and skipped.
  */
 const CONDITIONAL_KEYS = new Set<AnswerKey>(['projectTypeOther', 'builderName', 'builtBeforeNote', 'workedDesignerNote']);
 
@@ -22,10 +18,7 @@ const BLANK = '—';
 
 const joinList = (values: readonly string[]) => values.join(', ');
 
-/**
- * Flatten a validated submission to one string per question, with orphaned
- * conditional values removed.
- */
+/** Flatten a validated submission to one string per question, with orphaned conditional values removed. */
 export function normalizeAnswers(data: InquiryInput): Record<AnswerKey, string> {
   return {
     name: data.name,
@@ -78,11 +71,7 @@ export function normalizeAnswers(data: InquiryInput): Record<AnswerKey, string> 
 export type AnswerEntry = { key: AnswerKey; question: string; answer: string };
 export type AnswerBand = { numeral: string; label: string; entries: AnswerEntry[] };
 
-/**
- * The submission as ordered bands of question/answer pairs — the one shape both
- * the markdown description and the PDF render from, so they can never disagree
- * about what was asked or in what order.
- */
+/** Ordered bands of question/answer pairs — the one shape the markdown and the PDF both render from. */
 export function toAnswerBands(data: InquiryInput): AnswerBand[] {
   const answers = normalizeAnswers(data);
   return INQUIRY_BANDS.map(band => ({
@@ -101,17 +90,12 @@ export function toTaskName(data: InquiryInput): string {
   return `${answers.name} — ${summary}`.slice(0, MAX_TASK_NAME);
 }
 
-/**
- * `2026-08-15 14:22 UTC` — deliberately UTC rather than a guessed studio
- * timezone. ClickUp already shows task creation time in the viewer's own zone;
- * this exists so the submission time survives in the document verbatim.
- */
+/** `2026-08-15 14:22 UTC` — UTC rather than a guessed studio timezone, so the time survives in the document verbatim. */
 export function formatSubmittedAt(iso: string): string {
   return `${iso.slice(0, 10)} ${iso.slice(11, 16)} UTC`;
 }
 
-// Markdown collapses runs of plain spaces and tabs, so a literal non-breaking
-// space is what carries the indent. Verified against ClickUp's own renderer.
+// Markdown collapses runs of spaces and tabs, so a literal non-breaking space carries the indent.
 const INDENT = ' '.repeat(4);
 
 /** Indent an answer under its question, bolding each line. */
@@ -126,13 +110,10 @@ function indent(value: string, bold: boolean): string {
 const isProse = (value: string) => value.includes('\n') || value.length > 70;
 
 /**
- * The complete questionnaire as markdown. This is the **fallback** description,
- * used when the PDF could not be produced — normally the task carries
- * `toSummaryMarkdown` instead and the detail lives in the attachment.
+ * The complete questionnaire as markdown — the fallback description, used only when the PDF could not be produced.
  *
- * Answer text is inserted unescaped. This is a private task body written by a
- * prospective client in prose, and mangling their apostrophes and dashes to
- * defend against a stray `#` is the worse trade.
+ * Answers are inserted unescaped: this is a private task body, and mangling a client's apostrophes to defend against
+ * a stray `#` is the worse trade.
  */
 export function toFullMarkdown(data: InquiryInput, submittedAt: string): string {
   const out: string[] = [`**Inquiry received** ${formatSubmittedAt(submittedAt)}`];
@@ -140,8 +121,7 @@ export function toFullMarkdown(data: InquiryInput, submittedAt: string): string 
   for (const band of toAnswerBands(data)) {
     out.push('---', `## ${band.numeral} · ${band.label}`);
     for (const entry of band.entries) {
-      // Two trailing spaces are a hard line break, so the answer sits directly
-      // under its question rather than a blank line below it.
+      // Two trailing spaces are a hard line break, so the answer sits directly under its question.
       out.push(`${entry.question}  \n${indent(entry.answer, !isProse(entry.answer))}`);
     }
   }
@@ -149,10 +129,7 @@ export function toFullMarkdown(data: InquiryInput, submittedAt: string): string 
   return out.join('\n\n');
 }
 
-/**
- * The scannable version: who they are and the handful of facts that decide
- * whether this is a fit. Everything else is in the attached PDF.
- */
+/** The scannable version: who they are and the facts that decide whether this is a fit. The rest is in the PDF. */
 export function toSummaryMarkdown(data: InquiryInput, submittedAt: string): string {
   const a = normalizeAnswers(data);
   const line = (label: string, value: string) => `${label}  \n${INDENT}**${value || BLANK}**`;
