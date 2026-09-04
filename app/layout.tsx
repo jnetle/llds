@@ -24,19 +24,15 @@ const inter = Inter({
   display: 'swap'
 });
 
-// Pre-launch: keep the site out of search results. Set SITE_LIVE=true in Vercel Production
-// at launch to drop the noindex; anything else (including unset, the local default) keeps
-// it on, so the safe state is the one you get by doing nothing.
+// Pre-launch noindex. Set SITE_LIVE=true on Vercel Production at launch; anything else, unset included, keeps it on.
 const siteIsLive = process.env.SITE_LIVE === 'true';
 
 export const metadata: Metadata = {
-  // Every relative URL below — canonicals, OG images — resolves against this. Without
-  // it Next throws on a relative `openGraph.images` and emits no canonical at all.
+  // Every relative URL below resolves against this; without it Next throws on relative OG images and emits no canonical.
   metadataBase: new URL(SITE.url),
   title: {
     default: SITE.name,
-    // Child routes set the bare page name ('Projects') and get the suffix from here.
-    // A page that needs to opt out uses `title: { absolute: '…' }`.
+    // Child routes set the bare page name and inherit the suffix; opt out with `title: { absolute: '…' }`.
     template: `%s — ${SITE.name}`
   },
   description: SITE.description,
@@ -54,8 +50,7 @@ export const metadata: Metadata = {
     ? {
         index: true,
         follow: true,
-        // The site is a photography portfolio; without `max-image-preview: large`
-        // Google shows a thumbnail the size of a favicon next to the result.
+        // Without `max-image-preview: large` Google shows a favicon-sized thumbnail beside the result.
         googleBot: { index: true, follow: true, 'max-image-preview': 'large', 'max-snippet': -1, 'max-video-preview': -1 }
       }
     : { index: false, follow: false }
@@ -72,8 +67,7 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  // Set per environment in Vercel: production property on Production, test property on
-  // Preview/Development. Unset (the local default) renders no gtag script at all.
+  // Set per environment in Vercel. Unset (the local default) renders no gtag script at all.
   const gaId = process.env.GA_MEASUREMENT_ID;
 
   return (

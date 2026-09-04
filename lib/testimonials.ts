@@ -1,7 +1,5 @@
-// MOCK COPY — these are invented, not real client words. They exist so the
-// homepage section can be reviewed with realistic text. Replace every `quote`
-// before launch. Attributions are anonymized by place per the privacy
-// convention above PROJECT_META in lib/projects.ts — do not add client surnames.
+// MOCK COPY — invented, not real client words, so the homepage section can be reviewed with realistic text. Replace
+// every `quote` before launch. Attributions are anonymized by place, per the convention above PROJECT_META.
 
 export type Testimonial = {
   id: string;
@@ -11,8 +9,7 @@ export type Testimonial = {
   year: string;
 };
 
-// Ordered newest-first, matching PROJECT_META. Each entry is anchored to a real
-// project so the places and years line up with the rest of the site.
+// Ordered newest-first, matching PROJECT_META, so places and years line up with the rest of the site.
 export const TESTIMONIALS: Testimonial[] = [
   {
     id: 'yucca-ave',

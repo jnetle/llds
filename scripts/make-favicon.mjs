@@ -1,31 +1,21 @@
 // Build app/icon.svg from the two brand icon PNGs (one per color scheme).
 //
-// The source exports carry a wide transparent border and are not square, while a
-// favicon wants a square canvas. This trims each PNG to its actual alpha bounds,
-// re-pads to a square at a fixed margin, downscales, and inlines both as base64
-// data URIs inside a single SVG that swaps them via prefers-color-scheme.
+// The source exports carry a wide transparent border and are not square. This trims each to its alpha bounds,
+// re-pads to a square, downscales, and inlines both as base64 in one SVG that swaps them via prefers-color-scheme.
+// One SVG rather than two files plus `media` on <link>: the color logic lives in the file, so it works in browsers
+// that ignore `media` on favicon links and fits Next's app/icon.svg convention.
 //
-// One SVG rather than two files + `media` on <link>: the color logic lives in the
-// file, so it also works in browsers that ignore `media` on favicon links, and it
-// stays compatible with Next's app/icon.svg file convention (no manual <head>).
-//
-// Usage:
-//   node scripts/make-favicon.mjs <light-mode.png> <dark-mode.png>
-//
-// Light mode takes the dark ink artwork (Navy Ink), dark mode the light one
-// (Bone White) — the mark sits on the browser's tab-bar color, not its own.
+// Usage: node scripts/make-favicon.mjs <light-mode.png> <dark-mode.png>
+// Light mode takes the Navy Ink artwork, dark mode the Bone White one — the mark sits on the tab-bar color.
 
 import { writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import sharp from 'sharp';
 
-// Fraction of the square canvas left empty on the mark's longest axis. Kept
-// deliberately tight so the mark nearly fills the tab slot — just enough to stop
-// the anti-aliased edge sitting flush against the frame. The short axis picks up
-// more padding than this on its own, since the mark is not square.
+// Fraction of the square canvas left empty on the mark's longest axis — tight, so the mark nearly fills the tab
+// slot without its anti-aliased edge sitting flush against the frame.
 const MARGIN = 0.02;
-// Rendered favicon slots are 16/32/48px; 256 leaves retina headroom while
-// keeping the base64 payload small.
+// Favicon slots render at 16/32/48px; 256 leaves retina headroom while keeping the base64 payload small.
 const SIZE = 256;
 const ALPHA_THRESHOLD = 16;
 const OUT = join(process.cwd(), 'app', 'icon.svg');
@@ -61,10 +51,8 @@ async function alphaBounds(src) {
 
 // Trim to `box`, centre on a transparent square, and downscale to SIZE.
 //
-// Squaring and downscaling are two passes on purpose: sharp runs `extend` after
-// `resize` within a single pipeline no matter what order they are called in, so
-// doing both at once pads the already-downscaled image at full-resolution widths
-// and yields a stretched, oversized canvas.
+// Two passes on purpose: sharp runs `extend` after `resize` within one pipeline whatever the call order, so doing
+// both at once pads the already-downscaled image at full-resolution widths and yields a stretched canvas.
 async function squareCrop(src, box) {
   const canvas = Math.round(Math.max(box.width, box.height) / (1 - 2 * MARGIN));
   const left = Math.round((canvas - box.width) / 2);
@@ -85,8 +73,7 @@ async function squareCrop(src, box) {
   return sharp(squared).resize(SIZE, SIZE).png({ compressionLevel: 9, palette: true }).toBuffer();
 }
 
-// Both exports are the same artwork in different ink, so union the bounds to
-// guarantee the two crops stay pixel-aligned even if an export drifts.
+// Same artwork in different ink, so union the bounds to keep the two crops pixel-aligned even if an export drifts.
 const [lightBox, darkBox] = await Promise.all([alphaBounds(lightSrc), alphaBounds(darkSrc)]);
 const right = Math.max(lightBox.left + lightBox.width, darkBox.left + darkBox.width);
 const bottom = Math.max(lightBox.top + lightBox.height, darkBox.top + darkBox.height);

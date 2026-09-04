@@ -12,16 +12,11 @@ import { ProjectStrip } from './ProjectStrip';
 import { TestimonialsGrid } from './testimonials/TestimonialsGrid';
 
 /**
- * The cover panel is a splash: it belongs to arriving at the site, not to the
- * home route. Module scope is what makes that distinction — this binding
- * outlives every client-side navigation, so leaving for /projects and coming
- * back reads `true` and the panel never mounts again, while a hard reload gets
- * a fresh module and a fresh splash. That is the intended line: a reload is an
- * arrival, a logo click is not.
+ * The cover panel belongs to arriving at the site, not to the home route. Module scope draws that line: the binding
+ * outlives client-side navigation, so returning from /projects skips the panel while a hard reload gets a fresh one.
  *
- * Only ever written from the browser. The server's copy of this module is
- * per-process and shared across requests, so mutating it during render would
- * leak one visitor's splash state to the next.
+ * Only ever written from the browser — the server's copy is per-process, so mutating it during render would leak one
+ * visitor's splash state to the next.
  */
 let coverSeen = false;
 
@@ -29,26 +24,17 @@ export function HomeShell() {
   const router = useRouter();
   const openProject = (p: Project) => router.push(`/projects/${p.id}`);
 
-  // A reload is an arrival, so it has to arrive at the top. The panel below is
-  // absolutely positioned at document 0 and rides up with the page, so a scroll
-  // offset restored by the browser mounts it already half gone — and an offset
-  // past a viewport trips the dismissal below on the very first frame, which
-  // then compensates scroll for a swap the reader never saw.
-  //
-  // A layout effect here is early enough to prevent that: effects run
-  // child-first, but CoverPanel's dismissal check is a passive effect, and every
-  // layout effect runs before any passive one. `useScrollY` starts at 0 and
-  // seeds itself from the mount effect, so it too reads a document already reset.
+  // An arrival has to arrive at the top: the panel is absolutely positioned at document 0, so a restored scroll
+  // offset would mount it already half gone, and an offset past a viewport trips the dismissal on the first frame.
+  // A layout effect is early enough — every layout effect runs before any passive one, and CoverPanel's dismissal
+  // check is passive.
   useScrollTopOnLoad();
 
-  // Server and first client render agree: on a full page load `coverSeen` is
-  // false in both, so hydration matches. On a client-side navigation there is
-  // no server pass at all and this first render already omits the panel — no
-  // flash of a splash that is about to be removed.
+  // Server and first client render agree, so hydration matches; a client-side navigation has no server pass and
+  // already omits the panel, so there is no flash of a splash about to be removed.
   const [showCover, setShowCover] = useState(!coverSeen);
 
-  // On mount, not on dismissal: someone who clicks a nav link while the splash
-  // is still on screen has still seen it, and shouldn't get it again on return.
+  // On mount, not on dismissal — leaving mid-splash still counts as having seen it.
   useEffect(() => {
     coverSeen = true;
   }, []);
@@ -56,10 +42,8 @@ export function HomeShell() {
   const stageRef = useRef<HTMLDivElement>(null);
   const heightBefore = useRef(0);
 
-  // Dropping the panel also drops the scroll room it rode up through, which
-  // would yank everything below it up by a viewport. Measure first, correct
-  // after: the lead is pinned across this whole range, so once scroll is moved
-  // by the same delta the frames either side of the swap are identical.
+  // Dropping the panel drops the scroll room it rode up through, which would yank everything up by a viewport.
+  // Measure first, correct after: the lead is pinned across this range, so the frames either side of the swap match.
   const dismissCover = useCallback(() => {
     heightBefore.current = stageRef.current?.offsetHeight ?? 0;
     setShowCover(false);

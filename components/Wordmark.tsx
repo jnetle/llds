@@ -11,9 +11,7 @@ export function Wordmark({ color = 'currentColor', className }: WordmarkProps) {
         color,
         fontSize: 18,
         letterSpacing: '0.22em',
-        // 400 deliberately. This was 600, but layout.tsx loads Cormorant at
-        // 300/400/500 only, so 600 never rendered — the browser fell back to the
-        // nearest cut, 500. 400 states the intent instead of relying on that.
+        // 400 deliberately: layout.tsx loads Cormorant at 300/400/500 only, so 600 silently fell back to 500.
         fontWeight: 400,
         textTransform: 'uppercase',
         lineHeight: 1.35

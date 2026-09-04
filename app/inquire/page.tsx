@@ -42,10 +42,9 @@ import {
 import { QUESTIONS } from '@/lib/inquiryQuestions';
 import { submitInquiry } from './actions';
 
-// `width`/`minWidth` are load-bearing, not cosmetic: a bare <input> carries an
-// intrinsic min-content width of ~177px, which an `auto`-floored grid track has
-// to honour. Without them a two-up field row can out-measure a phone viewport,
-// and body's `overflow-x: clip` swallows the excess instead of scrolling it.
+// `width`/`minWidth` are load-bearing: a bare <input> has an intrinsic min-content width of ~177px, which an
+// `auto`-floored grid track must honour — so a two-up row can out-measure a phone, and body's `overflow-x: clip`
+// swallows the excess instead of scrolling it.
 const inputStyle: CSSProperties = {
   background: 'transparent',
   border: 'none',
@@ -59,8 +58,8 @@ const inputStyle: CSSProperties = {
   transition: 'border-color 0.3s'
 };
 
-// Standalone (not spread from inputStyle): inputStyle's `borderBottom` longhand
-// would be emitted after our `border` shorthand and silently strip the bottom border.
+// Standalone, not spread from inputStyle: its `borderBottom` longhand would be emitted after our `border`
+// shorthand and silently strip the bottom border.
 const textareaBaseStyle: CSSProperties = {
   background: 'transparent',
   border: `1px solid ${color.hairline}`,
@@ -84,12 +83,8 @@ const honeypotStyle: CSSProperties = {
   pointerEvents: 'none'
 };
 
-// The single horizontal rhythm for the whole page — hero, bands and submit row
-// all sit in this one column, so their left edges agree at every width. Below
-// ~1666px the gutter term wins and reproduces the site's standard inset;
-// above it the cap engages and the form centres rather than stretching to the
-// full width of a large display. `--gutter` (globals.css) is 8vw, tightening to
-// 24px at ≤600px, which keeps the breakpoint in CSS rather than JS.
+// One horizontal rhythm for the whole page, so hero, bands and submit row agree at every width. Below ~1666px the
+// gutter term wins and reproduces the site's standard inset; above it the cap engages and the form centres.
 const pageColumnStyle: CSSProperties = {
   width: 'min(1400px, calc(100% - 2 * var(--gutter)))',
   marginInline: 'auto'
@@ -105,12 +100,11 @@ const fieldsetStyle: CSSProperties = {
 };
 
 /**
- * One numbered band: sticky numeral rail beside its fieldset, stacking to a
- * single column at ≤1024px. The collapse is a <Grid> tier rather than a media
- * query or a `useCompact` read, so the server-rendered markup is already
- * correct at the viewport it lands in. Vertical padding is bespoke (the
- * <Section> presets have no 64/72 step), hence literal Tailwind classes.
- */
+ /**
+  * One numbered band: sticky numeral rail beside its fieldset, collapsing to one column at ≤1024px via a <Grid> tier
+  * rather than a `useCompact` read, so the server-rendered markup is already correct. Padding is bespoke (the
+  * <Section> presets have no 64/72 step), hence literal Tailwind classes.
+  */
 function FormBand({ numeral, label, children }: { numeral: string; label: string; children: ReactNode }) {
   return (
     <Grid
@@ -125,9 +119,8 @@ function FormBand({ numeral, label, children }: { numeral: string; label: string
   );
 }
 
-// Mirror of every field in inquirySchema. When a field is added to the schema,
-// add it here too — useForm needs an explicit default for every key, otherwise
-// react-hook-form treats the missing field as uncontrolled.
+// Mirror of every field in inquirySchema — useForm needs an explicit default per key, or react-hook-form treats the
+// missing field as uncontrolled.
 const defaultValues: InquiryInput = {
   name: '',
   email: '',
@@ -171,9 +164,8 @@ export default function InquirePage() {
   const [serverError, setServerError] = useState<string | null>(null);
   const [attempted, setAttempted] = useState(false);
   const fieldRefs = useRef<Record<string, HTMLLabelElement | null>>({});
-  // One stable ref setter per known field name. Pre-built once so React
-  // doesn't see a new function (and re-bind the ref) on every render.
-  // Typed against InquiryInput so a `refSetters.adress` typo is a compile error.
+  // One stable ref setter per field, pre-built so React doesn't re-bind on every render. Typed against InquiryInput,
+  // so a `refSetters.adress` typo is a compile error.
   const refSetters = useMemo(() => {
     const setters = {} as Record<keyof InquiryInput, (el: HTMLLabelElement | null) => void>;
     (Object.keys(defaultValues) as Array<keyof InquiryInput>).forEach(name => {
@@ -194,17 +186,12 @@ export default function InquirePage() {
     defaultValues
   });
 
-  // Only fields whose value is read directly during render need a top-level watch.
-  // Conditional show/hide gates use the ShowWhen helper, which subscribes locally
-  // so the rest of the form doesn't re-render on every chip click.
+  // Only fields read during render need a top-level watch; conditional gates use ShowWhen, which subscribes locally.
   const priorities = useWatch({ control, name: 'priorities' });
 
-  // Reveal-on-scroll for form bands. Re-arms when `submitted` flips back.
-  // threshold is a fraction of the *target's* size — for bands taller than the
-  // viewport, intersectionRatio caps at viewport/target and may never reach a
-  // fixed threshold, leaving the band stuck at opacity 0 (the bug seen on
-  // refresh). Use threshold 0 + rootMargin so reveal fires the moment any
-  // part of the band enters view.
+  // Reveal-on-scroll for form bands, re-arming when `submitted` flips back. threshold is a fraction of the *target's*
+  // size, so for bands taller than the viewport intersectionRatio caps below any fixed threshold and the band sticks
+  // at opacity 0 — hence threshold 0 plus rootMargin.
   useEffect(() => {
     if (submitted) return;
     const bands = document.querySelectorAll('.form-band');
@@ -227,9 +214,8 @@ export default function InquirePage() {
   const scrollToField = useCallback((key: string) => {
     const node = fieldRefs.current[key];
     if (!node) return;
-    // Header clearance comes from Field's `scroll-margin-top: var(--scroll-offset)`,
-    // which the browser applies here. Doing the arithmetic in JS meant one
-    // hardcoded desktop offset that overshot on phones.
+    // Header clearance comes from Field's `scroll-margin-top: var(--scroll-offset)`, which the browser applies here;
+    // doing the arithmetic in JS meant one hardcoded desktop offset that overshot on phones.
     node.scrollIntoView({ behavior: 'smooth', block: 'start' });
     setTimeout(() => {
       const focusable = node.querySelector<HTMLElement>('input, textarea, select');

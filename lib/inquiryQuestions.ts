@@ -1,18 +1,12 @@
 import type { InquiryInput } from './inquirySchema';
 
-/**
- * Every field a human actually answers — the schema minus the honeypot.
- */
+/** Every field a human actually answers — the schema minus the honeypot. */
 export type AnswerKey = Exclude<keyof InquiryInput, 'website'>;
 
 /**
- * The question text for each field, in one place.
- *
- * Both the form UI and the ClickUp task body read from here, so a lead arriving
- * in ClickUp is labelled with the exact words the client was asked. The
- * `Record<AnswerKey, string>` annotation is load-bearing: adding a field to
- * `inquirySchema` without adding its question here is a `tsc` error, which is
- * the only thing standing between us and a silently unlabelled answer.
+ * The question text for each field. The form UI and the ClickUp task body both read from here, so a lead is labelled
+ * with the exact words the client was asked. The `Record<AnswerKey, string>` annotation is load-bearing: a schema
+ * field with no question here is a `tsc` error rather than a silently unlabelled answer.
  */
 export const QUESTIONS: Record<AnswerKey, string> = {
   // 01 — Contact Information
@@ -23,8 +17,7 @@ export const QUESTIONS: Record<AnswerKey, string> = {
   // 02 — Project Overview
   address: 'Project address',
   projectType: 'What type of project are you planning? — select all that apply',
-  // Rendered as a placeholder in the form ("Other (optional)"), so it needs
-  // standalone wording for the task body.
+  // A placeholder in the form, so it needs standalone wording for the task body.
   projectTypeOther: 'Other project type',
   areas: 'What areas are included? — select all that apply',
   size: 'Approximate size of the home or area involved',
@@ -81,10 +74,7 @@ export type InquiryBand = {
   keys: readonly AnswerKey[];
 };
 
-/**
- * Render order for the ClickUp task body, mirroring the `<FormBand>` sequence in
- * `app/inquire/page.tsx` so the task reads in the same order the client filled it.
- */
+/** Render order for the ClickUp task body, mirroring the `<FormBand>` sequence in app/inquire/page.tsx. */
 export const INQUIRY_BANDS: readonly InquiryBand[] = [
   { numeral: '01', label: 'Contact Information', keys: ['name', 'email', 'phone'] },
   {

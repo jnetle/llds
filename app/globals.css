@@ -49,14 +49,9 @@
   --font-sans: var(--font-inter);
 }
 
-/* Breakpoints. The design has exactly two boundaries — mobile ≤600px and
-   tablet ≤1024px — which used to be read in JS by `useCompact`. Tailwind is
-   min-width/mobile-first, so the tiers invert: base styles are mobile, `sm:`
-   is everything above mobile, `lg:` is everything above tablet.
-
-   601/1025 rather than 600/1024 so the boundaries land exactly where the old
-   max-width queries did. Tailwind's `md`, `xl` and `2xl` defaults are left in
-   place but the design has no such tiers — don't reach for them. */
+/* The design has two boundaries: mobile ≤600px, tablet ≤1024px. Tailwind is min-width-first, so the tiers invert —
+   base is mobile, `sm:` is above mobile, `lg:` above tablet. 601/1025 land them exactly where the old max-width
+   queries did. The `md`/`xl`/`2xl` defaults survive but the design has no such tiers; don't reach for them. */
 @theme {
   --breakpoint-sm: 601px;
   --breakpoint-lg: 1025px;
@@ -125,15 +120,9 @@ button {
   font: inherit;
 }
 
-/* Responsive grid tiers for the <Grid> primitive (components/ui/Grid.tsx).
-   `cols` is a free-form track string, so it can't become a Tailwind class —
-   Tailwind only emits classes it can find as literal text. Grid instead writes
-   one custom property per tier and this rule picks the right one, which keeps
-   the breakpoints in CSS (so the first paint is correct) without a build-time
-   vocabulary. Tiers: base ≤600px, `t` 601–1024px, `d` ≥1025px.
-
-   Grid resolves rowGap/columnGap against gap in JS, so only two gap vars per
-   tier arrive here. The 0px fallbacks stand in for "gap omitted". */
+/* Tiers for <Grid>. `cols` is a free-form track string, so it cannot become a Tailwind class — Grid writes one
+   custom property per tier and this rule picks one, keeping the breakpoints in CSS so first paint is correct.
+   Tiers: base ≤600px, `t` 601–1024px, `d` ≥1025px. The 0px fallbacks stand in for "gap omitted". */
 .grid-tiers {
   display: grid;
   grid-template-columns: var(--cols-m);
@@ -174,18 +163,10 @@ a {
   }
 }
 
-/* Global fixed header (components/Header.tsx). Transparent over the photo
-   heroes at the top of a page; fills with warm stone on hover, and stays filled
-   once scrolled (`data-solid`) so the bar reads on the cream routes.
-
-   Warm stone is a mid-tone, so the foreground flips with the fill: cream over
-   the photography, ink once filled (2.3:1 vs 4.7:1 — the cream would fail AA on
-   the 11px nav labels). Both the fill and the foreground live here rather than
-   inline, because inline styles win the cascade — Header.tsx deliberately sets
-   no `color` so every child can inherit / use currentColor.
-
-   The bar is one height on every route and no longer resizes on scroll, so
-   `padding` is not in the transition list. */
+/* Global fixed header. Transparent over the photo heroes, filling with warm stone on hover and staying filled once
+   scrolled (`data-solid`). Warm stone is mid-tone, so the foreground flips with it: cream over photography, ink
+   once filled (the cream would fail AA on the 11px nav labels). Both live here rather than inline, because inline
+   wins the cascade — Header.tsx sets no `color` so children inherit. */
 .site-header {
   background-color: transparent;
   color: var(--bg);
@@ -198,20 +179,9 @@ a {
 
 .site-header:hover,
 .site-header[data-solid] {
-  /* Frosted fill: the page reads through the bar, but diffused rather than
-     sharp. The alpha lives here rather than on --header-fill because that token
-     is also used opaque. The two values are a pair — push the fill much past
-     ~70% and there is no backdrop left to blur.
-
-     10px matches the Services quick-links nav (app/services/page.tsx), the
-     site's other frosted surface. `backdrop-filter` is deliberately NOT in the
-     transition list above: animating it from `none` is expensive, and the
-     background-color transition already carries the state change.
-
-     Unprefixed only — Lightning CSS adds `-webkit-backdrop-filter` from
-     browserslist. Writing the prefix by hand is actively harmful here: it reads
-     the pair as one property and keeps the last, so a manual `-webkit-` line
-     *deletes* the standard one from the build. Same as .mobile-nav-overlay. */
+  /* Frosted fill. The alpha lives here rather than on --header-fill, which is also used opaque; the two are a pair,
+       and past ~70% there is no backdrop left to blur. `backdrop-filter` is deliberately NOT in the transition list
+       above — animating it from `none` is expensive, and the background-color transition carries the state change. */
   background-color: color-mix(in srgb, var(--header-fill) 60%, transparent);
   backdrop-filter: blur(10px);
   color: var(--ink);
@@ -228,13 +198,9 @@ a {
   opacity: 0;
 }
 
-/* Landscape logo (components/LogoLong.tsx). Two color variants stacked and
-   crossfaded, rather than one mark recolored — the artwork is raster, so it
-   can't ride `currentColor` like every other header child. The trigger lives
-   here and not in React because the fill has two triggers: `data-solid` (React
-   state) and `:hover` (CSS only, invisible to React). Picking a `src` in JS
-   would catch the scroll and miss the hover. Timing matches the fill above so
-   the mark, the bar, and the nav flip as one motion. */
+/* Landscape logo. Two color variants crossfaded rather than one mark recolored — the artwork is raster. The trigger
+   lives here, not in React, because the fill has two: `data-solid` (React state) and `:hover` (invisible to React),
+   so picking a `src` in JS would catch the scroll and miss the hover. */
 .logo-long {
   position: relative;
   display: block;
@@ -279,13 +245,9 @@ a {
   transform: scaleX(1);
 }
 
-/* Inquire form — numeral + label underline reveal (used by app/inquire/page.tsx).
-   The band content itself is always visible — the form-level useReveal handles
-   the single entrance fade. We previously hid each band behind opacity:0 and
-   only restored it via an IntersectionObserver, which made the entire form
-   contents disappear whenever the IO failed to fire (scroll restoration on
-   refresh, tall bands, etc.). Only the decorative numeral + underline now
-   depend on `.is-visible`, so a missed IO callback is purely cosmetic. */
+/* Inquire form numeral + underline reveal. Only the decorative numeral and underline depend on `.is-visible`, so a
+   missed IntersectionObserver callback is purely cosmetic — an earlier version hid whole bands behind opacity:0 and
+   lost the entire form whenever the IO failed to fire. */
 .form-band {
   position: relative;
 }
@@ -339,10 +301,8 @@ a {
     transform: translateY(0);
   }
 }
-/* Matches the tier at which <Grid> collapses the band to one column — a sticky
-   rail makes no sense once it sits above the fields rather than beside them.
-   Columns, gap and padding are all owned by the component now (Grid tiers and
-   Tailwind classes); this is the only thing left that CSS has to say. */
+/* Matches the tier at which <Grid> collapses the band to one column — a sticky rail makes no sense once it sits
+   above the fields rather than beside them. */
 @media (max-width: 1024px) {
   .form-band-header {
     position: static;
@@ -357,22 +317,11 @@ a {
 }
 
 /* ======================== INTERACTION STATES ========================
+   Hover and focus are the two things inline styles structurally cannot express, so they are collected here. */
 
-   Hover and focus are the two things inline styles structurally cannot express,
-   so every component that needed them either faked them in JS or went without.
-   Both are collected here rather than in *.module.css files: the pattern above
-   (.site-header:hover, .nav-link:hover, .cover-panel .cover-scroll:hover) is
-   already established and these are the last few holdouts. */
-
-/* Nothing in this codebase drew a focus ring before this block. The inquire
-   form went further and set `outline: none` inline on every input — an inline
-   declaration no stylesheet can override — so a keyboard user filling out a
-   20-field form had no indication of where they were. The inline declarations
-   are gone; this pair replaces them.
-
-   Pointer focus stays ringless, so the visual design is unchanged for mouse
-   users. Note that text inputs match :focus-visible even when clicked (per
-   spec, since they take keyboard input) — that is intended, not a leak. */
+/* The inquire form used to set `outline: none` inline on every input — a declaration no stylesheet can override —
+   leaving a keyboard user with no indication of where they were in a 20-field form. Pointer focus stays ringless.
+   Text inputs match :focus-visible even when clicked, per spec; that is intended. */
 :focus:not(:focus-visible) {
   outline: none;
 }
@@ -382,9 +331,7 @@ a {
   outline-offset: 3px;
 }
 
-/* Inquire submit button (app/inquire/page.tsx). Background lives here, not
-   inline, because an inline `background` outranks the :hover rule. The
-   submitting state reads :disabled rather than a second copy of isSubmitting. */
+/* Inquire submit button. Background lives here, not inline, because an inline `background` outranks :hover. */
 .btn-primary {
   background: var(--ink);
   color: var(--bg);
@@ -402,9 +349,8 @@ a {
   cursor: wait;
 }
 
-/* Home hero tile (components/GridCell.tsx). Hover drove three descendants off
-   one useState, which re-rendered the tile on every pointer cross and did
-   nothing at all until hydration. One parent :hover now feeds all three. */
+/* Home hero tile. One parent :hover feeds all three descendants, which previously shared a useState that
+   re-rendered the tile on every pointer cross and did nothing before hydration. */
 .grid-cell {
   position: relative;
   overflow: hidden;
@@ -475,13 +421,9 @@ a {
   transform: translateY(0);
 }
 
-/* Projects index tile (components/ProjectsGrid.tsx). Same useState-per-tile
-   pattern as above. :focus-within earns its keep here — the tile wraps a
-   <Link>, so tabbing to it now previews the same way hovering does. */
-/* Unlike the two rules either side of it, this class lands on the <img> next/image
-   renders. `fill` supplies the box inline and the component supplies object-fit, so all
-   that is left here is the hover zoom — which works because `transform` does apply to
-   replaced elements. (`::after` would not; see .grid-cell__media.) */
+/* Projects index tile. :focus-within earns its keep — the tile wraps a <Link>, so tabbing previews as hover does. */
+/* Unlike the rules either side, this lands on the <img> next/image renders: all that is left here is the hover zoom,
+   which works because `transform` applies to replaced elements. (`::after` would not; see .grid-cell__media.) */
 .project-tile__media {
   transform: scale(1);
   transition: transform 1.4s var(--ease-elegant);
@@ -492,13 +434,10 @@ a {
   transform: scale(1.03);
 }
 
-/* Project strip tile (components/ProjectStrip.tsx). Was two handlers writing
-   e.currentTarget.style.filter directly — DOM mutations React does not know
-   about, and which never fired for keyboard users. The transition was `all`;
-   only filter ever changed. */
-/* Also stays a wrapper: it owns the 580px box, and `filter` on it applies to the image
-   inside. `position: relative` is required — <button> is static, so without it the
-   `fill` image would escape to <body>, which is itself positioned. */
+/* Project strip tile. Was two handlers writing currentTarget.style.filter — DOM mutations React did not know about,
+   which never fired for keyboard users. */
+/* Stays a wrapper: it owns the 580px box, and `filter` on it applies to the image inside. `position: relative` is
+   required — <button> is static, so without it the `fill` image escapes to <body>, which is itself positioned. */
 .strip-tile__media {
   position: relative;
   width: 100%;
@@ -511,8 +450,7 @@ a {
   filter: brightness(1.05);
 }
 
-/* Services quick-links nav (app/services/page.tsx). Also two handlers mutating
-   currentTarget.style. Declared after .micro-sm so the tighter tracking wins. */
+/* Services quick-links nav. Declared after .micro-sm so the tighter tracking wins. */
 .quick-link {
   color: var(--ink);
   letter-spacing: 0.22em;
@@ -531,18 +469,11 @@ a {
   border-bottom-color: var(--ink);
 }
 
-/* Footer social icons (components/Footer.tsx). The text links these replaced carried
-   their meaning without a hover state; a bare glyph needs one to read as a link.
-   0.8 rather than the 0.7 used above — Phosphor Thin is a lighter mark than any text
-   set at this size, and 0.7 washed it out against Bone White.
+/* Footer social icons. A bare glyph needs a hover state to read as a link; 0.8 rather than the 0.7 used above,
+   since Phosphor Thin is a lighter mark than text at this size and 0.7 washed out against Bone White.
 
-   Hover/focus also swaps Thin for Phosphor Fill, a solid silhouette in the same ink.
-   Both weights are in the DOM and stacked into one grid cell, so the swap is a
-   cross-fade with no layout shift and no JS — matching .grid-cell and .strip-tile,
-   whose handlers were removed for re-rendering on every pointer cross and never firing
-   for keyboard users. The Thin outline fades out as the Fill comes up rather than
-   staying under it: the solid mark is opaque, so a hairline outline behind it would
-   only show through mid-transition. */
+   Hover swaps Thin for Fill. Both weights are stacked into one grid cell, so the swap cross-fades with no layout
+   shift and no JS. The Thin outline fades out rather than staying under the opaque Fill, where it would fringe. */
 .social-icon {
   display: grid;
   place-items: center;
@@ -579,18 +510,15 @@ a {
 
 /* TABLET ≤ 1024px */
 @media (max-width: 1024px) {
-  /* Hide desktop nav links. The Header keeps the <nav> in the DOM but the
-     compact 2-col grid layout requires it to be removed from layout flow. */
+  /* The Header keeps the <nav> in the DOM, but the compact 2-col layout needs it out of flow. */
   header > div > nav {
     display: none !important;
   }
 }
 
-/* Cover panel (components/CoverPanel.tsx) — the arch-window plane shown on entry.
-   Only its keyframes live here; everything static is inline in the component.
-   Every selector is scoped under `.cover-panel` so none of these generic names
-   (`.draw`, `.seat`) can reach anything else. The stagger is arch → lockup →
-   scroll pill → monogram → kicker. */
+/* Cover panel — the arch-window plane shown on entry. Only its keyframes live here; everything static is inline in
+   the component. Every selector is scoped under `.cover-panel` so generic names (`.draw`, `.seat`) cannot reach
+   anything else. The stagger is arch → lockup → scroll pill → monogram → kicker. */
 @keyframes cover-draw {
   to {
     stroke-dashoffset: 0;
@@ -662,11 +590,8 @@ a {
   }
 }
 
-/* One dial for the whole entrance. Every duration and delay below is multiplied
-   by it, so the authored rhythm — including the per-element `--dur`/`--delay`
-   set inline in the component — scales uniformly from a single number. Note
-   these local `--dur`/`--delay` props have nothing to do with the global
-   `--dur-fast`/`--dur-med` tokens in :root; .cover-scroll below uses both. */
+/* One dial for the whole entrance: every duration and delay below is multiplied by it, including the per-element
+   `--dur`/`--delay` set inline in the component. These are unrelated to the global `--dur-*` tokens in :root. */
 .cover-panel {
   --cover-tempo: 1.25;
 }
@@ -709,35 +634,26 @@ a {
   animation: cover-rise-in calc(1s * var(--cover-tempo)) ease calc(var(--delay) * var(--cover-tempo)) both;
 }
 
-/* A looping idle affordance rather than part of the stagger: only its start is
-   scaled, so it still waits for the entrance to settle. The period stays 2.4s. */
+/* A looping idle affordance, not part of the stagger: only its start is scaled, so it waits for the entrance. */
 .cover-panel .cover-nudge {
   animation: cover-nudge 2.4s ease-in-out calc(2s * var(--cover-tempo)) infinite;
 }
 
-/* Hold the whole timeline until CoverPanel says the panel can be seen playing it.
-   CSS animations advance on wall-clock time, not on frames — a main thread busy
-   hydrating doesn't delay this choreography, it skips it, and the first frame the
-   browser paints lands wherever the clock already got to. Pausing is the only way
-   to make the entrance start when there is someone to watch it. Every animation
-   above uses `both`, so a paused element holds at its `from` keyframe: undrawn
-   strokes, invisible lockup and kicker. The wildcard is safe — nothing inside the
-   panel animates except this choreography. */
+/* Hold the timeline until CoverPanel says the panel can be seen playing it. CSS animations advance on wall-clock
+   time, so a main thread busy hydrating does not delay this choreography, it skips it. Every animation above uses
+   `both`, so a paused element holds at its `from` keyframe. The wildcard is safe — nothing else here animates. */
 .cover-panel:not(.is-playing) * {
   animation-play-state: paused;
 }
 
-/* Without JS there is nothing to add .is-playing, so opt back out. Same
-   specificity as the rule above, so it has to stay after it to win. */
+/* Without JS nothing adds .is-playing, so opt back out. Same specificity as the rule above, so it must follow it. */
 @media (scripting: none) {
   .cover-panel:not(.is-playing) * {
     animation-play-state: running;
   }
 }
 
-/* Reduced motion: the panel should arrive fully composed. Nothing here is
-   load-bearing for legibility, so every animation is simply dropped — including
-   the entrance fades, which the source mock leaves running. */
+/* Reduced motion: the panel arrives fully composed. Nothing here is load-bearing for legibility. */
 @media (prefers-reduced-motion: reduce) {
   .cover-panel .draw {
     stroke-dashoffset: 0;
@@ -755,9 +671,7 @@ a {
 
 /* MOBILE ≤ 600px */
 @media (max-width: 600px) {
-  /* Mirror the desktop/mobile split that the <Section> primitive applies in
-     JS, so any consumer using `var(--gutter)` directly (e.g. raw <div>s
-     inside a hero) gets the same tightening. */
+  /* Mirrors the split <Section> applies, so anything using `var(--gutter)` directly tightens the same way. */
   :root {
     --gutter: 24px;
     /* Header bar is ~68px here (16px padding + 36px logo) vs ~74px on desktop. */
@@ -774,11 +688,8 @@ a {
     min-height: 36px;
   }
 
-  /* Chip / RadioPills (components/ui/) — 36px is under the 44px tap-target
-     floor, and these are the densest controls on the site. It has to live here
-     rather than as a `min-h-[44px]` utility on the component: Tailwind emits
-     utilities into `@layer utilities`, and the unlayered `button` rule above
-     beats any layered rule no matter how specific. */
+  /* 36px is under the 44px tap-target floor. This has to live here, not as a `min-h-[44px]` utility: Tailwind emits
+       utilities into `@layer utilities`, and the unlayered `button` rule above beats any layered rule. */
   .pill {
     min-height: 44px;
   }
@@ -826,8 +737,7 @@ a {
   pointer-events: none;
   transform: translateY(-20px);
 }
-/* The global ring is `var(--ink)` — heritage green, which vanished against the
-   old green panel and does the same on navy. Ride currentColor instead. */
+/* The global ring is heritage green, which vanishes against navy. Ride currentColor instead. */
 .mobile-nav-overlay :focus-visible {
   outline-color: currentColor;
 }
@@ -864,9 +774,8 @@ a {
   transform: translateY(0);
 }
 
-/* Reduced motion drops the entrance; (scripting: none) is the load-bearing arm —
-   with no JS nothing ever adds `.is-in`, so without this the images would sit at
-   opacity 0 permanently. Mirrors the cover-panel and .mag-* escape hatches. */
+/* (scripting: none) is the load-bearing arm — with no JS nothing adds `.is-in`, so the images would sit at opacity 0
+   permanently. Mirrors the cover-panel and .mag-* escape hatches. */
 @media (prefers-reduced-motion: reduce), (scripting: none) {
   .press-reveal {
     opacity: 1;
@@ -890,8 +799,7 @@ a {
    ──────────────────────────────────────────────────────────────────────────── */
 
 .mag-track {
-  /* One turn of scroll per page turned. The stage is 100svh, so the track pins
-     for exactly `4 * --mag-turn` with five leaves. */
+  /* One turn of scroll per page turned: the stage is 100svh, so the track pins for `4 * --mag-turn` with five leaves. */
   --mag-turn: 78svh;
   position: relative;
   height: calc(100svh + 4 * var(--mag-turn));
@@ -901,8 +809,7 @@ a {
   position: sticky;
   top: 0;
   height: 100svh;
-  /* `clip`, never `hidden` — hidden would make this a scroll container and kill
-     sticky on every descendant. See the html/body rule above. */
+  /* `clip`, never `hidden` — hidden would make this a scroll container and kill sticky on every descendant. */
   overflow: clip;
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -910,9 +817,8 @@ a {
   gap: 4vw;
 }
 
-/* No gutter on the stage itself: overflow clips at the padding box, so a gutter
-   here would slice the turning page off at 8vw instead of the viewport edge.
-   The left column's spare width IS the arc the page turns through. */
+/* No gutter on the stage: overflow clips at the padding box, so one here would slice the turning page off at 8vw
+   instead of the viewport edge. The left column's spare width IS the arc the page turns through. */
 .mag-stage__book {
   display: flex;
   justify-content: flex-end;
@@ -938,12 +844,10 @@ a {
   transform-origin: left center;
   transform-style: preserve-3d;
   will-change: transform;
-  /* The resting/turning shadow is assigned per frame in MagazineReader — five identical
-     stacked shadows would compound into a halo around the untouched stack. */
+  /* Shadows are assigned per frame in MagazineReader — five stacked would compound into a halo. */
 }
 
-/* First paint, before the scroll callback has run once: only the top of the resting stack casts
-   a shadow. JS inline styles take over from here. */
+/* First paint, before the scroll callback runs: only the top of the resting stack casts a shadow. */
 .mag-leaf:first-child {
   box-shadow:
     0 26px 54px -26px rgb(31 58 50 / 0.34),
@@ -980,8 +884,7 @@ a {
   position: absolute;
   left: 50%;
   bottom: 18px;
-  /* translateZ lifts it clear of the leaves in the book's 3D rendering context,
-     where plain z-index alone is not enough to win against a rotated sibling. */
+  /* translateZ lifts it clear in the book's 3D context, where z-index alone cannot beat a rotated sibling. */
   transform: translate(-50%, 0) translateZ(1px);
   z-index: 40;
   padding: 8px 16px;
@@ -1002,8 +905,7 @@ a {
   display: grid;
 }
 
-/* All quotes share one grid cell so the block is as tall as the longest and the
-   swap is a crossfade rather than a reflow. */
+/* All quotes share one grid cell, so the block is as tall as the longest and the swap crossfades rather than reflows. */
 .mag-quote {
   grid-area: 1 / 1;
   margin: 0;
@@ -1070,8 +972,7 @@ a {
   }
 }
 
-/* Width-driven so aspect-ratio derives the height: giving both an explicit height
-   and a max-width would distort the box instead of scaling it. */
+/* Width-driven so aspect-ratio derives the height; giving both a height and a max-width would distort the box. */
 .mag-lightbox__frame {
   position: relative;
   width: min(88vw, 64svh);
@@ -1161,11 +1062,9 @@ a {
 }
 
 /* ── Fallback: no pin, no 3D, just the pages ───────────────────────────────────
-   Handled entirely in CSS rather than by branching on usePrefersReducedMotion()
-   or useCompact() in the component — both initialise to `false`, so a JS branch
-   would render the animated layout first and swap after hydrate. The
-   `!important` is required because JS writes `transform` inline every frame.
-   The (scripting: none) arm mirrors the cover-panel escape hatch above. */
+   In CSS rather than a usePrefersReducedMotion()/useCompact() branch — both initialise `false`, so a JS branch would
+   render the animated layout first and swap after hydrate. `!important` is required because JS writes `transform`
+   inline every frame. */
 @media (prefers-reduced-motion: reduce), (scripting: none) {
   .mag-track {
     height: auto;
@@ -1202,19 +1101,15 @@ a {
     margin-bottom: 20px;
   }
 
-  /* next/image `fill` renders an absolutely-positioned img, so the face needs an
-     intrinsic ratio of its own to have any height once it leaves the fixed-height
-     stage. Every page is a 612×792pt letter page. */
+  /* `fill` renders an absolutely-positioned img, so the face needs its own ratio to have height off the fixed stage. */
   .mag-leaf__face {
     position: relative;
     inset: auto;
     aspect-ratio: 612 / 792;
   }
 
-  /* The aside exists to give the pinned stage something to say while one page is
-     on top. With every page laid out in full there is no "current" page to
-     caption, and the quotes share a single grid cell so they would overlap —
-     drop the whole column rather than reflow it. */
+  /* With every page laid out in full there is no "current" page to caption, and the quotes share one grid cell, so
+       they would overlap — drop the column rather than reflow it. */
   .mag-leaf__back,
   .mag-leaf__shade,
   .mag-book__hint,
@@ -1280,8 +1175,7 @@ a {
   }
 }
 
-/* No transition to animate, and with no JS the button can never become visible —
-   so take it out of the layout entirely rather than leave an inert control. */
+/* With no JS the button can never become visible, so take it out of layout rather than leave an inert control. */
 @media (prefers-reduced-motion: reduce) {
   .scroll-top {
     transition: none;

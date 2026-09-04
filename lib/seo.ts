@@ -8,25 +8,16 @@ type PageMeta = {
   /** Site-relative path, e.g. '/about'. Resolved against metadataBase. */
   path: string;
   type?: 'website' | 'article';
-  /**
-   * Set only for a route that has its own `opengraph-image` file beside it, which Next
-   * wires up for that segment automatically. Everything else inherits the site card.
-   */
+  /** Set only for a route with its own `opengraph-image` file beside it. Everything else inherits the site card. */
   hasOwnImage?: boolean;
 };
 
 /**
  * Build a route's `openGraph` block.
  *
- * **Next replaces a parent's `openGraph` with a child's — it does not merge them.** So a
- * route that hand-rolls its own silently drops every default the root set: `siteName`,
- * `locale`, and, critically, the `images` entry pointing at `app/opengraph-image.tsx`.
- * That is not theoretical — /about, /press, /services, /inquire and /projects all shipped
- * advertising `twitter:card=summary_large_image` with no image behind it, which renders
- * as an empty card frame.
- *
- * Routing every page through this helper means a route can only add to the defaults, and
- * can no longer lose them by omission.
+ * Next *replaces* a parent's `openGraph` with a child's rather than merging, so a route that hand-rolls its own
+ * silently drops `siteName`, `locale` and the `images` entry — which ships a `summary_large_image` card with no image
+ * behind it. Going through this helper means a route can add to the defaults but never lose them by omission.
  */
 export function pageOpenGraph({ title, description, path, type = 'website', hasOwnImage = false }: PageMeta): Metadata['openGraph'] {
   return {
@@ -36,8 +27,7 @@ export function pageOpenGraph({ title, description, path, type = 'website', hasO
     url: path,
     title,
     description,
-    // A route with a sibling opengraph-image gets it applied at its own segment; naming
-    // it here as well would override that route with the generic site card.
+    // Naming a sibling opengraph-image here would override that route's own card with the generic one.
     ...(hasOwnImage ? {} : { images: ['/opengraph-image'] })
   };
 }

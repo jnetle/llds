@@ -15,20 +15,17 @@ export type MagazinePage = {
   quote?: string;
 };
 
-// Scroll budget. The sticky stage is 100svh, so a track of `100svh + turns * TURN` pins for
-// exactly `turns * TURN` — one --mag-turn of scroll per page turned. LEAD_IN / LEAD_OUT hold the
-// stack still at either end so the cover reads as a cover before it lifts, and the last page
-// rests before the section releases. Same intent as COVER_STAGE / SOLO_STAGE in HeroGrid.
+// The sticky stage is 100svh, so a track of `100svh + turns * TURN` pins for exactly one --mag-turn per page turned.
+// LEAD_IN / LEAD_OUT hold the stack still at either end so the cover reads as a cover before it lifts.
 const LEAD_IN = 0.08;
 const LEAD_OUT = 0.1;
 
-// A leaf is nearly edge-on to the reader past this point; fading it out over the last stretch
-// stops turned pages from piling into a slab on the left. There is no left-hand page for them to
-// land on — this is a single-page reader, not an open spread.
+// Past this point a leaf is nearly edge-on; fading it out stops turned pages piling into a slab on the left, where
+// there is no facing page for them to land on.
 const FADE_FROM = 0.82;
 
-// Leaves are opaque and exactly stacked, so five identical shadows would compound into a halo
-// around the resting stack. Only the leaf mid-turn and the topmost resting leaf carry one.
+// Leaves are opaque and exactly stacked, so five shadows would compound into a halo. Only the leaf mid-turn and the
+// topmost resting leaf carry one.
 const SHADOW_TURNING = '0 34px 70px -20px rgb(31 58 50 / 0.45), 0 8px 22px -10px rgb(31 58 50 / 0.32)';
 const SHADOW_RESTING = '0 26px 54px -26px rgb(31 58 50 / 0.34), 0 4px 14px -8px rgb(31 58 50 / 0.2)';
 
@@ -46,8 +43,7 @@ export function MagazineReader({ pages }: { pages: MagazinePage[] }) {
   const indexRef = useRef(0);
 
   const count = pages.length;
-  // The last page is the bottom of the stack and never turns, so there is one fewer turn than
-  // there are leaves.
+  // The last page is the bottom of the stack and never turns, so there is one fewer turn than leaves.
   const turns = Math.max(1, count - 1);
 
   useTrackProgress(
@@ -56,8 +52,7 @@ export function MagazineReader({ pages }: { pages: MagazinePage[] }) {
       p => {
         const q = clamp01((p - LEAD_IN) / (1 - LEAD_IN - LEAD_OUT));
 
-        // Resolve every turn first: the shadow rule needs to know whether the leaf above has
-        // finished turning, which is not knowable partway through a single pass.
+        // Resolve every turn first — the shadow rule needs to know whether the leaf above has finished turning.
         const turned: number[] = [];
         for (let i = 0; i < count; i++) turned.push(i >= turns ? 0 : clamp01(q * turns - i));
 
@@ -68,9 +63,8 @@ export function MagazineReader({ pages }: { pages: MagazinePage[] }) {
 
           leaf.style.transform = `rotateY(${-t * 180}deg)`;
           leaf.style.opacity = String(t > FADE_FROM ? 1 - (t - FADE_FROM) / (1 - FADE_FROM) : 1);
-          // Everything still face-up paints above everything already turned: untouched leaves get
-          // the top band of the range (2N-i), turned leaves the bottom (i). A single `N - i` vs
-          // `i` split collides in the middle of the stack.
+          // Face-up leaves paint above turned ones: untouched get the top band (2N-i), turned the bottom (i).
+          // A single `N - i` vs `i` split collides in the middle of the stack.
           leaf.style.zIndex = String(t < 0.5 ? 2 * count - i : i);
           leaf.style.boxShadow = t > 0 && t < 1 ? SHADOW_TURNING : t === 0 && (i === 0 || turned[i - 1] === 1) ? SHADOW_RESTING : 'none';
 
@@ -88,8 +82,7 @@ export function MagazineReader({ pages }: { pages: MagazinePage[] }) {
     )
   );
 
-  // Jump the document to the scroll position that puts leaf `i` on top. Reads the track's
-  // geometry on click rather than per frame, so it costs nothing while scrolling.
+  // Jump to the scroll position that puts leaf `i` on top. Reads the track geometry on click, not per frame.
   const goTo = useCallback(
     (i: number) => {
       const el = trackRef.current;
@@ -117,9 +110,8 @@ export function MagazineReader({ pages }: { pages: MagazinePage[] }) {
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-    // Note: no body scroll lock. The reflex is `body { overflow: hidden }`, which check-css.mjs
-    // rejects outright — it would create a scroll container and kill position: sticky sitewide.
-    // The overlay is fixed and opaque, so scrolling behind it is harmless.
+    // No body scroll lock: `body { overflow: hidden }` is rejected by check-css.mjs — it would create a scroll
+    // container and kill position: sticky sitewide. The overlay is fixed and opaque, so scrolling behind is harmless.
   }, [lightbox, close, count]);
 
   return (
@@ -184,9 +176,8 @@ export function MagazineReader({ pages }: { pages: MagazinePage[] }) {
                     style={{
                       opacity: i === index ? 1 : 0,
                       transform: i === index ? 'translateY(0)' : 'translateY(10px)',
-                      // Asymmetric on purpose: the quotes share one grid cell, so a symmetric
-                      // crossfade shows both sets of words stacked on each other mid-swap. The
-                      // outgoing line clears first, then the incoming one arrives.
+                      // Asymmetric on purpose: the quotes share a grid cell, so a symmetric crossfade would stack
+                      // both sets of words mid-swap. The outgoing line clears first.
                       transition:
                         i === index
                           ? `opacity 380ms ${motion.ease} 170ms, transform 380ms ${motion.ease} 170ms`

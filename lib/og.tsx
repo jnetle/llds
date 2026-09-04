@@ -3,22 +3,12 @@ import { join } from 'node:path';
 import type { ReactElement } from 'react';
 
 /**
- * Shared pieces for the `opengraph-image` routes.
+ * Shared pieces for the `opengraph-image` routes. Satori has no CSSOM, so brand hexes are literal — it cannot
+ * dereference `var(--bone-white)` — and it supports only a CSS subset: flexbox but not grid, and every element with
+ * more than one child needs an explicit `display: flex`.
  *
- * Two things here mirror the constraints already documented for the inquiry PDF in
- * lib/pdf/inquiryDocument.tsx, for the same underlying reason — neither renderer has a
- * CSSOM:
- *
- * 1. **Brand hexes are written literally.** `lib/tokens.ts` resolves every color through
- *    a CSS custom property, and satori cannot dereference `var(--bone-white)`.
- * 2. **Fonts are read from disk at module scope, never fetched.** These are the same TTFs
- *    the PDF uses. Nothing imports the files, so Vercel's tracer cannot find them on its
- *    own — `next.config.ts` lists them under `outputFileTracingIncludes` for both OG
- *    routes. Getting that wrong fails only on Vercel: locally the font resolves fine and
- *    in production the route 500s.
- *
- * Note also that satori supports only a subset of CSS: flexbox but not grid, and any
- * element with more than one child needs an explicit `display: flex`.
+ * Fonts are read from disk, never fetched. Nothing imports the files, so `next.config.ts` must list them under
+ * `outputFileTracingIncludes` for both OG routes; getting that wrong fails only on Vercel, where the route 500s.
  */
 
 export const OG_SIZE = { width: 1200, height: 630 };
@@ -42,10 +32,7 @@ export const ogFonts = async () => {
   ];
 };
 
-/**
- * The shared card. One layout for the whole site: an eyebrow, a serif headline, and a
- * rule — the same vocabulary the pages use, at poster scale.
- */
+/** The shared card: eyebrow, serif headline, rule — the pages' own vocabulary at poster scale. */
 export function OgCard({ eyebrow, title, footer }: { eyebrow: string; title: string; footer?: string }): ReactElement {
   return (
     <div

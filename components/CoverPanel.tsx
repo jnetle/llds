@@ -9,29 +9,21 @@ import { brand } from '@/lib/tokens';
 import { ArchGlyphDefs, LL_GLYPH_ID } from './ArchGlyph';
 import logoLongNavy from '@/public/logo-long-navy.png';
 
-// The cover panel: a full-viewport plane pierced by an arch-shaped window, shown
-// on entry and scrolled away by ordinary document flow. There is deliberately no
-// scroll-driven transform here — the panel is `position: absolute; top: 0`, so it
-// rides up because the document does. Anything pinned behind it (today HeroGrid,
-// later a sticky hero) shows through the arch, which is why the panel paints no
-// background of its own: the color comes entirely from the cutout path below.
+// A full-viewport plane pierced by an arch-shaped window, scrolled away by ordinary document flow — no scroll-driven
+// transform, the panel is `position: absolute; top: 0` and rides up because the document does. It paints no
+// background of its own; the color comes entirely from the cutout path below, so whatever is pinned behind shows through.
 
 // ── Arch geometry, in the artwork's own coordinate space ──────────────────────
 const VB = '0 0 1159 1500';
 
-// The inner arch, as a closed subpath. Used twice: once as the hole in the flood
-// fill, once as the clip that keeps the monogram inside the window.
+// The inner arch. Used twice: as the hole in the flood fill, and as the clip keeping the monogram inside the window.
 const ARCH = 'M256 1390.5 V499 A323 323 0 0 1 902 499 V1390.5 Z';
 
-// The window itself. One path, `fill-rule="evenodd"`: a rect far larger than the
-// viewBox (with overflow:visible it floods the whole panel with the cover color)
-// minus ARCH, so the arch is a genuine hole rather than a lighter patch. The
-// panel's `overflow: hidden` is what stops the bleed at the panel edge — it is
-// load-bearing, not cosmetic.
+// One `fill-rule="evenodd"` path: an oversized rect that floods the panel, minus ARCH, so the arch is a genuine hole
+// rather than a lighter patch. The panel's `overflow: hidden` stops the bleed at the edge — load-bearing, not cosmetic.
 const CUTOUT = `M-9000 -9000 H10000 V10000 H-9000 Z ${ARCH}`;
 
-// The six strokes that draw themselves, outward-in: baselines, then the outer
-// arch, then the inner one.
+// The six self-drawing strokes, outward-in: baselines, then the outer arch, then the inner one.
 const STROKES: { d: string; delay: string; dur: string }[] = [
   { d: 'M579 1390.5 H 109', delay: '0s', dur: '.6s' },
   { d: 'M579 1390.5 H 1049', delay: '0s', dur: '.6s' },
@@ -42,45 +34,31 @@ const STROKES: { d: string; delay: string; dur: string }[] = [
 ];
 
 // ── Logo lockup crop ──────────────────────────────────────────────────────────
-// logo-long-navy.png is 1691×386 and leads with the arch monogram, which we crop
-// off so it doesn't double up with the big arch beside it. Measured from the
-// file's alpha channel: the arch inks x 0–280, then a 44px gap, then the wordmark
-// occupies x 325–1690 and rows 82–350. Cropping to exactly that box trims the
-// canvas whitespace on all four sides, so the lockup optically aligns with the
-// kicker rule beneath it.
+// logo-long-navy.png is 1691×386 and leads with the arch monogram, cropped off here so it doesn't double up with the
+// big arch beside it. Measured from the alpha channel: the wordmark occupies x 325–1690, rows 82–350.
 const CROP = { x: 325, y: 82, w: 1691 - 325, h: 350 - 82 + 1 };
 const pct = (n: number) => `${(n * 100).toFixed(4)}%`;
 
 type CoverPanelProps = {
-  /**
-   * Called once the panel has scrolled entirely off the top. It is a splash, so
-   * there is no scrolling back to it: the owner unmounts it here and reclaims
-   * the scroll room it occupied (see HomeShell).
-   */
+  /** Called once the panel is entirely off the top. There is no scrolling back — HomeShell unmounts it here. */
   onDismiss: () => void;
 };
 
 export function CoverPanel({ onDismiss }: CoverPanelProps) {
-  // The reference switches its hero layout at 860px; useCompact already takes a
-  // max-width, so no new hook is needed.
+  // The hero layout switches at 860px.
   const narrow = useCompact(860);
   const scrollY = useScrollY();
   const hiddenRef = useRef<boolean | null>(null);
   const sectionRef = useRef<HTMLElement>(null);
 
-  // The entrance is held paused until the panel can actually be seen playing it
-  // — see useCoverReady for why CSS delays alone get skipped on a cold load.
+  // Held paused until the panel can be seen playing it — see useCoverReady for why CSS delays alone get skipped.
   const playing = useCoverReady(sectionRef);
 
-  // Hand the header off: keep it out of the way while the panel owns the
-  // viewport — the panel's own lockup stands in for it — and release it once the
-  // panel has all but cleared. Same 0.92-of-a-viewport gate as the reference, and
-  // the same `globalHeader:setHidden` event the Services page uses.
+  // Hide the global header while the panel owns the viewport — its own lockup stands in — and release it once the
+  // panel has nearly cleared, via the same `globalHeader:setHidden` event the Services page uses.
   //
-  // The dismissal check rides along in the same effect rather than subscribing
-  // to scroll a second time. It reads the panel's own rect instead of comparing
-  // scrollY to innerHeight: the panel is sized in svh, which parts company with
-  // innerHeight whenever a mobile URL bar is retracted.
+  // The dismissal check rides along here rather than subscribing to scroll twice, and reads the panel's own rect:
+  // the panel is sized in svh, which parts company with innerHeight whenever a mobile URL bar retracts.
   useEffect(() => {
     const next = scrollY < window.innerHeight * 0.92;
     if (hiddenRef.current !== next) {
@@ -112,8 +90,7 @@ export function CoverPanel({ onDismiss }: CoverPanelProps) {
         top: 0,
         left: 0,
         right: 0,
-        // svh, never vh: the panel is a full-viewport cover, and on mobile vh
-        // measures past the browser chrome — the kicker would sit off-screen.
+        // svh, never vh — on mobile vh measures past the browser chrome and the kicker would sit off-screen.
         height: '100svh',
         overflow: 'hidden',
         zIndex: 45,
@@ -181,8 +158,7 @@ export function CoverPanel({ onDismiss }: CoverPanelProps) {
               top: '11.73%',
               bottom: '7.3%',
               borderRadius: '999px 999px 0 0',
-              // Bone white, not the reference's #f3f2f2 — that hex is outside the
-              // brand palette, and the two differ by 8/255 on one channel.
+              // Bone white rather than the reference's #f3f2f2, which is outside the brand palette.
               background: 'rgba(244, 241, 234, 0.3)',
               pointerEvents: 'none'
             }}

@@ -2,15 +2,11 @@
 
 import { useEffect, useState } from 'react';
 
-// How far down the page the button appears, in viewports. 1.5 is the point where
-// "scroll back up" stops being a flick and starts being a trip: the visitor has
-// passed a full screen of content and the top is no longer in recent memory.
-// Anything shorter (a 300px trigger, say) puts a control on screen for a journey
-// the scrollbar already handles.
+// How far down the page the button appears, in viewports. 1.5 is where "scroll back up" stops being a flick and
+// starts being a trip; anything shorter puts a control on screen for a journey the scrollbar already handles.
 const SHOW_AT_VIEWPORTS = 1.5;
 
-// Hidden again slightly higher up than it appeared, so scrolling around the
-// threshold doesn't flicker the button in and out.
+// Hidden slightly higher than it appeared, so scrolling around the threshold doesn't flicker the button.
 const HIDE_AT_VIEWPORTS = 1.2;
 
 export function ScrollToTop() {
@@ -41,16 +37,14 @@ export function ScrollToTop() {
   }, []);
 
   const toTop = () => {
-    // Read the preference at click time rather than through a hook: a hook
-    // initialises `false` and would render the wrong branch before hydration,
-    // and here the value is only ever needed inside the handler.
+    // Read at click time rather than through a hook: a hook initialises `false` and would render the wrong branch
+    // before hydration, and the value is only needed inside the handler.
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     window.scrollTo({ top: 0, behavior: reduced ? 'auto' : 'smooth' });
   };
 
-  // Always rendered; `data-visible` drives the fade in globals.css, the same way
-  // the header's fill rides `data-solid`. Kept out of the tab order and off the
-  // accessibility tree while it is invisible.
+  // Always rendered; `data-visible` drives the fade in globals.css, as the header's fill rides `data-solid`.
+  // Kept out of the tab order and off the accessibility tree while invisible.
   return (
     <button
       type="button"

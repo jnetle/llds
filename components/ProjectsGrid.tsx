@@ -13,9 +13,7 @@ import { brand, motion } from '@/lib/tokens';
 export function ProjectsGrid() {
   const compact = useCompact();
 
-  // Bespoke 32px desktop / 20px mobile gutters maximize tile width for the
-  // project grid. Section's standard 8vw gutters would crop ~165px off each
-  // side on a 1440 viewport, so this stays raw.
+  // Bespoke 32px/20px gutters maximize tile width; Section's 8vw would crop ~165px off each side at 1440.
   return (
     <>
       {/* Clearance so the grid starts below the fixed global header */}
@@ -23,11 +21,7 @@ export function ProjectsGrid() {
 
       <section style={{ padding: compact ? '0 20px 80px' : '0 32px 120px' }}>
         <div style={{ maxWidth: 1600, margin: '0 auto' }}>
-          {/* The index of fifteen projects had no heading of any kind — the tiles are
-              <h3>s under nothing. The design has no room for a visible one above the
-              grid, so this is hidden: it gives the page a document outline without
-              changing the layout. A visible editorial line here would be worth more,
-              but that is a design decision, not an SEO fix. */}
+          {/* The grid has no visible heading, so this carries the page's one <h1>. */}
           <h1 className="sr-only">Projects — Laurel Leaf Design Studio</h1>
           <ProjectsView compact={compact} />
         </div>
@@ -40,9 +34,7 @@ function ProjectsView({ compact }: { compact: boolean }) {
   const reduced = usePrefersReducedMotion();
   const [shown, setShown] = useState(false);
 
-  // Flip to shown on the next frame so the CSS transition has a 0→1 to animate.
-  // Reduced-motion is handled in the styles below (opacity/transform read
-  // `reduced` directly), so no synchronous state work is needed here.
+  // Flip on the next frame so the CSS transition has a 0→1 to animate. Reduced-motion is handled in the styles below.
   useEffect(() => {
     const id = requestAnimationFrame(() => setShown(true));
     return () => cancelAnimationFrame(id);
@@ -82,9 +74,8 @@ function ProjectsTile({ project, index }: { project: Project; index: number }) {
         transition: `opacity ${motion.durXSlow} ${motion.ease} ${delay}, transform ${motion.durXSlow} ${motion.ease} ${delay}`
       }}>
       <Link href={`/projects/${project.id}`} style={{ display: 'block', color: 'inherit' }}>
-        {/* `position: relative` is load-bearing: `fill` renders an absolutely-positioned
-            <img>, and body is itself `position: relative` (globals.css) — so without a
-            positioned parent here the photo escapes and covers the whole page. */}
+        {/* `position: relative` is load-bearing: `fill` renders an absolutely-positioned <img>, and body is itself
+            relative, so a missing position lets the photo cover the whole page rather than failing loudly. */}
         <div
           style={{
             position: 'relative',
@@ -93,16 +84,14 @@ function ProjectsTile({ project, index }: { project: Project; index: number }) {
             background: brand.modernTan,
             marginBottom: 22
           }}>
-          {/* The class rides on the <img> itself — it carries only the hover zoom, and
-              `transform` applies to replaced elements. See globals.css. */}
+          {/* The class rides on the <img> because it carries only a transform, which replaced elements do honour. */}
           <Image
             src={project.cover.src}
             alt={project.cover.alt}
             fill
             className="project-tile__media"
-            // Tiers are 2 / 3 / 4 columns at the sm (601px) and lg (1025px) breakpoints.
-            // The last two entries split because the container caps at maxWidth 1600: a
-            // flat 25vw would ask for 500px slots on a 2000px display where the tile is 376.
+            // Tiers are 2 / 3 / 4 columns at the sm and lg breakpoints. The last two split because the container caps at
+            // 1600: a flat 25vw would ask for 500px slots on a 2000px display where the tile is 376.
             sizes="(max-width: 600px) 50vw, (max-width: 1024px) 33vw, (max-width: 1664px) calc(25vw - 40px), 376px"
             style={{ objectFit: 'cover' }}
             draggable={false}

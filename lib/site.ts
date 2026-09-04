@@ -1,43 +1,18 @@
-/**
- * The studio's identity, in one place.
- *
- * Everything here is read by both the rendered page and the structured data in
- * `lib/schema.ts`. That is the point: before this file the service area was written
- * three different ways across Footer, CoverPanel and StatementSection, and the social
- * URLs existed only inside Footer's `SOCIAL_LINKS`. Structured data that disagrees with
- * the page it sits on is worse than no structured data at all, so both now come from
- * here and the components import back.
- */
+/** The studio's identity. Both the rendered pages and `lib/schema.ts` read from here, so the two cannot drift. */
 
 /**
- * Production origin. No trailing slash — `absoluteUrl` composes it with `new URL`.
+ * Production origin, no trailing slash. Feeds `metadataBase`, every canonical, the sitemap and each schema `@id`.
  *
- * `metadataBase` in app/layout.tsx reads this, and every canonical, sitemap entry, OG
- * URL and schema `@id` resolves against it. Getting it wrong does not throw — it
- * silently emits URLs pointing somewhere useless — so check a deployed preview, not dev.
- *
- * **Set `NEXT_PUBLIC_SITE_URL` on Preview as well as Production.** Two reasons, both
- * easy to get wrong:
- *
- * 1. This module is imported by components/Footer.tsx, which is `'use client'`, so it is
- *    compiled into the browser bundle. Only `NEXT_PUBLIC_`-prefixed variables are inlined
- *    there — `VERCEL_PROJECT_PRODUCTION_URL` is not, so the fallback below evaluates to
- *    `undefined` in the browser and the server and client would disagree about the origin.
- * 2. On Preview deployments `VERCEL_PROJECT_PRODUCTION_URL` is the *production* domain,
- *    not the preview's own URL — so relying on the fallback makes previews emit
- *    production canonicals, which is precisely what you were hoping to verify.
- *
- * The fallback is therefore a last resort for local dev, not a substitute for setting it.
+ * Set `NEXT_PUBLIC_SITE_URL` on Preview as well as Production. The fallback is for local dev only: Footer is a client
+ * component, so only `NEXT_PUBLIC_`-prefixed vars reach the browser, and on Preview `VERCEL_PROJECT_PRODUCTION_URL` is
+ * the *production* domain — previews would emit production canonicals. A wrong value doesn't throw, so verify on a
+ * deployed preview rather than in dev.
  */
 const url =
   process.env.NEXT_PUBLIC_SITE_URL ??
   (process.env.VERCEL_PROJECT_PRODUCTION_URL ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}` : 'http://localhost:3000');
 
-/**
- * Closed on purpose. components/Footer.tsx keys its glyph map by this union, so adding a
- * network here fails `tsc` there until it also has an icon — rather than publishing the
- * URL in structured data while the footer link quietly goes missing.
- */
+/** Closed on purpose: Footer keys its glyph map by this union, so a new network fails `tsc` there until it has an icon. */
 export type SocialLabel = 'Instagram' | 'Facebook';
 
 export type SocialLink = { label: SocialLabel; href: string };
@@ -45,7 +20,6 @@ export type SocialLink = { label: SocialLabel; href: string };
 export const SITE = {
   name: 'Laurel Leaf Design Studio',
   tagline: 'Considered interiors for the long view.',
-  /** Longer form, for meta descriptions that need a service and a place in them. */
   description:
     'Laurel Leaf Design Studio is an interior design practice serving Augusta, Georgia and Aiken, South Carolina — residential and small commercial work, from planning through installation.',
   founder: 'Maria Rhinehart',
@@ -58,22 +32,13 @@ export const SITE = {
     { label: 'Facebook', href: 'https://www.facebook.com/laurelleafdesignstudio' }
   ] as SocialLink[],
 
-  /**
-   * Every place the studio has actually delivered work, taken from PROJECT_META in
-   * lib/projects.ts. Ordered by prominence rather than alphabetically — the first three
-   * are the ones the site's own copy names.
-   */
+  /** Every place the studio has delivered work, ordered by prominence — the first three are the ones the copy names. */
   areaServed: ['Augusta, GA', 'North Augusta, SC', 'Aiken, SC', 'Martinez, GA', 'Evans, GA', 'McCormick, SC', 'Johnston, SC', 'Modoc, SC'],
 
   /**
-   * Empty on purpose. The studio is by appointment only and publishes no phone, email,
-   * or street address anywhere on the site — so the LocalBusiness node omits those
-   * properties rather than inventing them. Fill any of these in and `studioSchema()`
-   * picks it up automatically.
-   *
-   * If you do add them: they must match the Google Business Profile character for
-   * character, and they must also appear on the page. Structured data that states a
-   * fact the page does not is the thing manual actions are for.
+   * Empty on purpose — the studio publishes no contact details, so the LocalBusiness node omits them rather than
+   * inventing them. Fill any in and `studioSchema()` picks it up, but it must then match the Google Business Profile
+   * exactly and also appear on the page.
    */
   telephone: '',
   email: '',

@@ -241,10 +241,8 @@ export default function ServicesPage() {
         setStuck(isStuck);
         dispatch(isStuck);
       },
-      // Negative top margin trips the "stuck" state ~90px before the sentinel
-      // actually clears the viewport. The first quick link ("Services") scrolls
-      // to `section - 70px`, which would otherwise leave the sentinel just
-      // inside the viewport and keep the global header visible.
+      // Negative top margin trips the "stuck" state ~90px early. The first quick link scrolls to `section - 70px`, which
+      // would otherwise leave the sentinel just inside the viewport and keep the global header visible.
       { threshold: 0, rootMargin: '-90px 0px 0px 0px' }
     );
     io.observe(node);
@@ -325,10 +323,7 @@ export default function ServicesPage() {
       {/* Sentinel: flips when the quick-links nav reaches the top */}
       <div ref={sentinelRef} aria-hidden style={{ height: 1 }} />
 
-      {/* Quick links — raw <nav>: sticky with custom 18px vertical padding.
-          Gutter and the mobile scroll-strip behaviour are classes, not inline
-          styles: the `stuck` state rewrites this element's style attribute, and
-          the rules these replaced keyed off that attribute's text. */}
+      {/* Quick links — raw <nav>: sticky, with custom 18px vertical padding. */}
       <nav
         className="px-[24px] py-[18px] sm:px-[8vw]"
         style={{

@@ -3,28 +3,14 @@ import type { InquiryInput } from './inquirySchema';
 import { SITE, absoluteUrl } from './site';
 
 /**
- * The confirmation the visitor receives after submitting the questionnaire.
+ * The confirmation the visitor receives after submitting. To change the wording, edit `COPY` and nothing else — both
+ * the HTML and plain-text parts render from it, so they cannot drift.
  *
- * **To change what the email says, edit `COPY` below and nothing else.** Both
- * the HTML and the plain-text version render from it, so the two cannot drift
- * apart — which they had already started to do when the wording lived inline in
- * each builder.
- *
- * Two constraints shape the markup, and they are the same two that shape
- * `lib/pdf/inquiryDocument.tsx` and `lib/og.tsx` — none of these renderers has a
- * CSSOM:
- *
- * 1. Brand hexes are written literally. `lib/tokens.ts` resolves every color
- *    through a CSS custom property, which an email client will never see.
- * 2. Styling is inline `style` attributes only — no `<style>` block, no classes,
- *    no Tailwind. Gmail strips or rewrites most of what sits in a head.
- *
- * The site's Cormorant Garamond is deliberately not loaded: a webfont in email
- * is unreliable at best and silently falls back at worst, so this uses a
- * web-safe serif stack and lets color and spacing carry the brand instead.
+ * No CSSOM here, as in lib/pdf/inquiryDocument.tsx and lib/og.tsx: brand hexes are literal, and styling is inline
+ * `style` attributes only — Gmail strips most of what sits in a head. Cormorant is deliberately not loaded, since a
+ * webfont in email silently falls back.
  */
 
-// Brand hexes, verbatim from the 2026 brand book — see the note above.
 const ink = '#0f1a2b'; // navy ink
 const paper = '#f4f1ea'; // bone white
 const muted = '#a89f96'; // warm stone
@@ -33,16 +19,8 @@ const accent = '#8a5a32'; // saddle leather
 const SERIF = "Georgia, 'Times New Roman', Times, serif";
 const SANS = "'Helvetica Neue', Helvetica, Arial, sans-serif";
 
-/**
- * Everything the email says, in one place. Plain strings — no markup beyond the
- * two notes below, so this stays editable by someone who does not read HTML.
- *
- * The studio's name and tagline are deliberately absent: they come from `SITE`,
- * which is the single source of truth for identity across the whole site. Change
- * them there and this follows.
- */
+/** Everything the email says. Plain strings beyond the two notes below, so it stays editable by a non-coder. */
 const COPY = {
-  /** Subject line. */
   subject: `Your inquiry is received — ${SITE.name}`,
 
   /** The two letterspaced lines of the wordmark at the top. */
@@ -52,21 +30,13 @@ const COPY = {
   /** Small label above the headline. */
   eyebrow: '— THANK YOU',
 
-  /**
-   * The headline. `<em>` is the one tag allowed here — it renders italic in the
-   * HTML and is stripped for the plain-text version. Anything else will show up
-   * as literal angle brackets in a text client; links belong in `link` below.
-   */
+  /** `<em>` is the only tag allowed here — anything else shows as literal angle brackets in a text client. */
   headline: 'Your inquiry is <em>received</em>.',
 
   /** Used when the submitted name has no usable first word. */
   greetingFallback: 'Hello',
 
-  /**
-   * The body paragraph. `{link}` is replaced by `link.label` — as a real anchor
-   * in the HTML, and as bare text in the plain-text version, which appends the
-   * URL on its own line afterwards.
-   */
+  /** `{link}` becomes an anchor in HTML, and bare text plus the URL on its own line in the plain-text part. */
   body:
     'Thank you for taking the time to complete this inquiry. After reviewing your submission, we will follow up with next steps — ' +
     'which may include a consultation or placement within our upcoming project schedule. In the meantime, you may wish to revisit ' +
@@ -80,15 +50,8 @@ const COPY = {
 } as const;
 
 /**
- * Escape for interpolation into the HTML body.
- *
- * Applied to visitor input only. `COPY` is authored here and trusted — running
- * it through this would turn the headline's `<em>` into literal text.
- *
- * The markdown builders in `lib/inquiryPayload.ts` leave answers unescaped on
- * purpose, because ClickUp renders them in a trusted context. This does not: the
- * visitor's own name is attacker-controlled text going into a document someone
- * else's mail client will parse.
+ * Escape for the HTML body — visitor input only. `COPY` is trusted, and escaping it would make the headline's `<em>`
+ * literal. The markdown builders leave answers unescaped because ClickUp is a trusted context; a mail client is not.
  */
 function esc(value: string): string {
   return value.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
@@ -105,22 +68,15 @@ function firstName(name: string): string {
 }
 
 /**
- * `Jane` → `Jane,` · `''` → `Hello,`
- *
- * Returns raw text. Escaping happens at the HTML call site and must not happen
- * here — the plain-text part would otherwise render `O'Brien` as `O&#39;Brien`.
+ * `Jane` → `Jane,` · `''` → `Hello,`. Returns raw text: escaping belongs at the HTML call site, never here, or the
+ * plain-text part renders `O'Brien` as `O&#39;Brien`.
  */
 function greeting(name: string): string {
   const first = firstName(name);
   return first ? `${first},` : `${COPY.greetingFallback},`;
 }
 
-/**
- * What the builders actually read off a submission. Narrower than `InquiryInput`
- * on purpose: the full parsed form satisfies it at the call site in
- * app/inquire/actions.ts, and app/dev/email-preview can render a template
- * without inventing 33 answers it does not use.
- */
+/** What the builders read off a submission. Narrower than `InquiryInput` so the preview route need not invent 33 answers. */
 export type Recipient = Pick<InquiryInput, 'name'>;
 
 export function confirmationSubject(): string {

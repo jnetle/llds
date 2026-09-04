@@ -34,8 +34,7 @@ export function ProjectDetail({ project }: Props) {
         opacity: opening ? 0 : 1,
         transition: `opacity ${motion.durMed} ease`
       }}>
-      {/* Top bar — sits below the fixed global header. Bespoke 36px gutter to
-          align tightly with the global header's content rhythm. */}
+      {/* Top bar. Bespoke 36px gutter to align with the global header. */}
       <div
         style={{
           display: 'flex',
@@ -58,10 +57,7 @@ export function ProjectDetail({ project }: Props) {
         </Link>
       </div>
 
-      {/* Hero image. The opening scale stays on the wrapper, not the <img>: the wrapper
-          is also what gives `fill` its containing block, and transforming it scales the
-          absolutely-positioned child exactly as it used to scale the painted background.
-          No `overflow: hidden` here — the 1.05 bleed is meant to show. */}
+      {/* Hero image. The opening scale stays on the wrapper, not the <img>. */}
       <div
         style={{
           position: 'relative',
@@ -70,9 +66,7 @@ export function ProjectDetail({ project }: Props) {
           transform: opening ? 'scale(1.05)' : 'scale(1)',
           transition: `transform ${motion.durXSlow} ${motion.ease}`
         }}>
-        {/* No `key` on this: clicking a plate mutates src on the existing element, and
-            the browser keeps painting the current image until the next one has fully
-            decoded. A key would remount and blank the box mid-swap. */}
+        {/* No `key`: clicking a plate mutates src on the existing element rather than remounting. */}
         <Image
           src={project.gallery[imgIndex].src}
           alt={project.gallery[imgIndex].alt}
@@ -110,17 +104,13 @@ export function ProjectDetail({ project }: Props) {
             aria-pressed={imgIndex === i}
             style={{ cursor: 'pointer', textAlign: 'left', padding: 0, background: 'none', border: 'none' }}>
             <div style={{ position: 'relative', height: i === 1 ? '60vh' : '80vh', background: brand.modernTan }}>
-              {/* The button's aria-label already names the action, and it overrides the
-                  button's contents for the accessibility tree — so this alt is not read
-                  out twice. It is here for crawlers, which read alt and not aria-label.
-                  Do not "de-duplicate" it to alt="". */}
+              {/* The button's aria-label names the action, so the image inside is decorative. */}
               <Image
                 src={image.src}
                 alt={image.alt}
                 fill
-                // Deliberately 100vw rather than the ~84vw these actually occupy: it makes
-                // the srcset candidate identical to the hero's, so clicking a plate swaps
-                // the hero straight from cache instead of fetching a near-identical width.
+                // 100vw rather than the ~84vw these occupy, so the srcset candidate matches the hero's and clicking a plate
+                // swaps it straight from cache instead of fetching a near-identical width.
                 sizes="100vw"
                 style={{ objectFit: 'cover' }}
                 draggable={false}
@@ -131,8 +121,7 @@ export function ProjectDetail({ project }: Props) {
         <Eyebrow opacity={0.6}>Built by {project.builder}</Eyebrow>
       </Section>
 
-      {/* Footer nav between projects — bespoke 36px gutter to align with top bar.
-          Grid collapses to 1-col at ≤1024 via the cols-string default. */}
+      {/* Footer nav between projects. Bespoke 36px gutter, to align with the top bar. */}
       <Grid
         cols="1fr 1fr 1fr"
         gap={32}

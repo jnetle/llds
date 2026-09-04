@@ -2,13 +2,11 @@ import { SITE, absoluteUrl } from '@/lib/site';
 import { splitLocation, type Project } from '@/lib/projects';
 
 /**
- * schema.org builders. Everything factual here comes from `lib/site.ts` or `lib/projects.ts`
- * — the same values the pages render — so the markup cannot drift from the visible copy.
+ * schema.org builders. Every fact comes from `lib/site.ts` or `lib/projects.ts` — the same values the pages render —
+ * so the markup cannot drift from the visible copy.
  *
- * Deliberately absent: `Review` and `AggregateRating`. Every quote in `lib/testimonials.ts`
- * is flagged in that file as invented placeholder copy. Marking invented testimonials up as
- * structured data is both false and a documented manual-action trigger. Add them when there
- * are real client words to attribute, and not before.
+ * No `Review` or `AggregateRating` on purpose: the quotes in `lib/testimonials.ts` are invented placeholder copy, and
+ * marking those up is both false and a documented manual-action trigger. Add them when there are real client words.
  */
 
 type Node = Record<string, unknown>;
@@ -21,12 +19,8 @@ export const STUDIO_ID = `${SITE.url}/#studio`;
 const WEBSITE_ID = `${SITE.url}/#website`;
 
 /**
- * The studio itself.
- *
- * `HomeAndConstructionBusiness` is the nearest real type — schema.org has no interior
- * design vocabulary, and this is the LocalBusiness subtype Google documents for the trade.
- * `areaServed` carries the whole service region because there is no address: a studio that
- * works by appointment across two states has a service area, not a storefront.
+ * The studio itself. `HomeAndConstructionBusiness` is the nearest type schema.org offers — there is no interior design
+ * vocabulary. `areaServed` stands in for an address: an appointment-only studio has a service area, not a storefront.
  */
 export function studioSchema(): Node {
   return {
@@ -39,9 +33,8 @@ export function studioSchema(): Node {
     url: SITE.url,
     foundingDate: SITE.foundingDate,
     founder: { '@type': 'Person', name: SITE.founder, jobTitle: 'Founder & Interior Designer' },
-    // `City` has no `addressRegion` — consumers drop unknown properties, which would
-    // leave a bare "Augusta" and lose the whole point of a two-state service area.
-    // `containedInPlace` is the modelled way to say which state a city is in.
+    // `City` has no `addressRegion`, and consumers drop unknown properties — a bare "Augusta" would lose the point
+    // of a two-state service area. `containedInPlace` is the modelled way to name a city's state.
     areaServed: SITE.areaServed.map(area => {
       const { city, region } = splitLocation(area);
       return {
@@ -52,14 +45,11 @@ export function studioSchema(): Node {
     }),
     sameAs: SITE.social.map(s => s.href),
     knowsAbout: ['Interior design', 'Residential interior architecture', 'New construction', 'Renovation'],
-    // Each of these is omitted rather than emitted empty — see the note in lib/site.ts.
+    // Omitted rather than emitted empty — see lib/site.ts.
     ...(SITE.telephone ? { telephone: SITE.telephone } : {}),
     ...(SITE.email ? { email: SITE.email } : {}),
     ...(SITE.address ? { address: { '@type': 'PostalAddress', ...SITE.address } } : {}),
-    /**
-     * Real, verifiable recognition — the strongest genuine signal the site has. Mirrors
-     * what `/press` renders; update both together.
-     */
+    /** Mirrors what `/press` renders; update both together. */
     award: [
       'Best Curb Appeal, Custom Built Spec Home — 2026 Stellar Awards, HBA of the Aiken-Augusta Region',
       'Best Kitchen, Custom Built Spec Home — 2026 Stellar Awards, HBA of the Aiken-Augusta Region'
@@ -102,10 +92,7 @@ export function breadcrumbSchema(trail: [name: string, path: string][]): Node {
   };
 }
 
-/**
- * One project. `CreativeWork` rather than `Product` or `Service` — it is a body of work
- * shown as a portfolio piece, with no price and nothing to buy.
- */
+/** One project. `CreativeWork` rather than `Product` — a portfolio piece, with no price and nothing to buy. */
 export function projectSchema(project: Project): Node {
   const { city, region } = splitLocation(project.location);
 
@@ -116,18 +103,15 @@ export function projectSchema(project: Project): Node {
     name: project.title,
     description: project.summary,
     url: absoluteUrl(`/projects/${project.id}`),
-    // `year` is all the precision the data has, so the date is year-only rather than a
-    // fabricated January 1st.
+    // Year-only because that is all the precision the data has — better than a fabricated January 1st.
     dateCreated: project.year,
     creator: { '@id': STUDIO_ID },
     locationCreated: {
       '@type': 'Place',
       address: { '@type': 'PostalAddress', addressLocality: city, ...(region ? { addressRegion: region } : {}) }
     },
-    // Omitted entirely while the photos are placeholders. Publishing a stock interior as
-    // a machine-readable depiction of this project would be a false claim — and the same
-    // pooled image is reused under other project names, so three @ids would assert the
-    // same photographs. Same reasoning as the absent Review schema above.
+    // Omitted while the photos are placeholders: claiming a stock interior depicts this project would be false, and
+    // the pooled images repeat across projects, so several @ids would assert the same photographs.
     ...(project.hasRealAssets ? { image: [project.cover, ...project.gallery].map(i => i.src) } : {}),
     isPartOf: { '@id': WEBSITE_ID }
   };

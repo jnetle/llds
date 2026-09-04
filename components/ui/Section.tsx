@@ -1,11 +1,9 @@
 import type { ElementType, HTMLAttributes, Ref } from 'react';
 import type { SectionPad } from '@/lib/tokens';
 
-// Vertical padding presets, mirroring `sectionPadY` in lib/tokens.ts — mobile
-// value as the base, desktop value behind `sm:` (>600px). These have to be
-// complete literal strings: Tailwind scans source text, so an interpolated
-// `pt-[${n}px]` is never emitted and silently renders as no padding at all.
-// scripts/check-css.mjs asserts these stay in step with the token table.
+// Mirrors `sectionPadY` in lib/tokens.ts, mobile as the base and desktop behind `sm:`. These MUST stay complete
+// literal strings — Tailwind scans source text, so an interpolated `pt-[${n}px]` is never emitted and silently
+// renders as no padding. scripts/check-css.mjs asserts they stay in step with the token table.
 const PAD_TOP: Record<SectionPad, string> = {
   none: 'pt-0',
   xxs: 'pt-[24px] sm:pt-[60px]',
@@ -56,10 +54,8 @@ export function Section({
   children,
   ...rest
 }: SectionProps) {
-  // ElementType escape hatch: with a polymorphic `as` union spanning multiple
-  // HTML element types, JSX wants ref's type to satisfy the intersection of
-  // every ref shape — which is empty. Casting Tag to ElementType lets the
-  // ref pass through; runtime safety is fine since ref is always HTMLElement.
+  // With a polymorphic `as` union, JSX wants ref's type to satisfy the intersection of every ref shape — which is
+  // empty. Casting to ElementType lets the ref through; ref is always HTMLElement at runtime.
   const Tag = as as ElementType;
 
   const classes = [GUTTER, PAD_TOP[padTop ?? padY], PAD_BOTTOM[padBottom ?? padY], topBorder ? 'border-t border-hairline' : null, className]
