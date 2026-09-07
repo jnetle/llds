@@ -1,12 +1,12 @@
 import type { MetadataRoute } from 'next';
 import { SITE, absoluteUrl } from '@/lib/site';
+import { siteIsLive } from '@/lib/env';
 
 /**
  * Repeats the pre-launch gate from app/layout.tsx rather than inheriting it: a Route Handler never sees the root
  * layout's metadata, and a `robots.txt` allowing everything while every page says `noindex` is a contradiction
  * crawlers resolve unpredictably. Unset is the safe state.
  */
-const siteIsLive = process.env.SITE_LIVE === 'true';
 
 export default function robots(): MetadataRoute.Robots {
   if (!siteIsLive) {

@@ -1,4 +1,5 @@
 import { confirmationHtml, confirmationSubject, confirmationText } from '@/lib/inquiryEmail';
+import { isProduction } from '@/lib/env';
 
 /**
  * Local preview for the inquiry confirmation email — renders the same builders the server action uses, with hot
@@ -11,7 +12,7 @@ import { confirmationHtml, confirmationSubject, confirmationText } from '@/lib/i
  *   /dev/email-preview?name=D%27Angelo    → try a different greeting
  */
 export async function GET(request: Request): Promise<Response> {
-  if (process.env.NODE_ENV === 'production') {
+  if (isProduction) {
     return new Response('Not found', { status: 404 });
   }
 
