@@ -8,11 +8,10 @@ type LogoLongProps = {
 };
 
 /**
- /**
-  * The landscape brand lockup, shipped as two color variants stacked on each other — the artwork is raster, so it
-  * cannot ride `currentColor`. Which one shows is decided in globals.css, not here: the header's fill flips on both
-  * `:hover` and `data-solid`, and only one of those is visible to React.
-  */
+ * The landscape brand lockup, shipped as two color variants stacked on each other — the artwork is raster, so it
+ * cannot ride `currentColor`. Which one shows is decided in globals.css, not here: the header's fill flips on both
+ * `:hover` and `data-solid`, and only one of those is visible to React.
+ */
 export function LogoLong({ height = 32, className }: LogoLongProps) {
   return (
     <span className={`logo-long ${className ?? ''}`} style={{ height, aspectRatio: `${bone.width} / ${bone.height}` }}>

@@ -4,10 +4,9 @@ import { pageOpenGraph } from '@/lib/seo';
 import { SITE } from '@/lib/site';
 
 /**
- /**
-  * Inherits the root's `title.default` but takes its own description: the tagline is good copy and useless as a
-  * search snippet, naming neither the service nor the region on the page most likely to rank for both.
-  */
+ * Inherits the root's `title.default` but takes its own description: the tagline is good copy and useless as a
+ * search snippet, naming neither the service nor the region on the page most likely to rank for both.
+ */
 export const metadata: Metadata = {
   description: SITE.description,
   alternates: { canonical: '/' },
