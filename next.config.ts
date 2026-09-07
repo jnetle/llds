@@ -1,19 +1,11 @@
 import type { NextConfig } from 'next';
+import { configuredImageHost } from './lib/env';
 
 const DEFAULT_IMG_HOST = 'pub-2c63d568453046b488491cb8d09ac07b.r2.dev';
 
-const configuredImgHost = (() => {
-  const base = process.env.NEXT_PUBLIC_IMG_BASE;
-  if (!base) return null;
-  try {
-    const { protocol, hostname } = new URL(base);
-    return protocol === 'https:' ? hostname : null;
-  } catch {
-    return null;
-  }
-})();
-
-const imageHosts = [DEFAULT_IMG_HOST, configuredImgHost].filter((host, i, arr): host is string => Boolean(host) && arr.indexOf(host) === i);
+const imageHosts = [DEFAULT_IMG_HOST, configuredImageHost].filter(
+  (host, i, arr): host is string => Boolean(host) && arr.indexOf(host) === i
+);
 
 const nextConfig: NextConfig = {
   // react-pdf and the OG routes read these TTFs (and the logo) from disk at render time, and nothing imports them, so

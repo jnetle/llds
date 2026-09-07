@@ -6,6 +6,7 @@ import { Eyebrow } from '@/components/ui/Eyebrow';
 import { Heading } from '@/components/ui/Heading';
 import { color, space, text } from '@/lib/tokens';
 import { SITE } from '@/lib/site';
+import { gaMeasurementId } from '@/lib/env';
 
 /** Bump when the substance below changes, not for a typo. */
 const UPDATED = 'September 3, 2026';
@@ -62,7 +63,7 @@ function TextLink({ href, children }: { href: string; children: ReactNode }) {
 export default function PrivacyPage() {
   // The same gate app/layout.tsx uses for the gtag script, so the policy only claims analytics when the site runs it.
   // Both routes prerender, so the script tag and the paragraph describing it come out of one build and cannot disagree.
-  const analyticsEnabled = Boolean(process.env.GA_MEASUREMENT_ID);
+  const analyticsEnabled = Boolean(gaMeasurementId);
 
   // padTop `md` matches --scroll-offset, the clearance the rest of the site assumes for the fixed header.
   return (

@@ -8,6 +8,7 @@ import { GoogleAnalytics } from '@next/third-parties/google';
 import { JsonLd } from '@/components/seo/JsonLd';
 import { studioSchema, websiteSchema } from '@/lib/schema';
 import { SITE } from '@/lib/site';
+import { gaMeasurementId, siteIsLive } from '@/lib/env';
 
 const cormorant = Cormorant_Garamond({
   variable: '--font-cormorant',
@@ -23,9 +24,6 @@ const inter = Inter({
   subsets: ['latin'],
   display: 'swap'
 });
-
-// Pre-launch noindex. Set SITE_LIVE=true on Vercel Production at launch; anything else, unset included, keeps it on.
-const siteIsLive = process.env.SITE_LIVE === 'true';
 
 export const metadata: Metadata = {
   // Every relative URL below resolves against this; without it Next throws on relative OG images and emits no canonical.
@@ -68,7 +66,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   // Set per environment in Vercel. Unset (the local default) renders no gtag script at all.
-  const gaId = process.env.GA_MEASUREMENT_ID;
+  const gaId = gaMeasurementId;
 
   return (
     <html lang="en" className={`${cormorant.variable} ${inter.variable} h-full`}>

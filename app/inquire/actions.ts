@@ -8,6 +8,7 @@ import { confirmationHtml, confirmationSubject, confirmationText } from '@/lib/i
 import { toFullMarkdown, toSummaryMarkdown, toTaskName } from '@/lib/inquiryPayload';
 import { allow } from '@/lib/rateLimit';
 import { inquirySchema, type InquiryInput } from '@/lib/inquirySchema';
+import { getClickUpConfig, getInquiryEmailConfig } from '@/lib/env';
 
 export type SubmitResult = { ok: true } | { ok: false; error: string };
 
@@ -35,12 +36,12 @@ export async function submitInquiry(raw: unknown): Promise<SubmitResult> {
     return { ok: true };
   }
 
-  const token = process.env.CLICKUP_API_TOKEN;
-  const listId = process.env.CLICKUP_LIST_ID;
-  if (!token || !listId) {
+  const clickUp = getClickUpConfig();
+  if (!clickUp) {
     console.error('Inquiry submission failed: CLICKUP_API_TOKEN or CLICKUP_LIST_ID is not set.');
     return { ok: false, error: 'Inquiry system is not configured. Please email us directly.' };
   }
+  const { token, listId } = clickUp;
 
   const data = parsed.data;
   const submittedAt = new Date().toISOString();
@@ -123,19 +124,18 @@ async function mayEmail(email: string): Promise<boolean> {
  */
 async function sendConfirmation(data: InquiryInput, submittedAt: string): Promise<void> {
   try {
-    const apiKey = process.env.RESEND_API_KEY;
-    const from = process.env.INQUIRY_FROM_EMAIL;
+    const emailConfig = getInquiryEmailConfig();
 
-    if (!apiKey || !from) {
+    if (!emailConfig) {
       console.warn('RESEND_API_KEY or INQUIRY_FROM_EMAIL is not set; skipping the inquiry confirmation email.');
       return;
     }
 
     await sendEmail({
-      apiKey,
-      from,
+      apiKey: emailConfig.apiKey,
+      from: emailConfig.from,
       to: data.email,
-      replyTo: process.env.INQUIRY_REPLY_TO || undefined,
+      replyTo: emailConfig.replyTo,
       subject: confirmationSubject(),
       html: confirmationHtml(data, submittedAt),
       text: confirmationText(data, submittedAt)

@@ -1,3 +1,5 @@
+import { siteUrl } from '@/lib/env';
+
 /** The studio's identity. Both the rendered pages and `lib/schema.ts` read from here, so the two cannot drift. */
 
 /**
@@ -8,9 +10,7 @@
  * the *production* domain — previews would emit production canonicals. A wrong value doesn't throw, so verify on a
  * deployed preview rather than in dev.
  */
-const url =
-  process.env.NEXT_PUBLIC_SITE_URL ??
-  (process.env.VERCEL_PROJECT_PRODUCTION_URL ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}` : 'http://localhost:3000');
+const url = siteUrl;
 
 /** Closed on purpose: Footer keys its glyph map by this union, so a new network fails `tsc` there until it has an icon. */
 export type SocialLabel = 'Instagram' | 'Facebook';
