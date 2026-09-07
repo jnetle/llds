@@ -1,5 +1,20 @@
 import type { NextConfig } from 'next';
 
+const DEFAULT_IMG_HOST = 'pub-2c63d568453046b488491cb8d09ac07b.r2.dev';
+
+const configuredImgHost = (() => {
+  const base = process.env.NEXT_PUBLIC_IMG_BASE;
+  if (!base) return null;
+  try {
+    const { protocol, hostname } = new URL(base);
+    return protocol === 'https:' ? hostname : null;
+  } catch {
+    return null;
+  }
+})();
+
+const imageHosts = [DEFAULT_IMG_HOST, configuredImgHost].filter((host, i, arr): host is string => Boolean(host) && arr.indexOf(host) === i);
+
 const nextConfig: NextConfig = {
   // react-pdf and the OG routes read these TTFs (and the logo) from disk at render time, and nothing imports them, so
   // the tracer cannot find them on its own. Getting this wrong fails ONLY on Vercel: the PDF renders in a fallback
@@ -27,11 +42,11 @@ const nextConfig: NextConfig = {
         protocol: 'https',
         hostname: 'images.unsplash.com'
       },
-      {
-        // Cloudflare R2 public dev URL — swap/add the custom domain here in prod.
-        protocol: 'https',
-        hostname: 'pub-2c63d568453046b488491cb8d09ac07b.r2.dev'
-      }
+      ...imageHosts.map(hostname => ({
+        // Keep the legacy R2 host and also allow NEXT_PUBLIC_IMG_BASE (when valid https) for custom CDN domains.
+        protocol: 'https' as const,
+        hostname
+      }))
     ]
   }
 };

@@ -508,14 +508,6 @@ a {
 
 /* ======================== RESPONSIVE ======================== */
 
-/* TABLET ≤ 1024px */
-@media (max-width: 1024px) {
-  /* The Header keeps the <nav> in the DOM, but the compact 2-col layout needs it out of flow. */
-  header > div > nav {
-    display: none !important;
-  }
-}
-
 /* Cover panel — the arch-window plane shown on entry. Only its keyframes live here; everything static is inline in
    the component. Every selector is scoped under `.cover-panel` so generic names (`.draw`, `.seat`) cannot reach
    anything else. The stagger is arch → lockup → scroll pill → monogram → kicker. */
@@ -676,11 +668,6 @@ a {
     --gutter: 24px;
     /* Header bar is ~68px here (16px padding + 36px logo) vs ~74px on desktop. */
     --scroll-offset: 96px;
-  }
-
-  /* Header padding */
-  header {
-    padding: 16px 18px !important;
   }
 
   /* Buttons: keep tap target */
