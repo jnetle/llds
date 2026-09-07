@@ -4,7 +4,7 @@ import Image from 'next/image';
 import { type ReactNode } from 'react';
 import type { Project } from '@/lib/projects';
 import { useCompact } from '@/hooks/useCompact';
-import { color } from '@/lib/tokens';
+import { color, motion } from '@/lib/tokens';
 import { GridCell } from './GridCell';
 
 // Placeholder pending real photography — migrates to shared/home-hero.jpg on R2.
@@ -101,6 +101,58 @@ export function HeroGrid({ projects, onOpen, pinnedLead = false, coverStage = fa
             background: '#1a1a1a'
           }}>
           <HeroLead />
+          <div
+            aria-hidden={coverStage}
+            style={{
+              position: 'absolute',
+              inset: 0,
+              zIndex: 12,
+              pointerEvents: 'none',
+              opacity: coverStage ? 0 : 1,
+              transform: coverStage ? 'translateY(14px)' : 'translateY(0)',
+              transition: `opacity ${motion.durMed} ${motion.ease}, transform ${motion.durMed} ${motion.ease}`
+            }}>
+            <div
+              aria-hidden
+              style={{
+                position: 'absolute',
+                inset: 0,
+                background:
+                  'radial-gradient(112% 96% at 0% 100%, rgba(15, 26, 43, 0.42) 0%, rgba(15, 26, 43, 0.36) 28%, rgba(15, 26, 43, 0.17) 50%, rgba(15, 26, 43, 0) 74%), linear-gradient(to top, rgba(15, 26, 43, 0.1) 0%, rgba(15, 26, 43, 0) 22%), linear-gradient(to left, rgba(15, 26, 43, 0.1) 0%, rgba(15, 26, 43, 0) 28%)'
+              }}
+            />
+            <div
+              style={{
+                position: 'absolute',
+                left: isCompact ? 20 : 36,
+                bottom: isCompact ? 20 : 32,
+                color: color.bg,
+                maxWidth: 'min(560px, 84vw)',
+                textShadow: '0 2px 18px rgba(0,0,0,0.5), 0 1px 2px rgba(0,0,0,0.55)'
+              }}>
+              <p
+                className="micro-sm"
+                style={{
+                  margin: 0,
+                  opacity: 0.98,
+                  marginBottom: 8
+                }}>
+                From concept to completion
+              </p>
+              <p
+                className="serif"
+                style={{
+                  margin: 0,
+                  fontSize: 'clamp(20px, 2.1vw, 34px)',
+                  lineHeight: 1.16,
+                  fontWeight: 300,
+                  letterSpacing: '-0.01em',
+                  textWrap: 'balance'
+                }}>
+                Residential design for homes with lasting character.
+              </p>
+            </div>
+          </div>
         </div>
       </Stage>
 
