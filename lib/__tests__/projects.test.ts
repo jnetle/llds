@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import { PROJECTS, getProject, splitLocation } from '../projects';
 
+const KEBAB_KEY_RE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+
 describe('projects data', () => {
   it('has unique project slugs', () => {
     const slugs = PROJECTS.map(project => project.slug);
@@ -10,6 +12,12 @@ describe('projects data', () => {
   it('has unique asset keys', () => {
     const assetKeys = PROJECTS.map(project => project.assetKey);
     expect(new Set(assetKeys).size).toBe(assetKeys.length);
+  });
+
+  it('uses lowercase kebab-case asset keys', () => {
+    for (const project of PROJECTS) {
+      expect(project.assetKey).toMatch(KEBAB_KEY_RE);
+    }
   });
 
   it('contains exactly 3 gallery images per project', () => {
