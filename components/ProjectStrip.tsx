@@ -74,7 +74,7 @@ export function ProjectStrip({ projects, onOpen }: Props) {
         }}>
         {[...projects, ...projects].map((p, i) => (
           <button
-            key={`${p.id}-${i}`}
+            key={`${p.slug}-${i}`}
             onClick={() => onOpen(p)}
             className="strip-tile"
             style={{

@@ -7,7 +7,7 @@ import { breadcrumbSchema, projectSchema } from '@/lib/schema';
 import { pageOpenGraph } from '@/lib/seo';
 
 export function generateStaticParams() {
-  return PROJECTS.map(p => ({ slug: p.id }));
+  return PROJECTS.map(p => ({ slug: p.slug }));
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
@@ -15,7 +15,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const project = getProject(slug);
   if (!project) return {};
 
-  const url = `/projects/${project.id}`;
+  const url = `/projects/${project.slug}`;
 
   return {
     // Bare title — app/layout.tsx's template appends the studio name.
@@ -45,11 +45,11 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
           projectSchema(project),
           breadcrumbSchema([
             ['Projects', '/projects'],
-            [project.title, `/projects/${project.id}`]
+            [project.title, `/projects/${project.slug}`]
           ])
         ]}
       />
-      <ProjectDetail key={project.id} project={project} />
+      <ProjectDetail key={project.slug} project={project} />
     </>
   );
 }

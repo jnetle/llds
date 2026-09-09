@@ -4,7 +4,7 @@ import { PROJECTS, getProject } from '@/lib/projects';
 
 // Without this the route is rendered on demand, so the first social crawler pays a cold start — and crawlers time out.
 export function generateStaticParams() {
-  return PROJECTS.map(p => ({ slug: p.id }));
+  return PROJECTS.map(p => ({ slug: p.slug }));
 }
 
 /**

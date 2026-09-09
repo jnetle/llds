@@ -2,9 +2,14 @@ import { describe, expect, it } from 'vitest';
 import { PROJECTS, getProject, splitLocation } from '../projects';
 
 describe('projects data', () => {
-  it('has unique project ids', () => {
-    const ids = PROJECTS.map(project => project.id);
-    expect(new Set(ids).size).toBe(ids.length);
+  it('has unique project slugs', () => {
+    const slugs = PROJECTS.map(project => project.slug);
+    expect(new Set(slugs).size).toBe(slugs.length);
+  });
+
+  it('has unique asset keys', () => {
+    const assetKeys = PROJECTS.map(project => project.assetKey);
+    expect(new Set(assetKeys).size).toBe(assetKeys.length);
   });
 
   it('contains exactly 3 gallery images per project', () => {
@@ -15,7 +20,7 @@ describe('projects data', () => {
 
   it('returns projects by slug and undefined for unknown slugs', () => {
     const sample = PROJECTS[0];
-    expect(getProject(sample.id)?.id).toBe(sample.id);
+    expect(getProject(sample.slug)?.slug).toBe(sample.slug);
     expect(getProject('not-a-real-project')).toBeUndefined();
   });
 

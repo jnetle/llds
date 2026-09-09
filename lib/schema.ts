@@ -96,10 +96,10 @@ export function projectSchema(project: Project): Node {
   return {
     '@context': 'https://schema.org',
     '@type': 'CreativeWork',
-    '@id': absoluteUrl(`/projects/${project.id}`) + '#project',
+    '@id': absoluteUrl(`/projects/${project.slug}`) + '#project',
     name: project.title,
     description: project.summary,
-    url: absoluteUrl(`/projects/${project.id}`),
+    url: absoluteUrl(`/projects/${project.slug}`),
     // Year-only because that is all the precision the data has — better than a fabricated January 1st.
     dateCreated: project.year,
     creator: { '@id': STUDIO_ID },

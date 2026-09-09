@@ -170,7 +170,7 @@ export function HeroGrid({ projects, onOpen, pinnedLead = false, coverStage = fa
           overflow: 'hidden'
         }}>
         {row2.map(p => (
-          <GridCell key={p.id} project={p} onOpen={onOpen} />
+          <GridCell key={p.slug} project={p} onOpen={onOpen} />
         ))}
         {!isCompact && vDiv}
       </div>
@@ -187,7 +187,7 @@ export function HeroGrid({ projects, onOpen, pinnedLead = false, coverStage = fa
           overflow: 'hidden'
         }}>
         {row3.map(p => (
-          <GridCell key={p.id} project={p} onOpen={onOpen} />
+          <GridCell key={p.slug} project={p} onOpen={onOpen} />
         ))}
         {!isCompact && vDiv}
 
