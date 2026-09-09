@@ -149,7 +149,14 @@ const PROJECT_META: ProjectRecord[] = [
     builder: 'Southern State Builders'
   },
   // Sanders
-  { slug: 'two-mile-dr', assetKey: 'two-mile-dr', title: 'Two Mile Dr', location: 'Johnston, SC', year: '2025', builder: 'Chandler Homes' },
+  {
+    slug: 'johnston-two-mile-house',
+    assetKey: 'two-mile-dr',
+    title: 'Two Mile House',
+    location: 'Johnston, SC',
+    year: '2025',
+    builder: 'Chandler Homes'
+  },
   // Brown
   {
     slug: 'holiday-rd',
@@ -181,29 +188,43 @@ const PROJECT_META: ProjectRecord[] = [
   },
   // Fisher
   {
-    slug: 'riverclub-ln',
+    slug: 'north-augusta-river-club-kitchen',
     assetKey: 'riverclub-ln',
-    title: 'Riverclub Ln',
+    title: 'River Club Kitchen',
     location: 'North Augusta, SC',
     year: '2024',
     builder: 'Southern State Builders'
   },
   // Campbell
   {
-    slug: 'heatherstone-way',
+    slug: 'martinez-heatherstone-kitchen',
     assetKey: 'heatherstone-way',
-    title: 'Heatherstone Way',
+    title: 'Heatherstone Kitchen',
     location: 'Martinez, GA',
     year: '2024',
     builder: 'Southern State Builders'
   },
   // Willingham
-  { slug: 'atomic-rd', assetKey: 'atomic-rd', title: 'Atomic Rd', location: 'Aiken, SC', year: '2024', builder: 'Southern State Builders' },
+  {
+    slug: 'aiken-homestead',
+    assetKey: 'atomic-rd',
+    title: 'Aiken Homestead',
+    location: 'Aiken, SC',
+    year: '2024',
+    builder: 'Southern State Builders'
+  },
   // Woodward
-  { slug: 'heathwood-dr', assetKey: 'heathwood-dr', title: 'Heathwood Dr', location: 'Aiken, SC', year: '2024', builder: 'Chandler Homes' },
+  {
+    slug: 'aiken-heathwood-house',
+    assetKey: 'heathwood-dr',
+    title: 'Heathwood House',
+    location: 'Aiken, SC',
+    year: '2024',
+    builder: 'Chandler Homes'
+  },
   // Bernal
   {
-    slug: 'rolland-place-2023',
+    slug: 'mccormick-modern-escape',
     assetKey: 'rolland-place-2023',
     title: 'Rolland Place (2023)',
     location: 'McCormick, SC',
@@ -212,18 +233,18 @@ const PROJECT_META: ProjectRecord[] = [
   },
   // Guha
   {
-    slug: 'conifer-rd',
+    slug: 'augusta-conifer-modern-tudor',
     assetKey: 'conifer-rd',
-    title: 'Conifer Rd',
+    title: 'Conifer Modern Tudor',
     location: 'Augusta, GA',
     year: '2022',
     builder: 'Southern State Builders'
   },
   // Wachowicz
   {
-    slug: 'kestwick-dr',
+    slug: 'martinez-kestwick-kitchen',
     assetKey: 'kestwick-dr',
-    title: 'Kestwick Dr',
+    title: 'Kestwick Kitchen',
     location: 'Martinez, GA',
     year: '2022',
     builder: 'Southern State Builders'
