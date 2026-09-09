@@ -8,7 +8,9 @@ export type ProjectImage = {
 
 /** A project as the site consumes it. `ProjectRecord` below is what you actually author. */
 export type Project = {
-  id: string;
+  slug: string;
+  /** Stable storage key for R2 object paths; may be shorter than the route slug. */
+  assetKey: string;
   title: string;
   location: string;
   year: string;
@@ -25,7 +27,7 @@ export type Project = {
   hasRealAssets: boolean;
 };
 
-// Unsplash placeholders, cycled across every project until real assets land on R2 under `projects/<slug>/`.
+// Unsplash placeholders, cycled across every project until real assets land on R2 under `projects/<assetKey>/`.
 type PlaceholderAssets = { cover: string; gallery: [string, string, string] };
 
 const PLACEHOLDER_ASSETS: PlaceholderAssets[] = [
@@ -94,12 +96,17 @@ const PLACEHOLDER_ASSETS: PlaceholderAssets[] = [
  * derived until it does — so importing a finished project is an edit to one record, never to a component.
  */
 type ProjectRecord = {
-  id: string;
+  slug: string;
+  /**
+   * Stable storage key for R2 object paths; keep immutable once images are uploaded.
+   * Can differ from `slug` when you want shorter bucket paths, e.g. slug `rolland-place-2024` + assetKey `rp24`.
+   */
+  assetKey: string;
   title: string;
   location: string;
   year: string;
   builder: string;
-  /** Flip once `cover.jpg` and `gallery-1..3.jpg` are on R2 under `projects/<id>/`. URLs derive from the id. */
+  /** Flip once `cover.jpg` and `gallery-1..3.jpg` are on R2 under `projects/<assetKey>/`. URLs derive from `assetKey`. */
   assetsReady?: boolean;
   /** Real lede copy. Omitted -> derived from location/year/builder. */
   intro?: string;
@@ -115,35 +122,112 @@ type ProjectRecord = {
 // Keep sorted by `year` descending.
 const PROJECT_META: ProjectRecord[] = [
   // Shuford
-  { id: 'yucca-ave', title: 'Yucca Ave', location: 'North Augusta, SC', year: '2026', builder: 'Southern State Builders' },
+  {
+    slug: 'yucca-ave',
+    assetKey: 'yucca-ave',
+    title: 'Yucca Ave',
+    location: 'North Augusta, SC',
+    year: '2026',
+    builder: 'Southern State Builders'
+  },
   // McDonald
-  { id: 'mcdonald-ln', title: 'McDonald Ln', location: 'Evans, GA', year: '2025', builder: 'Southern State Builders' },
+  {
+    slug: 'mcdonald-ln',
+    assetKey: 'mcdonald-ln',
+    title: 'McDonald Ln',
+    location: 'Evans, GA',
+    year: '2025',
+    builder: 'Southern State Builders'
+  },
   // Faveran
-  { id: 'faveran-ln', title: 'Faveran Ln', location: 'McCormick, SC', year: '2025', builder: 'Southern State Builders' },
+  {
+    slug: 'faveran-ln',
+    assetKey: 'faveran-ln',
+    title: 'Faveran Ln',
+    location: 'McCormick, SC',
+    year: '2025',
+    builder: 'Southern State Builders'
+  },
   // Sanders
-  { id: 'two-mile-dr', title: 'Two Mile Dr', location: 'Johnston, SC', year: '2025', builder: 'Chandler Homes' },
+  { slug: 'two-mile-dr', assetKey: 'two-mile-dr', title: 'Two Mile Dr', location: 'Johnston, SC', year: '2025', builder: 'Chandler Homes' },
   // Brown
-  { id: 'holiday-rd', title: 'Holiday Rd', location: 'McCormick, SC', year: '2024', builder: 'Southern State Builders' },
+  {
+    slug: 'holiday-rd',
+    assetKey: 'holiday-rd',
+    title: 'Holiday Rd',
+    location: 'McCormick, SC',
+    year: '2024',
+    builder: 'Southern State Builders'
+  },
   // Roberson
-  { id: 'gordon-dr', title: 'Gordon Dr', location: 'Modoc, SC', year: '2024', builder: 'Zook Homes' },
+  { slug: 'gordon-dr', assetKey: 'gordon-dr', title: 'Gordon Dr', location: 'Modoc, SC', year: '2024', builder: 'Zook Homes' },
   // Ross
-  { id: 'rolland-place-2024', title: 'Rolland Place (2024)', location: 'McCormick, SC', year: '2024', builder: 'Southern State Builders' },
+  {
+    slug: 'rolland-place-2024',
+    assetKey: 'rolland-place-2024',
+    title: 'Rolland Place (2024)',
+    location: 'McCormick, SC',
+    year: '2024',
+    builder: 'Southern State Builders'
+  },
   // McCann
-  { id: 'amelia-dr', title: 'Amelia Dr', location: 'McCormick, SC', year: '2024', builder: 'Southern State Builders' },
+  {
+    slug: 'amelia-dr',
+    assetKey: 'amelia-dr',
+    title: 'Amelia Dr',
+    location: 'McCormick, SC',
+    year: '2024',
+    builder: 'Southern State Builders'
+  },
   // Fisher
-  { id: 'riverclub-ln', title: 'Riverclub Ln', location: 'North Augusta, SC', year: '2024', builder: 'Southern State Builders' },
+  {
+    slug: 'riverclub-ln',
+    assetKey: 'riverclub-ln',
+    title: 'Riverclub Ln',
+    location: 'North Augusta, SC',
+    year: '2024',
+    builder: 'Southern State Builders'
+  },
   // Campbell
-  { id: 'heatherstone-way', title: 'Heatherstone Way', location: 'Martinez, GA', year: '2024', builder: 'Southern State Builders' },
+  {
+    slug: 'heatherstone-way',
+    assetKey: 'heatherstone-way',
+    title: 'Heatherstone Way',
+    location: 'Martinez, GA',
+    year: '2024',
+    builder: 'Southern State Builders'
+  },
   // Willingham
-  { id: 'atomic-rd', title: 'Atomic Rd', location: 'Aiken, SC', year: '2024', builder: 'Southern State Builders' },
+  { slug: 'atomic-rd', assetKey: 'atomic-rd', title: 'Atomic Rd', location: 'Aiken, SC', year: '2024', builder: 'Southern State Builders' },
   // Woodward
-  { id: 'heathwood-dr', title: 'Heathwood Dr', location: 'Aiken, SC', year: '2024', builder: 'Chandler Homes' },
+  { slug: 'heathwood-dr', assetKey: 'heathwood-dr', title: 'Heathwood Dr', location: 'Aiken, SC', year: '2024', builder: 'Chandler Homes' },
   // Bernal
-  { id: 'rolland-place-2023', title: 'Rolland Place (2023)', location: 'McCormick, SC', year: '2023', builder: 'Southern State Builders' },
+  {
+    slug: 'rolland-place-2023',
+    assetKey: 'rolland-place-2023',
+    title: 'Rolland Place (2023)',
+    location: 'McCormick, SC',
+    year: '2023',
+    builder: 'Southern State Builders'
+  },
   // Guha
-  { id: 'conifer-rd', title: 'Conifer Rd', location: 'Augusta, GA', year: '2022', builder: 'Southern State Builders' },
+  {
+    slug: 'conifer-rd',
+    assetKey: 'conifer-rd',
+    title: 'Conifer Rd',
+    location: 'Augusta, GA',
+    year: '2022',
+    builder: 'Southern State Builders'
+  },
   // Wachowicz
-  { id: 'kestwick-dr', title: 'Kestwick Dr', location: 'Martinez, GA', year: '2022', builder: 'Southern State Builders' }
+  {
+    slug: 'kestwick-dr',
+    assetKey: 'kestwick-dr',
+    title: 'Kestwick Dr',
+    location: 'Martinez, GA',
+    year: '2022',
+    builder: 'Southern State Builders'
+  }
 ];
 
 // ── Derivation ──────────────────────────────────────────────────────────────
@@ -161,18 +245,19 @@ const deriveAlt = (m: ProjectRecord, index: number | 'cover'): string => {
     : `${m.title}, interior view ${index + 1} — ${m.location}`;
 };
 
-/** R2 keys are deterministic from the slug, per the bucket layout in AGENTS.md. */
-const realAssets = (id: string): PlaceholderAssets => ({
-  cover: img(`projects/${id}/cover.jpg`),
-  gallery: [img(`projects/${id}/gallery-1.jpg`), img(`projects/${id}/gallery-2.jpg`), img(`projects/${id}/gallery-3.jpg`)]
+/** R2 keys are deterministic from `assetKey`, per the bucket layout in AGENTS.md. */
+const realAssets = (assetKey: string): PlaceholderAssets => ({
+  cover: img(`projects/${assetKey}/cover.jpg`),
+  gallery: [img(`projects/${assetKey}/gallery-1.jpg`), img(`projects/${assetKey}/gallery-2.jpg`), img(`projects/${assetKey}/gallery-3.jpg`)]
 });
 
 const buildProject = (m: ProjectRecord, i: number): Project => {
-  const src = m.assetsReady ? realAssets(m.id) : PLACEHOLDER_ASSETS[i % PLACEHOLDER_ASSETS.length];
+  const src = m.assetsReady ? realAssets(m.assetKey) : PLACEHOLDER_ASSETS[i % PLACEHOLDER_ASSETS.length];
   const intro = m.intro ?? deriveIntro(m);
 
   return {
-    id: m.id,
+    slug: m.slug,
+    assetKey: m.assetKey,
     title: m.title,
     location: m.location,
     year: m.year,
@@ -192,8 +277,8 @@ const buildProject = (m: ProjectRecord, i: number): Project => {
 
 export const PROJECTS: Project[] = PROJECT_META.map(buildProject);
 
-/** Lookup by slug. The id *is* the slug — hand-authored, never generated. */
-export const getProject = (slug: string): Project | undefined => PROJECTS.find(p => p.id === slug);
+/** Lookup by slug. Slugs are hand-authored, never generated. */
+export const getProject = (slug: string): Project | undefined => PROJECTS.find(p => p.slug === slug);
 
 /** `"Aiken, SC"` → `{ city: 'Aiken', region: 'SC' }`. Anything not in that shape degrades to the whole string as city. */
 export const splitLocation = (location: string): { city: string; region?: string } => {

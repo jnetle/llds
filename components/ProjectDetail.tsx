@@ -24,7 +24,7 @@ export function ProjectDetail({ project }: Props) {
     return () => cancelAnimationFrame(raf);
   }, []);
 
-  const idx = PROJECTS.findIndex(p => p.id === project.id);
+  const idx = PROJECTS.findIndex(p => p.slug === project.slug);
   const prev = PROJECTS[(idx - 1 + PROJECTS.length) % PROJECTS.length];
   const next = PROJECTS[(idx + 1) % PROJECTS.length];
 
@@ -48,7 +48,10 @@ export function ProjectDetail({ project }: Props) {
           <span style={{ fontSize: 14, lineHeight: 1 }}>←</span> All Projects
         </Link>
 
-        <Link href={`/projects/${next.id}`} className="micro" style={{ display: 'flex', alignItems: 'center', gap: 10, color: 'inherit' }}>
+        <Link
+          href={`/projects/${next.slug}`}
+          className="micro"
+          style={{ display: 'flex', alignItems: 'center', gap: 10, color: 'inherit' }}>
           Next:{' '}
           <span style={{}} className="serif">
             {next.title}
@@ -131,7 +134,7 @@ export function ProjectDetail({ project }: Props) {
           padding: '60px 36px'
         }}>
         <Link
-          href={`/projects/${prev.id}`}
+          href={`/projects/${prev.slug}`}
           className="micro"
           style={{ display: 'flex', alignItems: 'center', gap: 12, justifySelf: 'start', color: 'inherit' }}>
           <span style={{ fontSize: 14 }}>←</span>
@@ -149,7 +152,7 @@ export function ProjectDetail({ project }: Props) {
           All Projects
         </Link>
         <Link
-          href={`/projects/${next.id}`}
+          href={`/projects/${next.slug}`}
           className="micro"
           style={{ display: 'flex', alignItems: 'center', gap: 12, justifySelf: 'end', color: 'inherit' }}>
           <span style={{ display: 'grid', gap: 4, textAlign: 'right' }}>

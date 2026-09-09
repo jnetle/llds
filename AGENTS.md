@@ -70,8 +70,8 @@ are deterministic from data:
 
 ```
 <NEXT_PUBLIC_IMG_BASE>/
-  projects/<slug>/cover.jpg
-  projects/<slug>/gallery-1.jpg … gallery-3.jpg      # slugs = PROJECT_META ids in lib/projects.ts
+  projects/<asset-key>/cover.jpg
+  projects/<asset-key>/gallery-1.jpg … gallery-3.jpg  # asset keys = PROJECT_META assetKey values in lib/projects.ts
   about/profile-1.jpg … profile-3.jpg                # profile shots
   about/hero.jpg                                       # if/when added
   press/awards/<award-slug>.jpg                        # one per award
@@ -91,7 +91,7 @@ are deterministic from data:
 - **Magazine spread pages are the one deliberate exception to the 200 KB target.** `press/magazine/page-{1,2}.jpg` are documents, not photographs — page 2 is two columns of 9pt body copy, and the reader's lightbox is meant to be read, not just looked at. They run 1500–1800 px and ~270/370 KB. The photo pages and the cover hold the normal budget.
 - A third party's masthead is displayed with `mix-blend-mode: multiply` over Bone White rather than an alpha-knockout PNG (see the `press/magazine/hh-masthead.png` usage in `app/press/page.tsx`). The artwork is black on white, so multiply removes the box for free — and leaves the publication's mark in its own color, which recoloring to `ink` would not.
 - Rename on upload to meaningful slugs — don't carry `photo-160058…` IDs over.
-- **Project photos are switched on per project, not globally.** `lib/projects.ts` derives every R2 key from the project's slug, so uploading `projects/<slug>/cover.jpg` and `gallery-1..3.jpg` and setting `assetsReady: true` on that one record is the entire migration — no URL is ever pasted into the data. Until the flag is set, that project renders from the Unsplash placeholder pool. When every record carries it, delete `PLACEHOLDER_ASSETS` and drop `images.unsplash.com` from `next.config.ts`.
+- **Project photos are switched on per project, not globally.** `lib/projects.ts` derives every R2 key from the project's `assetKey`, so uploading `projects/<asset-key>/cover.jpg` and `gallery-1..3.jpg` and setting `assetsReady: true` on that one record is the entire migration — no URL is ever pasted into the data. Route slugs can differ; storage paths stay stable via `assetKey`. Until the flag is set, that project renders from the Unsplash placeholder pool. When every record carries it, delete `PLACEHOLDER_ASSETS` and drop `images.unsplash.com` from `next.config.ts`.
 - Replace-in-place keeps the URL stable, but the CDN caches by TTL — purge the object in Cloudflare, or append `?v=2`, for an immediate swap.
 - **Every image on the site now renders through `next/image`**, project imagery included — so all of it gets a `srcset`, lazy loading, and WebP. Pre-compression on upload still matters (it is what the optimizer fetches), but it is no longer the only defence. Any new image host needs its hostname in `next.config.ts` `images.remotePatterns`.
 - `next/image` with `fill` emits an absolutely-positioned `<img>`, so **its wrapper must be positioned**. `body` is itself `position: relative`, so a missing `position` on the wrapper does not fail quietly — the photo escapes and covers the whole page.

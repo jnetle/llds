@@ -22,7 +22,7 @@ let coverSeen = false;
 
 export function HomeShell() {
   const router = useRouter();
-  const openProject = (p: Project) => router.push(`/projects/${p.id}`);
+  const openProject = (p: Project) => router.push(`/projects/${p.slug}`);
 
   // An arrival has to arrive at the top: the panel is absolutely positioned at document 0, so a restored scroll
   // offset would mount it already half gone, and an offset past a viewport trips the dismissal on the first frame.

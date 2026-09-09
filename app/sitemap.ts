@@ -39,7 +39,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     })),
     // Project pages come from the data, so adding a project adds a sitemap entry.
     ...PROJECTS.map(p => ({
-      url: absoluteUrl(`/projects/${p.id}`),
+      url: absoluteUrl(`/projects/${p.slug}`),
       lastModified: parseDate(p.updatedAt) ?? built,
       changeFrequency: 'yearly' as const,
       priority: 0.8

@@ -10,6 +10,8 @@ const projectsPath = resolve(root, 'lib', 'projects.ts');
 
 const failures = [];
 
+const KEBAB_KEY_RE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+
 function fail(title, ...detail) {
   failures.push([title, ...detail]);
 }
@@ -69,36 +71,52 @@ function checkProjects() {
   const projects = parseProjectsMeta();
   if (projects.length === 0) return;
 
-  const seenIds = new Set();
+  const seenSlugs = new Set();
+  const seenAssetKeys = new Set();
 
   for (const [index, project] of projects.entries()) {
     const label = `PROJECT_META[${index}]`;
 
-    const id = project.id;
-    if (!id) {
-      fail('project record is missing id', `  ${label}: ${JSON.stringify(project)}`);
-    } else if (seenIds.has(id)) {
-      fail('duplicate project id', `  id: ${id}`, `  second occurrence: ${label}`);
+    const slug = project.slug;
+    if (!slug) {
+      fail('project record is missing slug', `  ${label}: ${JSON.stringify(project)}`);
+    } else if (seenSlugs.has(slug)) {
+      fail('duplicate project slug', `  slug: ${slug}`, `  second occurrence: ${label}`);
     } else {
-      seenIds.add(id);
+      seenSlugs.add(slug);
+    }
+
+    const assetKey = project.assetKey;
+    if (!assetKey) {
+      fail('project record is missing assetKey', `  ${label}: ${JSON.stringify(project)}`);
+    } else {
+      if (seenAssetKeys.has(assetKey)) {
+        fail('duplicate project assetKey', `  assetKey: ${assetKey}`, `  second occurrence: ${label}`);
+      } else {
+        seenAssetKeys.add(assetKey);
+      }
+
+      if (!KEBAB_KEY_RE.test(assetKey)) {
+        fail('project assetKey must be lowercase kebab-case', `  ${label}: assetKey=${assetKey}`);
+      }
     }
 
     const yearNum = Number(project.year);
     if (!project.year || !Number.isFinite(yearNum)) {
-      fail('project year must be a numeric string', `  ${label}: id=${id ?? '(missing)'}, year=${String(project.year)}`);
+      fail('project year must be a numeric string', `  ${label}: slug=${slug ?? '(missing)'}, year=${String(project.year)}`);
     }
 
     const location = project.location;
     const builder = project.builder;
     if (!location || !builder) {
-      fail('project record missing required field for derived summary checks', `  ${label}: id=${id ?? '(missing)'}`);
+      fail('project record missing required field for derived summary checks', `  ${label}: slug=${slug ?? '(missing)'}`);
       continue;
     }
 
     const intro = project.intro ?? derivedIntro(project);
     const summary = project.summary ?? intro;
     if (summary.length > 160) {
-      fail('project summary exceeds 160 characters', `  id: ${id}`, `  length: ${summary.length}`, `  summary: ${summary}`);
+      fail('project summary exceeds 160 characters', `  slug: ${slug}`, `  length: ${summary.length}`, `  summary: ${summary}`);
     }
   }
 
@@ -109,8 +127,8 @@ function checkProjects() {
     if (next > prev) {
       fail(
         'PROJECT_META is not sorted by descending year',
-        `  index ${i - 1}: id=${projects[i - 1].id ?? '(missing)'}, year=${projects[i - 1].year ?? '(missing)'}`,
-        `  index ${i}: id=${projects[i].id ?? '(missing)'}, year=${projects[i].year ?? '(missing)'}`
+        `  index ${i - 1}: slug=${projects[i - 1].slug ?? '(missing)'}, year=${projects[i - 1].year ?? '(missing)'}`,
+        `  index ${i}: slug=${projects[i].slug ?? '(missing)'}, year=${projects[i].year ?? '(missing)'}`
       );
     }
   }

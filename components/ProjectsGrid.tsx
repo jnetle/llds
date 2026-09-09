@@ -53,7 +53,7 @@ function ProjectsView({ compact }: { compact: boolean }) {
         columnGap={{ d: 32, t: 24, m: 16 }}
         rowGap={{ d: 64, m: 40 }}>
         {PROJECTS.map((p, idx) => (
-          <ProjectsTile key={p.id} project={p} index={idx} />
+          <ProjectsTile key={p.slug} project={p} index={idx} />
         ))}
       </Grid>
     </div>
@@ -73,7 +73,7 @@ function ProjectsTile({ project, index }: { project: Project; index: number }) {
         transform: seen ? 'translateY(0)' : 'translateY(24px)',
         transition: `opacity ${motion.durXSlow} ${motion.ease} ${delay}, transform ${motion.durXSlow} ${motion.ease} ${delay}`
       }}>
-      <Link href={`/projects/${project.id}`} style={{ display: 'block', color: 'inherit' }}>
+      <Link href={`/projects/${project.slug}`} style={{ display: 'block', color: 'inherit' }}>
         {/* `position: relative` is load-bearing: `fill` renders an absolutely-positioned <img>, and body is itself
             relative, so a missing position lets the photo cover the whole page rather than failing loudly. */}
         <div
