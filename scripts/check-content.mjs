@@ -10,6 +10,8 @@ const projectsPath = resolve(root, 'lib', 'projects.ts');
 
 const failures = [];
 
+const KEBAB_KEY_RE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+
 function fail(title, ...detail) {
   failures.push([title, ...detail]);
 }
@@ -87,10 +89,16 @@ function checkProjects() {
     const assetKey = project.assetKey;
     if (!assetKey) {
       fail('project record is missing assetKey', `  ${label}: ${JSON.stringify(project)}`);
-    } else if (seenAssetKeys.has(assetKey)) {
-      fail('duplicate project assetKey', `  assetKey: ${assetKey}`, `  second occurrence: ${label}`);
     } else {
-      seenAssetKeys.add(assetKey);
+      if (seenAssetKeys.has(assetKey)) {
+        fail('duplicate project assetKey', `  assetKey: ${assetKey}`, `  second occurrence: ${label}`);
+      } else {
+        seenAssetKeys.add(assetKey);
+      }
+
+      if (!KEBAB_KEY_RE.test(assetKey)) {
+        fail('project assetKey must be lowercase kebab-case', `  ${label}: assetKey=${assetKey}`);
+      }
     }
 
     const yearNum = Number(project.year);
