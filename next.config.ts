@@ -25,9 +25,9 @@ const nextConfig: NextConfig = {
     deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 2400],
     // Default starts at 32; the smallest image here is the ~128px header logo.
     imageSizes: [96, 128, 256, 384],
-    // 31 days, up from the 4-hour default. There is no cache-invalidation API, so this commits us to the documented
-    // workflow: R2 keys are stable, and an image that must change immediately is purged in Cloudflare or re-pointed
-    // with `?v=2`.
+    // 31 days, up from the 4-hour default. R2 keys stay stable; after replacing a source image, invalidate its
+    // optimized variants with `vercel cache invalidate --srcimg <exact-source-url>`. Re-pointing the source with
+    // `?v=2` remains an alternative when a URL change is preferable.
     minimumCacheTTL: 2678400,
     remotePatterns: [
       {
