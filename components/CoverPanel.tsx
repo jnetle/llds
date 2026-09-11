@@ -34,9 +34,9 @@ const STROKES: { d: string; delay: string; dur: string }[] = [
 ];
 
 // ── Logo lockup crop ──────────────────────────────────────────────────────────
-// logo-long-navy.png is 1691×386 and leads with the arch monogram, cropped off here so it doesn't double up with the
-// big arch beside it. Measured from the alpha channel: the wordmark occupies x 325–1690, rows 82–350.
-const CROP = { x: 325, y: 82, w: 1691 - 325, h: 350 - 82 + 1 };
+// logo-long-navy.png is 1692×390 and leads with the arch monogram, cropped off here so it doesn't double up with the
+// big arch beside it. Measured from the alpha channel: the wordmark occupies x 325–1691, rows 82–351.
+const CROP = { x: 325, y: 82, w: 1692 - 325, h: 351 - 82 + 1 };
 const pct = (n: number) => `${(n * 100).toFixed(4)}%`;
 
 type CoverPanelProps = {
@@ -225,7 +225,7 @@ export function CoverPanel({ onDismiss }: CoverPanelProps) {
               priority
               style={{
                 position: 'absolute',
-                width: pct(1691 / CROP.w),
+                width: pct(1692 / CROP.w),
                 height: 'auto',
                 maxWidth: 'none',
                 left: `-${pct(CROP.x / CROP.w)}`,
