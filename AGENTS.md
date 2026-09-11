@@ -57,12 +57,23 @@ This project deploys to Vercel. Prefer Vercel-compatible patterns: avoid long-ru
 
 ## Images
 
-Raster photos are hosted on **Cloudflare R2** (chosen for zero egress fees) behind a CDN
-domain. Today the **About** page loads its profile photos directly from R2 (see the
-`pub-….r2.dev` URLs in `app/about/page.tsx`); **project** imagery is still on the Unsplash
-placeholder pool in `lib/projects.ts` and will migrate to R2 under the slug convention
-below as real assets are uploaded. **SVGs** (logo, UI icons) stay in `public/` as
-versioned code assets — they are not hosted on R2.
+Raster photos are stored in **Cloudflare R2**, separate from the Git repository. The main
+reason is asset management, not delivery speed or egress savings: photographs are large
+binary files that Git cannot diff efficiently, so every replacement committed to `public/`
+would remain in repository history. R2 lets photography be replaced without permanently
+growing every future clone of the codebase. Visitors still receive optimized images through
+`next/image` on Vercel; R2 is the source-image store. This is a pragmatic choice rather than
+a hard architectural requirement—keeping the compressed images in `public/` would also be
+reasonable at the site's current size if simpler deployment were valued over separating
+content from code.
+
+Today the **About** page loads its profile photos from R2 via the temporary Cloudflare-managed
+`pub-….r2.dev` development URL. Before launch, connect the bucket to a production custom
+domain and set it as `NEXT_PUBLIC_IMG_BASE`; the `r2.dev` endpoint is rate-limited and is not
+a production CDN endpoint. **Project** imagery is still on the Unsplash placeholder pool in
+`lib/projects.ts` and will migrate under the slug convention below as real assets are
+uploaded. **SVGs** (logo, UI icons) stay in `public/` as versioned code assets—they are not
+hosted on R2.
 
 **Bucket layout (single bucket, feature-first).** Keys are lowercase kebab-case,
 use descriptive slugs (never camera/Unsplash IDs), and have stable filenames so URLs
@@ -92,7 +103,7 @@ are deterministic from data:
 - A third party's masthead is displayed with `mix-blend-mode: multiply` over Bone White rather than an alpha-knockout PNG (see the `press/magazine/hh-masthead.png` usage in `app/press/page.tsx`). The artwork is black on white, so multiply removes the box for free — and leaves the publication's mark in its own color, which recoloring to `ink` would not.
 - Rename on upload to meaningful slugs — don't carry `photo-160058…` IDs over.
 - **Project photos are switched on per project, not globally.** `lib/projects.ts` derives every R2 key from the project's `assetKey`, so uploading `projects/<asset-key>/cover.jpg` and `gallery-1..3.jpg` and setting `assetsReady: true` on that one record is the entire migration — no URL is ever pasted into the data. Route slugs can differ; storage paths stay stable via `assetKey`. Until the flag is set, that project renders from the Unsplash placeholder pool. When every record carries it, delete `PLACEHOLDER_ASSETS` and drop `images.unsplash.com` from `next.config.ts`.
-- Replace-in-place keeps the URL stable, but the CDN caches by TTL — purge the object in Cloudflare, or append `?v=2`, for an immediate swap.
+- Replace-in-place keeps the source URL stable, but Vercel's `next/image` optimizer may retain its cached derivative for `minimumCacheTTL` (31 days). Purging R2 or Cloudflare does not purge Vercel's image cache. After replacing an image, invalidate all of its optimized variants with `vercel cache invalidate --srcimg <exact-source-url>`; use `vercel cache dangerously-delete --srcimg <exact-source-url>` when the very next request must block until it receives the new image. Appending a version query such as `?v=2` is an alternative when changing the requested URL is preferable.
 - **Every image on the site now renders through `next/image`**, project imagery included — so all of it gets a `srcset`, lazy loading, and WebP. Pre-compression on upload still matters (it is what the optimizer fetches), but it is no longer the only defence. Any new image host needs its hostname in `next.config.ts` `images.remotePatterns`.
 - `next/image` with `fill` emits an absolutely-positioned `<img>`, so **its wrapper must be positioned**. `body` is itself `position: relative`, so a missing `position` on the wrapper does not fail quietly — the photo escapes and covers the whole page.
 - An `<img>` is a replaced element and **renders no pseudo-elements**. Two of the three `__media` classes in `globals.css` therefore stay on a wrapper `<div>` rather than moving onto the image: `.grid-cell__media` because its `::after` is the entire hover scrim, and `.strip-tile__media` because it owns the tile's box. Only `.project-tile__media` sits on the `<img>`, because all it carries is a `transform`, which replaced elements do honour. Hover states do not show up in a screenshot diff — check them by hovering.
