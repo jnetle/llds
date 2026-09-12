@@ -1105,11 +1105,225 @@ const PROJECT_META: ProjectRecord[] = [
   // Bernal
   {
     slug: 'mccormick-modern-escape',
-    assetKey: 'rolland-place-2023',
-    title: 'Rolland Place (2023)',
+    assetKey: 'mccormick-modern-escape',
+    title: 'Modern Escape',
     location: 'McCormick, SC',
     year: '2023',
-    builder: 'Southern State Builders'
+    builder: 'Southern State Builders',
+    scope: 'Custom New Construction',
+    intro: [
+      'Designed for a couple approaching the empty-nest years, this Clarks Hill Lake home was envisioned as a place to slow down, spread out, and enjoy life by the water. With views toward the lake and pool, the home was planned around relaxed living, from separate home offices to a generous screened porch that quickly became a favorite place to unwind.',
+      'Clean white walls and warm wood tones set the foundation, while black cabinetry, woven lighting, and graphic details bring contrast throughout. In the primary bath, a single glass wall keeps the oversized shower open and modern, while dark chevron tile adds texture underfoot. Outside, board-and-batten siding, stained wood accents, brick, and black detailing give the home a crisp but welcoming presence.',
+      'Not long after moving in, our client told us she had already taken her first nap on the screened porch. We’d say the house was doing exactly what it was designed to do.'
+    ],
+    summary:
+      'A custom lake home in McCormick, South Carolina, designed for relaxed empty-nest living with warm wood, bold contrast, and a generous screened porch.',
+    updatedAt: '2026-09-12',
+    galleryTemplate: 'masonry',
+    // Portrait, and the frame that holds the whole project at tile size: the gable and the screened porch the lede
+    // ends on, the brick retaining wall under it, and the pool in the foreground.
+    cover: 'screened-porch-above-pool-7035.jpg',
+    // Display order follows the lede: the approach and the black-trimmed siding the second paragraph names, then
+    // the living room and the kitchen at the heart of the open plan, then the primary bath the lede singles out,
+    // the two smaller baths, and last the pool, the lake and the screened porch — closing where the copy closes,
+    // on the porch. File names carry the camera number, as at Heathwood House, Aiken Homestead, Heatherstone,
+    // River Club, Kestwick and Conifer, so a frame can be matched back to the photographer's original from the
+    // bucket listing alone.
+    //
+    // The delivery is 42 frames across seven spaces and six are left off — a low cut rate, because unlike Conifer
+    // this delivery carries no screenshots and no repeated crops. IMG_7035 is the one frame delivered twice, as a
+    // landscape and as a portrait crop of it; the crop is the better composition and is the one published. The
+    // other five are frames another says better: a second primary-bath shower-and-tub view a shutter apart from
+    // the one published (6879), a second low-angle island profile (6927), a second island-to-fireplace view with a
+    // pendant clipped (6918), a kitchen frame that is more than half bare floor and has a box left on the counter
+    // (6938), and a 1478 px island-and-sink export (6989) well under the 2400 px target, whose composition 6933
+    // already holds at full resolution.
+    //
+    // 17 of the 36 run 217–685 KB at the default quality floor. Like Heatherstone, River Club, Kestwick and
+    // Conifer, and unlike Aiken Homestead, the shoot is NOT held at a raised floor: --min-quality=64 was measured
+    // against the default on the five densest frames and buys 1–4% on the 1200 px WebP derivative next/image
+    // actually serves (396/309/239/384/209 KB vs 401/312/248/373/218 KB — the front elevation coming out *larger*
+    // from the q64 source) while making each bucket object ~47% heavier (1005/779/643/580/590 KB vs
+    // 685/532/433/401/397 KB). At 100% on the densest frame, pines against the far shore of the lake, the two
+    // sources are indistinguishable. The density here is foliage, brick and brushed concrete, not the stone
+    // veining that made Aiken's floor bite.
+    //
+    // This shoot breaks the one-landscape-frame-one-`feature` mapping every shoot before it has used, because it
+    // has nine landscape frames among 36 rather than one or three. Featuring all nine would put a full-width band
+    // every fourth plate, and the narrative interleaves them too closely to survive it — it would strand the stair
+    // as a one-plate run (a lone tile beside an empty column) and stack the kitchen's two wides back to back. So
+    // the six that hold a whole space are featured and the other three ride in the columns: the garage wing, the
+    // kitchen seen from the living room, and the pool from the house.
+    //
+    // The six split the masonry into runs of 4, 2, 4, 10, 6, 2 and 2 — all even, so every run's two columns carry
+    // the same number of plates. Four end dead level. Runs 1, 2 and 6 end 0.583 column widths apart, which is the
+    // minimum each allows: they are the runs carrying an in-column landscape, and at heights of 3/4 and 4/3 of a
+    // column width no subset splits them evenly. Run 7 ends 0.083 apart, the 4/5 porch frame against a 3/4 one.
+    //
+    // `aspect` is set only on the ten frames that are not the 3/4 default: nine 4/3 landscapes and the 4/5 porch
+    // frame, which is the delivery's portrait crop of IMG_7035 rather than a frame shot that way.
+    gallery: [
+      {
+        file: 'front-elevation-from-drive-7063.jpg',
+        alt: 'The Modern Escape front elevation from the curve of the drive — white board-and-batten under black gables, a stained wood entry, and hardwoods standing over the approach'
+      },
+      {
+        file: 'entry-gables-brick-foundation-7055.jpg',
+        alt: 'The entry wing of the Modern Escape from the motor court, brick steps and foundation carrying the white siding up to its black-trimmed gables'
+      },
+      {
+        file: 'garage-wing-metal-awnings-7050.jpg',
+        alt: 'The garage wing of the Modern Escape, black doors under standing-seam awnings on stained wood brackets, the front entry carrying on past them',
+        aspect: 4 / 3
+      },
+      {
+        file: 'stair-white-oak-treads-6967.jpg',
+        alt: 'The Modern Escape stair, white oak treads over white risers with a slim wall-mounted rail and step lights washing down the wall'
+      },
+      {
+        file: 'living-room-vaulted-sliders-3236.jpg',
+        alt: 'The Modern Escape living room the width of the house — a linen sectional under the vaulted ceiling, black sliding doors opening onto the screened porch, the kitchen carrying on at left',
+        aspect: 4 / 3,
+        feature: true
+      },
+      {
+        file: 'fireplace-oak-mantel-detail-7022.jpg',
+        alt: 'The white oak mantel of the Modern Escape fireplace, a single hewn beam set into the black shiplap chimney breast'
+      },
+      {
+        file: 'kitchen-from-living-room-3244.jpg',
+        alt: 'The Modern Escape kitchen from the living room, two woven pendants over the black island with the hood wall and the bar shelving to either side',
+        aspect: 4 / 3
+      },
+      {
+        file: 'kitchen-island-range-wall-6987.jpg',
+        alt: 'The Modern Escape kitchen across the island — white cabinetry and an oak-banded hood above the herringbone backsplash, two woven pendants hung over the black island',
+        aspect: 4 / 3,
+        feature: true
+      },
+      {
+        file: 'island-pendants-range-wall-6913.jpg',
+        alt: 'The black island of the Modern Escape kitchen under its woven pendants, the range and the panelled refrigerator along the wall behind'
+      },
+      {
+        file: 'island-pendants-pantry-cabinets-6934.jpg',
+        alt: 'The Modern Escape island straight on, its brass faucet centred between two woven pendants below the tall pantry cabinets'
+      },
+      {
+        file: 'range-run-toward-window-wall-6909.jpg',
+        alt: 'Down the working side of the Modern Escape kitchen past the range, black perimeter cabinetry and a window wall closing the far end'
+      },
+      {
+        file: 'oak-hood-herringbone-range-6930.jpg',
+        alt: 'The white oak hood of the Modern Escape kitchen over the herringbone backsplash, the range and its brass knobs below'
+      },
+      {
+        file: 'island-perimeter-run-windows-6995.jpg',
+        alt: 'The length of the Modern Escape kitchen — the black island on one side, the perimeter run beneath the window wall on the other, brass sconces above it',
+        aspect: 4 / 3,
+        feature: true
+      },
+      {
+        file: 'island-sink-quartz-faucet-6933.jpg',
+        alt: 'The sink set into the veined quartz of the Modern Escape island, the brass faucet and the black-framed doors beyond it'
+      },
+      {
+        file: 'quartz-island-edge-detail-6924.jpg',
+        alt: 'The mitred quartz edge of the Modern Escape island, the hood and the faucet falling away behind it'
+      },
+      {
+        file: 'black-cabinetry-brass-pulls-6906.jpg',
+        alt: 'Brass knobs and bar pulls along the black cabinetry of the Modern Escape kitchen, the window sill running above them'
+      },
+      {
+        file: 'black-cabinetry-run-low-6928.jpg',
+        alt: 'The Modern Escape island from floor level, its black run carrying toward the window wall and the brass sconces above the perimeter cabinets'
+      },
+      {
+        file: 'island-toward-shiplap-fireplace-6946.jpg',
+        alt: 'Past the Modern Escape island to the living room, the black shiplap fireplace and its oak mantel across the open plan'
+      },
+      {
+        file: 'beverage-bar-oak-shelves-3276.jpg',
+        alt: 'The beverage bar of the Modern Escape — three white oak shelves on herringbone tile above black cabinetry and a glass-front cooler, a brass sconce overhead'
+      },
+      {
+        file: 'primary-bath-glass-wall-chevron-6878.jpg',
+        alt: 'The Modern Escape primary bath — a single glass wall holding the open shower, the soaking tub beneath the window, and dark chevron tile running under all of it'
+      },
+      {
+        file: 'primary-shower-tub-chevron-floor-6889.jpg',
+        alt: 'The open shower of the Modern Escape primary bath behind its one pane of glass, the freestanding tub and its sconce alongside'
+      },
+      {
+        file: 'primary-tub-filler-shower-detail-6888.jpg',
+        alt: 'The brass floor filler at the Modern Escape tub, the shower fittings on the tiled wall beyond the glass'
+      },
+      {
+        file: 'primary-tub-window-sconce-6883.jpg',
+        alt: 'The Modern Escape soaking tub in its corner, the obscured window and a shaded sconce above it'
+      },
+      {
+        file: 'primary-soaking-tub-window-6997.jpg',
+        alt: 'The Modern Escape soaking tub straight on, centred under the window with the dark chevron tile running out to either side',
+        aspect: 4 / 3,
+        feature: true
+      },
+      {
+        file: 'primary-vanity-brass-faucet-6882.jpg',
+        alt: 'The Modern Escape primary vanity, a brass faucet at the undermount sink below a black-framed mirror and a matching sconce'
+      },
+      {
+        file: 'primary-faucet-mirror-detail-6881.jpg',
+        alt: 'The brass faucet of the Modern Escape primary vanity close up, doubled in the mirror behind it'
+      },
+      {
+        file: 'guest-bath-black-vanity-3283.jpg',
+        alt: 'The guest bath of the Modern Escape — a black vanity with brass knobs under a black-framed mirror, the graphic marble floor running to the window'
+      },
+      {
+        file: 'guest-bath-window-graphic-floor-3281.jpg',
+        alt: 'The window end of the Modern Escape guest bath, the black-and-white marble floor carried under the vanity and out to the door'
+      },
+      {
+        file: 'marble-petal-floor-detail-6948.jpg',
+        alt: 'The petal-cut marble floor of the Modern Escape guest bath close up, its black points meeting at the foot of the vanity'
+      },
+      {
+        file: 'powder-room-wallpaper-round-mirror-6960.jpg',
+        alt: 'The Modern Escape powder room, a round mirror hung on dark wallpaper drawn in gold arcs above a white vanity and its black fittings'
+      },
+      {
+        file: 'rear-elevation-over-pool-3223.jpg',
+        alt: 'The Modern Escape from the far side of the pool — the screened porch above, the lower level opening onto the deck, and the cabana at the end of the water',
+        aspect: 4 / 3,
+        feature: true
+      },
+      {
+        file: 'pool-cabana-from-house-6980.jpg',
+        alt: 'The pool of the Modern Escape from the house, the open cabana standing at the far corner of the deck',
+        aspect: 4 / 3
+      },
+      {
+        file: 'pool-cabana-toward-lake-6978.jpg',
+        alt: 'The Modern Escape pool looking past the cabana to Clarks Hill Lake through the pines'
+      },
+      {
+        file: 'deck-into-screened-porch-3234.jpg',
+        alt: 'The deck of the Modern Escape at the corner of the screened porch, black sliding doors open to the dining table set inside it',
+        aspect: 4 / 3,
+        feature: true
+      },
+      {
+        file: 'screened-porch-above-pool-7035.jpg',
+        alt: 'The screened porch of the Modern Escape from the pool below, its gable carried on white columns above the brick retaining wall',
+        aspect: 4 / 5
+      },
+      {
+        file: 'screened-porch-lake-view-3214.jpg',
+        alt: 'Inside the Modern Escape screened porch — black-framed seating on a woven rug, the pool below and the lake beyond the screens'
+      }
+    ]
   },
   // Guha
   {
