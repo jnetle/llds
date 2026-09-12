@@ -239,7 +239,7 @@ const PROJECT_META: ProjectRecord[] = [
       'A longtime family home on more than 100 acres in Johnston, South Carolina — a reimagined kitchen and a calm primary bath by Laurel Leaf Design Studio.',
     galleryTemplate: 'masonry',
     // The cover names a file already in the shoot, so there is no second copy of it in the bucket.
-    cover: 'bath-tub-window-bay.jpg',
+    cover: 'kitchen-range-island-flowers.jpg',
     updatedAt: '2026-09-11',
     // Display order. Reordering this array reorders the page; nothing on R2 moves.
     // The two `feature` plates also set the masonry's run boundaries, so their positions are load-bearing for the
@@ -463,8 +463,8 @@ const PROJECT_META: ProjectRecord[] = [
       'A North Augusta, South Carolina kitchen renovation that opened the room to the living space, with a new island, working pantry, mudroom and coffee bar.',
     updatedAt: '2026-09-12',
     galleryTemplate: 'masonry',
-    // Portrait, and the frame that holds the whole room at tile size — island, stools, pendants and the range wall behind.
-    cover: 'kitchen-island-pendants-stools-3182.jpg',
+    // Portrait, and the frame that holds the whole room at tile size — across the island to the range wall, pendants overhead.
+    cover: 'island-counter-pendants-range-3215.jpg',
     // Display order follows the lede: the island the house gathers at, then the opened plan the wall used to divide,
     // then the working walls, and last the three spaces the second paragraph names — pantry, mudroom, coffee bar.
     // File names carry the camera number, as at Heathwood House, Aiken Homestead and Heatherstone, so a frame can be
@@ -965,8 +965,9 @@ const PROJECT_META: ProjectRecord[] = [
     summary:
       'An Aiken, South Carolina kitchen and bathroom renovation designed for everyday ease, family gatherings, and the homeowners’ next chapter.',
     galleryTemplate: 'masonry',
-    // Portrait, and the frame that reads as this kitchen at tile size. Already in `gallery`, so no second object.
-    cover: 'kitchen-island-range-wall-6504.jpg',
+    // Portrait, and the frame that reads best at tile size — the primary bath, tub and glass shower together. Already in
+    // `gallery`, so no second object.
+    cover: 'bath-tub-shower-glass-6594.jpg',
     updatedAt: '2026-09-11',
     // Display order, following the lede: kitchen, then the coffee bar and the pantry it hides, then the primary bath.
     // Unlike Two Mile House these file names carry the camera number, so a frame can be matched back to the
@@ -1122,9 +1123,9 @@ const PROJECT_META: ProjectRecord[] = [
       'A custom lake home in McCormick, South Carolina, designed for relaxed empty-nest living with warm wood, bold contrast, and a generous screened porch.',
     updatedAt: '2026-09-12',
     galleryTemplate: 'masonry',
-    // Portrait, and the frame that holds the whole project at tile size: the gable and the screened porch the lede
-    // ends on, the brick retaining wall under it, and the pool in the foreground.
-    cover: 'screened-porch-above-pool-7035.jpg',
+    // Portrait, and the frame that introduces the house at tile size: the front elevation from the curve of the drive,
+    // black gables over white board-and-batten, hardwoods over the approach.
+    cover: 'front-elevation-from-drive-7063.jpg',
     // Display order follows the lede: the approach and the black-trimmed siding the second paragraph names, then
     // the living room and the kitchen at the heart of the open plan, then the primary bath the lede singles out,
     // the two smaller baths, and last the pool, the lake and the screened porch — closing where the copy closes,
@@ -1529,8 +1530,8 @@ const PROJECT_META: ProjectRecord[] = [
       'A Martinez, Georgia kitchen renovation with an open layout, custom white cabinetry, quartzite countertops, floating wood shelves, and improved flow.',
     updatedAt: '2026-09-12',
     galleryTemplate: 'masonry',
-    // Portrait, and the frame that holds the whole room at tile size — island, quartzite, both lanterns and the cooking wall behind.
-    cover: 'island-quartzite-lantern-pendants-6466.jpg',
+    // Portrait, and the frame that holds the cooking wall at tile size — the wall ovens at one end, the hood and cooktop at the other.
+    cover: 'wall-ovens-and-cooktop-wall-6726.jpg',
     // Display order follows the lede: the island and the room it now opens into, then the wall that came out, then the
     // working walls and the run past them, and last the details — the stone, the hood, and the panelled fireplace wall
     // the kitchen now reads toward. File names carry the camera number, as at Heathwood House, Aiken Homestead,
