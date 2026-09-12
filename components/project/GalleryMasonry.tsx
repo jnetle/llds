@@ -9,14 +9,19 @@ type Props = {
 };
 
 /**
- * How many columns the grid runs. The columns are real elements, so both the packing and the grid track derive from
- * this one number — the track is written inline below rather than left in the stylesheet, because a `repeat(2, 1fr)`
- * sitting in CSS would silently disagree the moment this changed, and each run would wrap into a broken second row.
+ * How many columns the grid runs at the wide tiers. The columns are real elements, so both the packing and the grid
+ * track derive from this one number — it rides out as the `--masonry-cols` custom property rather than a literal
+ * `repeat(2, 1fr)` in the stylesheet, which would silently disagree the moment this changed and wrap each run into a
+ * broken second row. Below 601px globals.css renders one column regardless; see `.project-masonry__run` there.
  */
 const COLUMNS = 2;
 
+/** A plate plus its index in the authored `gallery`. The index survives the packing because the phone tier renders
+    one column and has to replay the shoot in its authored order — see `.project-masonry__item` in globals.css. */
+type Plate = { image: GalleryImage; order: number };
+
 /** A run of column-packed plates, or a single plate spanning the full width. */
-type Block = { kind: 'run'; columns: GalleryImage[][] } | { kind: 'feature'; plate: GalleryImage };
+type Block = { kind: 'run'; columns: Plate[][] } | { kind: 'feature'; plate: Plate };
 
 /**
  * Deal plates into the currently shortest column. Heights come from the authored `aspect` — at a fixed column width
@@ -27,8 +32,8 @@ type Block = { kind: 'run'; columns: GalleryImage[][] } | { kind: 'feature'; pla
  * the viewport, and including them would make the packing viewport-dependent for a few percent of a tile's height —
  * while whenever the columns end up with the same number of plates, which is the common case, they cancel exactly.
  */
-function packColumns(plates: GalleryImage[]): GalleryImage[][] {
-  const columns: GalleryImage[][] = Array.from({ length: COLUMNS }, () => []);
+function packColumns(plates: Plate[]): Plate[][] {
+  const columns: Plate[][] = Array.from({ length: COLUMNS }, () => []);
   const heights = new Array<number>(COLUMNS).fill(0);
 
   for (const plate of plates) {
@@ -37,7 +42,7 @@ function packColumns(plates: GalleryImage[]): GalleryImage[][] {
       if (heights[i] < heights[shortest]) shortest = i;
     }
     columns[shortest].push(plate);
-    heights[shortest] += 1 / plate.aspect;
+    heights[shortest] += 1 / plate.image.aspect;
   }
   return columns;
 }
@@ -45,21 +50,21 @@ function packColumns(plates: GalleryImage[]): GalleryImage[][] {
 /** Split the shoot at every feature, so each full-width plate sits between two independently packed runs. */
 function toBlocks(gallery: GalleryImage[]): Block[] {
   const blocks: Block[] = [];
-  let run: GalleryImage[] = [];
+  let run: Plate[] = [];
 
   const flush = () => {
     if (run.length) blocks.push({ kind: 'run', columns: packColumns(run) });
     run = [];
   };
 
-  for (const image of gallery) {
+  gallery.forEach((image, order) => {
     if (image.feature) {
       flush();
-      blocks.push({ kind: 'feature', plate: image });
+      blocks.push({ kind: 'feature', plate: { image, order } });
     } else {
-      run.push(image);
+      run.push({ image, order });
     }
-  }
+  });
   flush();
   return blocks;
 }
@@ -85,13 +90,15 @@ export function GalleryMasonry({ gallery }: Props) {
     <div className="project-masonry">
       {blocks.map((block, b) =>
         block.kind === 'feature' ? (
-          <MasonryTile key={block.plate.src} image={block.plate} column={0} feature />
+          <MasonryTile key={block.plate.image.src} plate={block.plate} column={0} feature />
         ) : (
-          <div className="project-masonry__run" key={`run-${b}`} style={{ gridTemplateColumns: `repeat(${COLUMNS}, 1fr)` }}>
+          // The track itself is in globals.css so the phone tier can override it; `COLUMNS` still owns the count and
+          // rides out as a custom property, which keeps it the one number both the packing and the grid read.
+          <div className="project-masonry__run" key={`run-${b}`} style={{ '--masonry-cols': COLUMNS } as CSSProperties}>
             {block.columns.map((column, c) => (
               <div className="project-masonry__col" key={c}>
-                {column.map(image => (
-                  <MasonryTile key={image.src} image={image} column={c} />
+                {column.map(plate => (
+                  <MasonryTile key={plate.image.src} plate={plate} column={c} />
                 ))}
               </div>
             ))}
@@ -102,9 +109,9 @@ export function GalleryMasonry({ gallery }: Props) {
   );
 }
 
-type TileProps = { image: GalleryImage; column: number; feature?: boolean };
+type TileProps = { plate: Plate; column: number; feature?: boolean };
 
-function MasonryTile({ image, column, feature = false }: TileProps) {
+function MasonryTile({ plate: { image, order }, column, feature = false }: TileProps) {
   const [ref, seen] = useReveal<HTMLDivElement>();
 
   return (
@@ -118,9 +125,10 @@ function MasonryTile({ image, column, feature = false }: TileProps) {
           // computed column height cannot disagree.
           aspectRatio: image.aspect,
           background: brand.modernTan,
-          // Neighbouring columns rise a beat apart. Keyed off the column, not the sequence index, or the last plate
-          // in the shoot would wait several seconds before appearing.
-          '--reveal-delay': `${column * 0.08}s`
+          // Both are read by globals.css, which decides per tier what to do with them: `--col` drives the stagger
+          // where there are neighbouring columns, `--order` replays the authored sequence where there are not.
+          '--col': column,
+          '--order': order
         } as CSSProperties
       }>
       {/* TEMPORARY — review aid, see FileBadge below. */}
@@ -132,8 +140,8 @@ function MasonryTile({ image, column, feature = false }: TileProps) {
         fill
         loading="lazy"
         // Column widths, not the hero's. A feature spans every column, so it needs its own hint or it loads a
-        // half-width candidate and renders soft.
-        sizes={feature ? '(max-width: 600px) 92vw, 84vw' : '(max-width: 600px) 46vw, 42vw'}
+        // half-width candidate and renders soft — and below 601px every tile is full width, feature or not.
+        sizes={feature ? '(max-width: 600px) 92vw, 84vw' : '(max-width: 600px) 92vw, 42vw'}
         style={{ objectFit: 'cover' }}
         draggable={false}
       />

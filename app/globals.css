@@ -439,35 +439,171 @@ a {
 /* Masonry gallery template (components/project/GalleryMasonry.tsx). The columns are real elements and the plates
    are dealt into them in the component, so there is no `column-count` here — CSS only sets the track and the gaps.
    That is deliberate: CSS multi-column balanced the run above each full-width feature, and balancing cannot split
-   a tile, so it left a hole. Packing by known aspect closes it. Two columns at every width keeps the photographs
-   large enough that "uncropped" is the point rather than a technicality. */
+   a tile, so it left a hole. Packing by known aspect closes it. Two columns keep the photographs large enough that
+   "uncropped" is the point rather than a technicality — but that stops being true on a phone, where two columns
+   inside the 24px gutters leave each tile about 160px wide, so the base tier below is one column. */
 .project-masonry {
   display: grid;
   gap: 10px;
 }
 
-/* No `grid-template-columns` here on purpose: the track is written inline from `COLUMNS` in GalleryMasonry, which
-   is the same number the packing uses. A copy in this file would be overridden and would read as if it still set
-   the layout. */
+/* Phone: one column, and the packed column boxes dissolve so every tile becomes an item of this grid. Collapsing
+   the track alone would not do — the columns are real elements, so it would play all of column 1 and then all of
+   column 2, i.e. the shoot out of its authored order. `--order` (the plate's index in `gallery`) puts the sequence
+   back. That reorders visually only, which is safe precisely here: masonry tiles are inert figures with no tab
+   stop, so there is no focus order to desynchronise. */
 .project-masonry__run {
   display: grid;
   gap: 10px;
+  grid-template-columns: 1fr;
   align-items: start;
 }
 
-/* `align-content: start` keeps a short column's plates their true height — stretch would smear the last one to
-   close the column, which is exactly the crop this template exists to avoid. */
 .project-masonry__col {
-  display: grid;
-  gap: 10px;
-  align-content: start;
+  display: contents;
+}
+
+/* Scoped to a run: a `feature` plate is a direct child of `.project-masonry`, so an unscoped `order` would sort it
+   against the runs themselves and send every feature to the bottom of the gallery. */
+.project-masonry__run .project-masonry__item {
+  order: var(--order, 0);
+}
+
+/* One column means every tile enters view alone, so the column stagger below has nothing to stagger against. */
+.project-masonry__item {
+  --reveal-delay: 0s;
 }
 
 @media (min-width: 601px) {
   .project-masonry,
-  .project-masonry__run,
-  .project-masonry__col {
+  .project-masonry__run {
     gap: 14px;
+  }
+
+  /* `--masonry-cols` is written by GalleryMasonry from `COLUMNS`, the same number the packing uses — the count stays
+     in the component, only the breakpoint lives here. A literal `repeat(2, 1fr)` in this file would silently
+     disagree the moment that constant changed. */
+  .project-masonry__run {
+    grid-template-columns: repeat(var(--masonry-cols, 2), 1fr);
+  }
+
+  /* `align-content: start` keeps a short column's plates their true height — stretch would smear the last one to
+     close the column, which is exactly the crop this template exists to avoid. */
+  .project-masonry__col {
+    display: grid;
+    gap: 14px;
+    align-content: start;
+  }
+
+  /* Back to source order inside a column (the indices already ascend there), and neighbouring columns rise a beat
+     apart — keyed off the column, not the sequence index, or the shoot's last plate would wait several seconds. */
+  .project-masonry__run .project-masonry__item {
+    order: 0;
+  }
+
+  .project-masonry__item {
+    --reveal-delay: calc(var(--col, 0) * 0.08s);
+  }
+}
+
+/* Project detail top bar (components/ProjectDetail.tsx): `← All Projects` across from `Next: <project title>`.
+
+   The title is what breaks it on a phone. Set in `.micro`'s tracked uppercase the longest one measures 292px on its
+   own, against 284px of room between the gutters at 320px — so the two links could never share a row, and the bar
+   became a two-line block wedged between the fixed header and the hero. Dropping only the title puts them back on
+   one line at 213px: `Next` alone still says what the arrow does, and the link's `aria-label` carries the title, so
+   it leaves the eye and not the accessible name. Same bargain the footer pager strikes one screen further down. */
+.project-topbar__link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* `letter-spacing: 0` undoes `.micro`'s 0.22em, which on a lone glyph is just a gap pretending to be kerning. */
+.project-topbar__arrow {
+  font-size: 14px;
+  line-height: 1;
+  letter-spacing: 0;
+}
+
+/* The colon belongs to the title, not to `Next` — it only introduces something when there is something to introduce.
+   Hung off the label so it stays in `.micro`'s sans and glued to the word, with the flex gap after it. */
+.project-topbar__label::after {
+  content: ':';
+}
+
+@media (max-width: 600px) {
+  .project-topbar__title,
+  .project-topbar__label::after {
+    display: none;
+  }
+}
+
+/* Project detail footer nav (components/ProjectDetail.tsx). Three across at every width now — the row used to
+   collapse to one stacked track below 1025px, which put the three links on three different left edges and, on a
+   phone, ran a third of the screen for what is one "go somewhere else" affordance. */
+.project-nav__link {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  justify-self: start;
+}
+
+.project-nav__link--all {
+  justify-self: center;
+}
+
+.project-nav__link--next {
+  justify-self: end;
+}
+
+.project-nav__stack {
+  display: grid;
+  gap: 4px;
+  text-align: left;
+}
+
+.project-nav__link--next .project-nav__stack {
+  text-align: right;
+}
+
+.project-nav__arrow {
+  font-size: 14px;
+  line-height: 1;
+}
+
+/* Phone: the pager. The prev/next titles come off and the arrows become the control — an arrow beside the word
+   "Previous" beside the project's name is three ways of saying one thing, and only the arrow survives a 375px row.
+   Each link keeps the title in its `aria-label`, so this drops the titles from the eye and not from the accessible
+   name. The 44px box is the tap target (`a { min-height: 36px }` above is short of the floor) and gives the glyph
+   somewhere to sit; `letter-spacing: 0` undoes `.micro`'s 0.22em, which would otherwise push a lone arrow
+   off-centre by its own trailing space. */
+@media (max-width: 600px) {
+  .project-nav__stack {
+    display: none;
+  }
+
+  .project-nav__arrow {
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    border: 1px solid var(--hairline);
+    font-size: 16px;
+    letter-spacing: 0;
+    transition:
+      border-color var(--dur-fast) var(--ease-elegant),
+      background-color var(--dur-fast) var(--ease-elegant),
+      color var(--dur-fast) var(--ease-elegant);
+  }
+
+  /* `:active` as well as `:hover` — a phone has no hover, and without it the control never acknowledges the tap. */
+  .project-nav__link:hover .project-nav__arrow,
+  .project-nav__link:active .project-nav__arrow,
+  .project-nav__link:focus-visible .project-nav__arrow {
+    border-color: var(--ink);
+    background-color: var(--ink);
+    color: var(--bg);
   }
 }
 
@@ -733,6 +869,18 @@ a {
   /* Hide hero grid dividers on mobile (rows stack to 1 col anyway) */
   .hero-divider {
     display: none !important;
+  }
+
+  /* The footer copyright is 53 characters, and `.micro-sm`'s 0.28em tracking alone adds 148px of it — 452px total,
+     wider than any phone, so it wrapped. Keeping it on one line means trading tracking for size: measured against
+     Inter Regular the glyphs are 30.35em wide, so at 0.06em the line is 33.5x the font size and fits the
+     gutter-to-gutter width (100vw - 48px) at any viewport down to 320px. `min()` caps it back at the normal 10px
+     once the viewport is wide enough (~398px) to seat it. Lives here rather than as a utility because `.micro-sm`
+     is unlayered and would outrank one. */
+  .footer-legal {
+    font-size: min(10px, calc((100vw - 48px) / 35));
+    letter-spacing: 0.06em;
+    white-space: nowrap;
   }
 }
 

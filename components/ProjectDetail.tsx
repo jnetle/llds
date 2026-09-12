@@ -38,37 +38,42 @@ export function ProjectDetail({ project }: Props) {
         opacity: opening ? 0 : 1,
         transition: `opacity ${motion.durMed} ease`
       }}>
-      {/* Top bar. Bespoke 36px gutter to align with the global header. */}
+      {/* Top bar. Bespoke gutter to align with the global header — 18px on a phone, 36px above it — and clearance of
+          the header's own height plus a beat: it is ~68px on a phone and ~74px above. One row at every width; the
+          phone tier drops the next project's title to keep it that way, which is `.project-topbar__*` in
+          globals.css. Layout lives there rather than inline, or the media query could not reach it. */}
       <div
-        style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          padding: '110px 36px 24px',
-          borderBottom: `1px solid ${color.hairline}`,
-          gap: 16
-        }}>
-        <Link href="/projects" className="micro" style={{ display: 'flex', alignItems: 'center', gap: 10, color: 'inherit' }}>
-          <span style={{ fontSize: 14, lineHeight: 1 }}>←</span> All Projects
+        className="project-topbar flex items-center justify-between gap-[16px] px-[18px] pt-[78px] pb-[14px] sm:px-[36px] sm:pt-[110px] sm:pb-[24px]"
+        style={{ borderBottom: `1px solid ${color.hairline}` }}>
+        <Link href="/projects" className="micro project-topbar__link" style={{ color: 'inherit' }}>
+          <span className="project-topbar__arrow" aria-hidden>
+            ←
+          </span>
+          All Projects
         </Link>
 
         <Link
           href={`/projects/${next.slug}`}
-          className="micro"
-          style={{ display: 'flex', alignItems: 'center', gap: 10, color: 'inherit' }}>
-          Next:{' '}
-          <span style={{}} className="serif">
-            {next.title}
-          </span>{' '}
-          <span style={{ fontSize: 14, lineHeight: 1 }}>→</span>
+          aria-label={`Next project: ${next.title}`}
+          className="micro project-topbar__link"
+          style={{ color: 'inherit' }}>
+          <span className="project-topbar__label">Next</span>
+          <span className="project-topbar__title serif">{next.title}</span>
+          <span className="project-topbar__arrow" aria-hidden>
+            →
+          </span>
         </Link>
       </div>
 
-      {/* Hero image. The opening scale stays on the wrapper, not the <img>. */}
+      {/* Hero image. The opening scale stays on the wrapper, not the <img>. Height is a class so it is right on the
+          server, and `svh` on a phone: `vh` there is measured against the viewport with the browser chrome retracted,
+          so the hero pushed the title block off-screen on load and then settled as the bar collapsed.
+          With the top bar gone below 601px this is the first thing on the page, sitting under the fixed header the
+          way the home hero does — which is what the header's own scrim gradient is for. */}
       <div
+        className="h-[62svh] sm:h-[85vh]"
         style={{
           position: 'relative',
-          height: '85vh',
           background: brand.modernTan,
           transform: opening ? 'scale(1.05)' : 'scale(1)',
           transition: `transform ${motion.durXSlow} ${motion.ease}`
@@ -129,21 +134,27 @@ export function ProjectDetail({ project }: Props) {
         </Eyebrow>
       </Section>
 
-      {/* Footer nav between projects. Bespoke 36px gutter, to align with the top bar. */}
+      {/* Footer nav between projects. Bespoke gutter, to align with the top bar. Three across at every tier — on a
+          phone the outer tracks shrink to the arrows alone and the titles drop out (globals.css `.project-nav__*`),
+          so the whole thing is one 44px row instead of three stacked links. Layout and alignment live there rather
+          than inline: an inline `display` or `justifySelf` would outrank the phone tier's media query.
+          The titles stay in each link's `aria-label`, which is also why it is set at every width — the visible
+          `Previous <title>` and the accessible name then say the same thing wherever both exist. */}
       <Grid
-        cols="1fr 1fr 1fr"
-        gap={32}
+        cols={{ d: '1fr 1fr 1fr', t: '1fr 1fr 1fr', m: 'auto 1fr auto' }}
+        gap={{ d: 32, t: 28, m: 12 }}
         alignItems="center"
-        style={{
-          borderTop: `1px solid ${color.hairline}`,
-          padding: '60px 36px'
-        }}>
+        className="px-[18px] py-[28px] sm:px-[36px] sm:py-[44px] lg:py-[60px]"
+        style={{ borderTop: `1px solid ${color.hairline}` }}>
         <Link
           href={`/projects/${prev.slug}`}
-          className="micro"
-          style={{ display: 'flex', alignItems: 'center', gap: 12, justifySelf: 'start', color: 'inherit' }}>
-          <span style={{ fontSize: 14 }}>←</span>
-          <span style={{ display: 'grid', gap: 4, textAlign: 'left' }}>
+          aria-label={`Previous project: ${prev.title}`}
+          className="micro project-nav__link project-nav__link--prev"
+          style={{ color: 'inherit' }}>
+          <span className="project-nav__arrow" aria-hidden>
+            ←
+          </span>
+          <span className="project-nav__stack">
             <span style={{ opacity: 0.5 }}>Previous</span>
             <span className="serif" style={{ fontSize: 18, opacity: 0.95, textTransform: 'none', letterSpacing: 0 }}>
               {prev.title}
@@ -152,21 +163,24 @@ export function ProjectDetail({ project }: Props) {
         </Link>
         <Link
           href="/projects"
-          className="micro"
-          style={{ justifySelf: 'center', borderBottom: `1px solid ${color.ink}`, paddingBottom: 4, color: 'inherit' }}>
+          className="micro project-nav__link project-nav__link--all"
+          style={{ borderBottom: `1px solid ${color.ink}`, paddingBottom: 4, color: 'inherit' }}>
           All Projects
         </Link>
         <Link
           href={`/projects/${next.slug}`}
-          className="micro"
-          style={{ display: 'flex', alignItems: 'center', gap: 12, justifySelf: 'end', color: 'inherit' }}>
-          <span style={{ display: 'grid', gap: 4, textAlign: 'right' }}>
+          aria-label={`Next project: ${next.title}`}
+          className="micro project-nav__link project-nav__link--next"
+          style={{ color: 'inherit' }}>
+          <span className="project-nav__stack">
             <span style={{ opacity: 0.5 }}>Next</span>
             <span className="serif" style={{ fontSize: 18, opacity: 0.95, textTransform: 'none', letterSpacing: 0 }}>
               {next.title}
             </span>
           </span>
-          <span style={{ fontSize: 14 }}>→</span>
+          <span className="project-nav__arrow" aria-hidden>
+            →
+          </span>
         </Link>
       </Grid>
     </div>

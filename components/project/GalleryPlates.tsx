@@ -45,10 +45,13 @@ function Plate({ image, index, selected, onSelect, title }: PlateProps) {
       {/* The second band is shorter on purpose — three equal bands read as a stack rather than a sequence. */}
       {/* No `--reveal-delay`: a plate is a full-width band, so it enters view alone and has no neighbour to stagger
           against. Delaying by index would just make the tenth band hang for the better part of a second. */}
+      {/* Heights are classes so the phone tier is right on the server. `svh` below 601px, not `vh`: a mobile browser
+          measures `vh` against the viewport with its chrome retracted, so an 80vh band overflowed the screen on load
+          and then settled — and a band taller than the screen can never be seen whole. */}
       <div
         ref={ref}
-        className={`reveal${seen ? ' is-in' : ''}`}
-        style={{ position: 'relative', height: index === 1 ? '60vh' : '80vh', background: brand.modernTan }}>
+        className={`reveal${seen ? ' is-in' : ''} ${index === 1 ? 'h-[42svh] sm:h-[60vh]' : 'h-[56svh] sm:h-[80vh]'}`}
+        style={{ position: 'relative', background: brand.modernTan }}>
         {/* The button's aria-label names the action, so the image inside is decorative. */}
         <Image
           src={image.src}
