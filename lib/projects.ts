@@ -447,11 +447,165 @@ const PROJECT_META: ProjectRecord[] = [
   // Fisher
   {
     slug: 'north-augusta-river-club-kitchen',
-    assetKey: 'riverclub-ln',
+    assetKey: 'riverclub-kitchen',
     title: 'River Club Kitchen',
     location: 'North Augusta, SC',
     year: '2024',
-    builder: 'Southern State Builders'
+    builder: 'Southern State Builders',
+    scope: 'Kitchen Renovation',
+    intro: [
+      'In this North Augusta golf community, entertaining is part of everyday life, but a closed-off kitchen made hosting a crowd difficult. We removed the wall separating the kitchen and living room and reworked the layout around a spacious new island, giving the homeowners plenty of room for friends to gather while keeping the cook part of the conversation.',
+      'Beyond the kitchen, every bit of space was put to work. A new scullery-style working pantry with a full-size sink and second dishwasher keeps entertaining cleanup out of sight, while the back entry gained built-in mudroom storage for everything that doesn’t need to make its way into the house. Even a small former closet found a new purpose as a dedicated coffee bar.'
+    ],
+    summary:
+      'A North Augusta, South Carolina kitchen renovation that opened the room to the living space, with a new island, working pantry, mudroom and coffee bar.',
+    updatedAt: '2026-09-12',
+    galleryTemplate: 'masonry',
+    // Portrait, and the frame that holds the whole room at tile size — island, stools, pendants and the range wall behind.
+    cover: 'kitchen-island-pendants-stools-3182.jpg',
+    // Display order follows the lede: the island the house gathers at, then the opened plan the wall used to divide,
+    // then the working walls, and last the three spaces the second paragraph names — pantry, mudroom, coffee bar.
+    // File names carry the camera number, as at Heathwood House, Aiken Homestead and Heatherstone, so a frame can be
+    // matched back to the photographer's original from the bucket listing alone.
+    //
+    // The delivery is 35 frames across four spaces; six are left off where another frame says the same thing better,
+    // and one — a brass chandelier over the dining table — is left off because it photographs the adjoining room
+    // rather than this scope of work.
+    //
+    // 17 of the 29 run 200–300 KB at the default quality floor. Like Heatherstone and unlike Aiken Homestead this
+    // shoot is NOT held at a raised floor: --min-quality=64 was measured against the default on the three densest
+    // frames and buys ~3% on the 1200 px WebP derivative next/image actually serves (137/145/153 KB vs
+    // 141/149/157 KB) while making each bucket object ~65% heavier (440–447 KB vs 297–300 KB). Same reason as
+    // Heatherstone: these are iPhone frames, already smooth enough that the floor never bites.
+    //
+    // The three `feature` plates are the shoot's only landscape frames, and they split the masonry into runs of
+    // 6, 4, 6 and 10 — all even, so each run's two columns end level. `aspect` is set only where the frame is not
+    // the 3/4 default.
+    gallery: [
+      {
+        file: 'kitchen-island-pendants-stools-3182.jpg',
+        alt: 'The River Club kitchen in full — a grey island beneath three brass-and-white pendants, leather stools drawn up along it, the marble range wall beyond'
+      },
+      {
+        file: 'island-stools-range-wall-3198.jpg',
+        alt: 'The island at the centre of the River Club kitchen, four swivel stools along one side and the vent hood and windows behind it'
+      },
+      {
+        file: 'island-counter-pendants-range-3215.jpg',
+        alt: 'Across the River Club island toward the range wall, pendants overhead and a branch of greenery on the quartz'
+      },
+      {
+        file: 'island-quartz-top-sink-3254.jpg',
+        alt: 'The veined quartz top of the River Club island, its sink and brass faucet set below the shaped vent hood'
+      },
+      {
+        file: 'island-sink-end-back-hall-3207.jpg',
+        alt: 'The sink end of the River Club island, the back hall and the stair beyond it'
+      },
+      {
+        file: 'island-toward-coffee-bar-3257.jpg',
+        alt: 'Along the River Club island toward the back of the house, the coffee bar built into the far wall'
+      },
+      {
+        file: 'kitchen-wide-from-living-room-3251.jpg',
+        alt: 'The River Club kitchen seen whole from the living room, the island running the length of the room beneath its three pendants',
+        aspect: 4 / 3,
+        feature: true
+      },
+      {
+        file: 'living-room-into-kitchen-3263.jpg',
+        alt: 'The River Club living room in the foreground and the kitchen beyond it, nothing between the two where a wall used to stand'
+      },
+      {
+        file: 'back-hall-into-kitchen-3242.jpg',
+        alt: 'The River Club kitchen from the back hall, the living room visible through the opening past the island'
+      },
+      {
+        file: 'island-toward-breakfast-table-3245.jpg',
+        alt: 'Past the River Club island to the breakfast table under its brass chandelier, the panelled refrigerator along the right',
+        aspect: 2400 / 3309
+      },
+      {
+        file: 'dining-room-toward-wall-ovens-3200.jpg',
+        alt: 'The River Club kitchen from the dining room, the double wall ovens and the cooktop wall beyond the chandelier'
+      },
+      {
+        file: 'open-plan-living-room-kitchen-3306.jpg',
+        alt: 'The whole open plan at River Club — living room, kitchen and dining area reading as one room',
+        aspect: 4 / 3,
+        feature: true
+      },
+      {
+        file: 'range-wall-and-wall-ovens-3258.jpg',
+        alt: 'The cooking wall of the River Club kitchen, double wall ovens at one end of the run and the vent hood at the other'
+      },
+      {
+        file: 'range-wall-drawer-run-3249.jpg',
+        alt: 'The River Club range wall and the long run of drawers beneath it, brass sconces above the counter'
+      },
+      {
+        file: 'range-wall-marble-backsplash-3185.jpg',
+        alt: 'The River Club range wall straight on — a marble slab backsplash carried to the ceiling, pot filler and shaped hood'
+      },
+      {
+        file: 'glass-cabinet-window-corner-3213.jpg',
+        alt: 'A glass-front cabinet beside the wall ovens in the River Club kitchen, the window and its marble surround to the right'
+      },
+      {
+        file: 'window-brass-sconce-marble-3295.jpg',
+        alt: 'A brass sconce above one of the River Club kitchen windows, the marble carried around the opening'
+      },
+      {
+        file: 'vent-hood-pot-filler-3318.jpg',
+        alt: 'The shaped vent hood and its pot filler in the River Club kitchen, against the marble slab'
+      },
+      {
+        file: 'island-toward-living-room-3274.jpg',
+        alt: 'The River Club kitchen from the refrigerator end, the island leading to the living room on one side and the breakfast table on the other',
+        aspect: 4 / 3,
+        feature: true
+      },
+      {
+        file: 'pantry-through-doorway-3226.jpg',
+        alt: 'The River Club working pantry through its doorway — a full-size sink, a second dishwasher and open shelving on every wall'
+      },
+      {
+        file: 'pantry-shelves-appliances-3229.jpg',
+        alt: 'Inside the River Club pantry, open shelves above a run of small appliances with a beverage refrigerator at the end'
+      },
+      {
+        file: 'pantry-sink-wall-shelving-3231.jpg',
+        alt: 'The sink wall of the River Club pantry, open shelving above it and walnut roll-out drawers to one side'
+      },
+      {
+        file: 'pantry-sink-tile-backsplash-3230.jpg',
+        alt: 'The River Club pantry sink, its brass faucet against a handmade-look tile backsplash'
+      },
+      {
+        file: 'pantry-walnut-roll-out-drawers-3235.jpg',
+        alt: 'Walnut roll-out drawers built in below the counter of the River Club pantry'
+      },
+      {
+        file: 'mudroom-back-entry-storage-3240.jpg',
+        alt: 'Built-in mudroom storage at the River Club back entry, a walnut bench above its drawers and tall cabinets over it'
+      },
+      {
+        file: 'mudroom-bench-drawers-3246.jpg',
+        alt: 'The walnut bench top and drawer fronts of the River Club mudroom'
+      },
+      {
+        file: 'coffee-bar-cabinet-3218.jpg',
+        alt: 'The River Club coffee bar, built into a former closet with drawers below it and the living room beyond'
+      },
+      {
+        file: 'coffee-bar-niche-tile-3217.jpg',
+        alt: 'The coffee bar niche at River Club, a walnut shelf above the machine and tile carried to the top of the opening'
+      },
+      {
+        file: 'coffee-bar-shelf-mugs-3220.jpg',
+        alt: 'Mugs and a framed photograph on the walnut shelf of the River Club coffee bar'
+      }
+    ]
   },
   // Campbell
   {
