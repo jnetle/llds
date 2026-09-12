@@ -105,10 +105,18 @@ are deterministic from data:
   floor and still writes an over-budget file, now with visible blocking. That file is the _source_ every `next/image`
   derivative is built from, so the artifacts reach visitors even though these bytes never do — the optimizer fetches
   the source once and serves resized WebP. Pass `--min-quality=N` to hold a quality floor instead, and let the size
-  run over. Seven frames in `projects/heathwood-dr/` are compressed this way (`--min-quality=64`, 298–503 KB); the
+  run over. Seven frames in `projects/heathwood-house/` are compressed this way (`--min-quality=64`, 298–503 KB); the
   other 24 hold the normal budget. Shrinking the width instead was measured and rejected — reaching 200 KB needed
   1800 px, which is a visible resolution drop against the rest of the shoot, and the densest frame stayed at the
   quality floor even there.
+- **A whole shoot can fall under that exception, and `projects/aiken-homestead/` does.** That bathroom is marble field tile,
+  a hexagon mosaic, a checkerboard stone floor, and a fine metallic wallpaper — high-frequency detail in nearly every
+  frame — so 22 of its 32 plates run 202–494 KB at `--min-quality=64`, and the shoot is compressed in one pass at that
+  floor rather than frame by frame. The difference was measured before it was accepted: at the 1200 px derivative a
+  masonry column actually receives, q40 and q64 sources are indistinguishable once re-encoded to WebP; at the 2400 px
+  candidate the q40 source visibly smears the wallpaper's petal edges and the floor's veining. The budget is a proxy
+  for what visitors download, and `next/image` already governs that — so where the two conflict, the source keeps its
+  fidelity.
 - A third party's masthead is displayed with `mix-blend-mode: multiply` over Bone White rather than an alpha-knockout PNG (see the `press/magazine/hh-masthead.png` usage in `app/press/page.tsx`). The artwork is black on white, so multiply removes the box for free — and leaves the publication's mark in its own color, which recoloring to `ink` would not.
 - Rename on upload to meaningful slugs — don't carry `photo-160058…` IDs over.
 - **Project photos are switched on per project, not globally.** Upload the shoot to `projects/<asset-key>/` and author it as the record's `gallery` — one `{ file, alt, aspect? }` entry per photograph, in display order. That array _is_ the switch: present and non-empty means the project has real photography, so there is no `assetsReady` flag to forget. Only the folder is derived (`assetKey`); the leaf is authored, so no URL is ever pasted into the data. **Order lives in the array, never in the file names** — renaming objects on R2 to reorder would leave every renamed URL serving a stale optimized derivative for `minimumCacheTTL` (31 days). `cover` names one file in the same folder, normally one already in `gallery`, which costs no second object and inherits that plate's alt text. Route slugs can differ; storage paths stay stable via `assetKey`. Until a record has a `gallery`, that project renders from the Unsplash placeholder pool. When every record has one, delete `PLACEHOLDER_ASSETS` and drop `images.unsplash.com` from `next.config.ts`.
