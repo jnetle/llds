@@ -456,11 +456,177 @@ const PROJECT_META: ProjectRecord[] = [
   // Campbell
   {
     slug: 'martinez-heatherstone-kitchen',
-    assetKey: 'heatherstone-way',
+    assetKey: 'heatherstone-kitchen',
     title: 'Heatherstone Kitchen',
     location: 'Martinez, GA',
     year: '2024',
-    builder: 'Southern State Builders'
+    builder: 'Southern State Builders',
+    scope: 'Kitchen Renovation',
+    intro: [
+      'With two young children and a dated kitchen layout that felt too small for family life, these homeowners were ready to make their new Martinez, Georgia home their own. We removed the angular peninsula and incorporated the former breakfast area into a new kitchen layout, placing the sink beneath an oversized window where Mom can keep an eye on the kids playing in the backyard.',
+      'At the center, a warm stained-wood island creates a natural gathering place for everything from weeknight meals to future homework and craft projects. Custom cabinetry along the opposite wall adds a wall oven, beverage refrigerator, and much-needed storage, turning what was once two disconnected spaces into a kitchen designed for the way this family actually lives.'
+    ],
+    summary:
+      'A Martinez, Georgia kitchen renovation with a family-centered layout, warm wood island, oversized window, and custom cabinetry.',
+    galleryTemplate: 'masonry',
+    // Portrait, and the one frame that holds the whole room — island, pendants, sink window and range wall — at tile size.
+    cover: 'kitchen-island-pendants-wide-8020.jpg',
+    updatedAt: '2026-09-12',
+    // Display order follows the lede: the room whole, then the sink beneath its oversized window, then the island the
+    // family gathers at, then the range wall, and last the cabinetry run that carries the wall oven, the beverage
+    // refrigerator and the storage. File names carry the camera number, as at Heathwood House and Aiken Homestead, so
+    // a frame can be matched back to the photographer’s original from the bucket listing alone.
+    //
+    // The delivery is 38 frames of one room shot in a single twenty-minute pass, so it is dense with near-duplicates;
+    // seven are left off where another frame says the same thing better. Nothing is excluded for being a different
+    // look: the island reads mid-brown on the faces in shade and pale honey on the panels facing the windows, which
+    // is one island under one edit — EXIF puts every frame in the same twenty minutes on the same camera — not two
+    // grades of the shoot to choose between.
+    //
+    // The arabesque mosaic backsplash, the quartz veining and the hardwood floor put 20 of 31 frames over the 200 KB
+    // budget at the default quality floor, 183–336 KB. Unlike Aiken Homestead this shoot is NOT held at a raised
+    // floor: --min-quality=64 was tried and measured against the default, and it buys nothing here. At 100% on the
+    // three densest frames the two sources are indistinguishable, and the 1200 px WebP derivative next/image
+    // actually serves comes out no smaller from the q64 source than from the default one (196/147/193 KB vs
+    // 191/143/185 KB) — so the raised floor only made each bucket object ~50% heavier. The difference from Aiken is
+    // the capture: these are iPhone frames, already smooth enough that the floor never bites the way a full-frame
+    // file's stone veining did.
+    //
+    // The single `feature` is the landscape range wall; it splits the masonry into runs of 18 and 12, both even, so
+    // each run’s two columns end level. `aspect` is set only where the frame is not the 3/4 default.
+    gallery: [
+      {
+        file: 'kitchen-island-pendants-wide-8020.jpg',
+        alt: 'The Heatherstone kitchen in full — a warm stained-wood island beneath two glass pendants, cream cabinetry carried around the walls'
+      },
+      {
+        file: 'kitchen-island-window-range-wall-8017.jpg',
+        alt: 'The Heatherstone kitchen from the doorway, the island centred between the sink window and the range wall',
+        aspect: 4 / 3
+      },
+      {
+        file: 'kitchen-island-quartz-top-8186.jpg',
+        alt: 'The stained-wood island in the Heatherstone kitchen, its quartz top running the length of the room toward the range'
+      },
+      {
+        file: 'kitchen-island-pendants-fridge-8184.jpg',
+        alt: 'The Heatherstone kitchen across the island, glass pendants overhead and the refrigerator at the far end of the cabinetry',
+        aspect: 4 / 3
+      },
+      {
+        file: 'kitchen-island-corner-range-wall-8205.jpg',
+        alt: 'The corner of the island in the Heatherstone kitchen, the range wall and its shaped vent hood beyond'
+      },
+      {
+        file: 'kitchen-entry-wall-ovens-island-8217.jpg',
+        alt: 'Looking into the Heatherstone kitchen past the built-in wall oven and microwave, the island and its pendants ahead'
+      },
+      {
+        file: 'kitchen-entry-view-wide-8218.jpg',
+        alt: 'The Heatherstone kitchen from the hall — wall ovens to one side, the refrigerator to the other, the island between them',
+        aspect: 4 / 3
+      },
+      {
+        file: 'kitchen-island-cabinet-wall-wide-8171.jpg',
+        alt: 'The island and the full cabinetry run of the Heatherstone kitchen, the refrigerator at the end of it',
+        aspect: 4 / 3
+      },
+      {
+        file: 'kitchen-galley-toward-window-8045.jpg',
+        alt: 'The working side of the Heatherstone kitchen, the range at one hand and the sink window at the end of the run'
+      },
+      {
+        file: 'kitchen-sink-window-cabinetry-8143.jpg',
+        alt: 'The sink wall of the Heatherstone kitchen — an oversized window over the sink, dishwasher and drawers below, pantry cabinetry beyond'
+      },
+      {
+        file: 'sink-window-wallpaper-sconces-8079.jpg',
+        alt: 'The oversized window above the Heatherstone sink, patterned wallpaper and two brass sconces framing it'
+      },
+      {
+        file: 'sink-window-sconces-eucalyptus-8085.jpg',
+        alt: 'Brass sconces and a pitcher of eucalyptus at the Heatherstone sink window, the garden beyond the glass'
+      },
+      {
+        file: 'island-drawers-dining-beyond-8156.jpg',
+        alt: 'Drawer fronts along the Heatherstone island, the dining room and its fireplace beyond'
+      },
+      {
+        file: 'island-drawers-windows-beyond-8157.jpg',
+        alt: 'The Heatherstone island from its end, brass pulls on stained wood and the sink window beyond'
+      },
+      {
+        file: 'island-drawer-fronts-brass-pulls-8061.jpg',
+        alt: 'Brass pulls on the stained-wood drawer fronts of the Heatherstone island'
+      },
+      {
+        file: 'island-end-panel-grain-8064.jpg',
+        alt: 'The panelled end of the Heatherstone island, its grain catching the light from the windows'
+      },
+      {
+        file: 'island-quartz-veining-lemons-8121.jpg',
+        alt: 'Veining in the quartz top of the Heatherstone island, a bowl of lemons at its edge'
+      },
+      {
+        file: 'range-wall-pendants-symmetry-8178.jpg',
+        alt: 'The range wall of the Heatherstone kitchen centred between its two glass pendants'
+      },
+      {
+        file: 'range-wall-pendants-wide-8180.jpg',
+        feature: true,
+        alt: 'The full range wall of the Heatherstone kitchen — shaped vent hood, arabesque mosaic backsplash, and a glass pendant to either side',
+        aspect: 4 / 3
+      },
+      {
+        file: 'range-wall-from-island-8163.jpg',
+        alt: 'The Heatherstone range wall seen across the island, vent hood and pot filler centred'
+      },
+      {
+        file: 'range-wall-hood-backsplash-8208.jpg',
+        alt: 'Cabinetry, vent hood and mosaic backsplash above the range in the Heatherstone kitchen'
+      },
+      {
+        file: 'range-hood-pot-filler-8089.jpg',
+        alt: 'The shaped vent hood and brushed-nickel pot filler above the range in the Heatherstone kitchen'
+      },
+      {
+        file: 'cooktop-pot-filler-detail-8008.jpg',
+        alt: 'The gas cooktop, pot filler and arabesque mosaic backsplash in the Heatherstone kitchen'
+      },
+      {
+        file: 'range-wall-pantry-refrigerator-8173.jpg',
+        alt: 'The length of the Heatherstone range wall, full-height pantry cabinetry and the refrigerator at the end'
+      },
+      {
+        file: 'cabinet-run-range-autumn-branches-8167.jpg',
+        alt: 'The cabinetry run and range in the Heatherstone kitchen, autumn branches standing on the island in the foreground'
+      },
+      {
+        file: 'cabinet-run-uppers-backsplash-8097.jpg',
+        alt: 'Upper cabinets and mosaic backsplash in the Heatherstone kitchen, a stand mixer on the counter below'
+      },
+      {
+        file: 'pantry-cabinet-counter-flowers-8164.jpg',
+        alt: 'Full-height pantry cabinetry in the Heatherstone kitchen, flowers on the counter and the range beyond'
+      },
+      {
+        file: 'cabinet-run-range-hardwood-8202.jpg',
+        alt: 'The cabinetry run of the Heatherstone kitchen from the island, drawers and range along the wall'
+      },
+      {
+        file: 'pantry-range-wall-island-wide-8200.jpg',
+        alt: 'The Heatherstone kitchen from the pantry end — storage cabinetry, the range wall, and the island at right',
+        aspect: 4 / 3
+      },
+      {
+        file: 'beverage-refrigerator-wall-oven-8098.jpg',
+        alt: 'The beverage refrigerator built into the Heatherstone cabinetry, wall oven and microwave alongside'
+      },
+      {
+        file: 'wall-oven-tower-beverage-fridge-8221.jpg',
+        alt: 'The wall-oven tower and beverage refrigerator in the Heatherstone kitchen, the island and dining room beyond'
+      }
+    ]
   },
   // Willingham
   {
