@@ -54,6 +54,11 @@ function parseProjectsMeta() {
       const value = prop.initializer;
       if (ts.isStringLiteralLike(value) || ts.isNoSubstitutionTemplateLiteral(value)) {
         record[key] = value.text;
+      } else if (ts.isArrayLiteralExpression(value)) {
+        // `intro` is authored as an array of paragraphs. Without this the property is dropped, every check below
+        // falls through to its derived default, and the guards go quiet on exactly the records that need them.
+        const strings = value.elements.filter(el => ts.isStringLiteralLike(el) || ts.isNoSubstitutionTemplateLiteral(el));
+        if (strings.length === value.elements.length) record[key] = strings.map(el => el.text);
       }
     }
 
@@ -63,8 +68,9 @@ function parseProjectsMeta() {
   return items;
 }
 
+// Mirrors deriveIntro in lib/projects.ts, which returns one entry per paragraph.
 function derivedIntro(project) {
-  return `A home in ${project.location}, completed in ${project.year} with ${project.builder}.`;
+  return [`A home in ${project.location}, completed in ${project.year} with ${project.builder}.`];
 }
 
 function checkProjects() {
@@ -114,7 +120,9 @@ function checkProjects() {
     }
 
     const intro = project.intro ?? derivedIntro(project);
-    const summary = project.summary ?? intro;
+    // `intro` is an array of paragraphs, so take the first the way buildProject does. Reading `.length` off the
+    // array itself would be the item count — always 1 or 2, always under the limit, and the check would go quiet.
+    const summary = project.summary ?? intro[0] ?? '';
     if (summary.length > 160) {
       fail('project summary exceeds 160 characters', `  slug: ${slug}`, `  length: ${summary.length}`, `  summary: ${summary}`);
     }
