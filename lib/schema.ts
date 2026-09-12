@@ -113,10 +113,11 @@ export function projectSchema(project: Project): Node {
     },
     // Omitted while the photos are placeholders: claiming a stock interior depicts this project would be false, and
     // the pooled images repeat across projects, so several @ids would assert the same photographs.
-    // Deduped: `cover` normally names a plate that is already in `gallery` (it defaults to the first one), and a
-    // repeated URL would spend one of the few slots restating the same photograph.
+    // Deduped: `cover` and `hero` normally name plates that are already in `gallery` (both default to the first
+    // one), and a repeated URL would spend one of the few slots restating the same photograph. Both are listed
+    // anyway because either may legitimately name a file the gallery does not publish.
     ...(project.hasRealAssets
-      ? { image: [...new Set([project.cover, ...project.gallery].map(i => i.src))].slice(0, SCHEMA_IMAGE_LIMIT) }
+      ? { image: [...new Set([project.cover, project.hero, ...project.gallery].map(i => i.src))].slice(0, SCHEMA_IMAGE_LIMIT) }
       : {}),
     isPartOf: { '@id': WEBSITE_ID }
   };

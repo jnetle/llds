@@ -1,24 +1,26 @@
 'use client';
 
-import Image from 'next/image';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { PROJECTS, formatLocationLong, type Project } from '@/lib/projects';
-import { Container } from '@/components/ui/Container';
 import { Eyebrow } from '@/components/ui/Eyebrow';
 import { Grid } from '@/components/ui/Grid';
 import { GalleryMasonry } from '@/components/project/GalleryMasonry';
 import { GalleryPlates } from '@/components/project/GalleryPlates';
-import { Heading } from '@/components/ui/Heading';
+import { HeroBanner } from '@/components/project/HeroBanner';
+import { HeroSplit } from '@/components/project/HeroSplit';
 import { Section } from '@/components/ui/Section';
-import { brand, color, motion, text } from '@/lib/tokens';
+import { color, motion } from '@/lib/tokens';
 
 type Props = {
   project: Project;
 };
 
 export function ProjectDetail({ project }: Props) {
-  const [imgIndex, setImgIndex] = useState(0);
+  // `null` means "showing the project's own hero frame", which is the state the page loads in. It is not the same as
+  // index 0: `hero` may name a file that is not in `gallery` at all, and even when it is a plate, nothing in the
+  // gallery is *selected* until the reader picks one — so no plate should render as pressed on arrival.
+  const [selected, setSelected] = useState<number | null>(null);
   const [opening, setOpening] = useState(true);
 
   useEffect(() => {
@@ -27,6 +29,18 @@ export function ProjectDetail({ project }: Props) {
   }, []);
 
   const meta = [`${formatLocationLong(project.location)} · ${project.year}`, project.scope].filter(Boolean).join(' | ');
+
+  // The shoot as the gallery shows it: everything except the frame already standing at the top of the page. `hero`
+  // normally names a plate (that is what lets it inherit the plate's alt text and cost no second object on R2), so
+  // without this the reader meets the same photograph twice — once as the banner, then again a scroll later as the
+  // first tile. The record keeps the whole shoot; this is a rendering decision, and `lib/schema.ts` still publishes
+  // every frame. Matched on `src` because that is what identifies a photograph — two records could name one file.
+  const galleryImages = project.gallery.filter(image => image.src !== project.hero.src);
+
+  // The authored hero until a plate is promoted over it. `cover` deliberately does not appear here — that frame
+  // belongs to the tile on /projects, and picking one has never implied the other. Indices are into `galleryImages`,
+  // not the authored array: the gallery is what the reader is clicking, so the two must count the same plates.
+  const heroImage = selected === null ? project.hero : galleryImages[selected];
 
   const idx = PROJECTS.findIndex(p => p.slug === project.slug);
   const prev = PROJECTS[(idx - 1 + PROJECTS.length) % PROJECTS.length];
@@ -65,70 +79,29 @@ export function ProjectDetail({ project }: Props) {
         </Link>
       </div>
 
-      {/* Hero image. The opening scale stays on the wrapper, not the <img>. Height is a class so it is right on the
-          server, and `svh` on a phone: `vh` there is measured against the viewport with the browser chrome retracted,
-          so the hero pushed the title block off-screen on load and then settled as the bar collapsed.
-          With the top bar gone below 601px this is the first thing on the page, sitting under the fixed header the
-          way the home hero does — which is what the header's own scrim gradient is for. */}
-      <div
-        className="h-[62svh] sm:h-[85vh]"
-        style={{
-          position: 'relative',
-          background: brand.modernTan,
-          transform: opening ? 'scale(1.05)' : 'scale(1)',
-          transition: `transform ${motion.durXSlow} ${motion.ease}`
-        }}>
-        {/* No `key`: clicking a plate mutates src on the existing element rather than remounting. */}
-        {/* This is the LCP element on every project page, and it was on `preload` — which emits a preload link but
-            leaves the <img> lazy, so Next flagged it. `loading="eager"` + `fetchPriority="high"` matches HeroGrid:
-            React 19 emits the preload link itself for an eager high-priority image, without Next adding a second
-            competing one. */}
-        <Image
-          src={project.gallery[imgIndex].src}
-          alt={project.gallery[imgIndex].alt}
-          fill
-          loading="eager"
-          fetchPriority="high"
-          sizes="100vw"
-          style={{ objectFit: 'cover' }}
-          draggable={false}
-        />
-      </div>
-
-      {/* Title block */}
-      <Section padY="xxs">
-        <Container maxWidth={1400} align="center">
-          {/* Built as a string rather than JSX fragments so the separators are exact — a project with no authored
-              `scope` drops the segment and its divider together, instead of leaving a trailing pipe. The region is
-              spelled out here and only here; see `formatLocationLong`. */}
-          <Eyebrow style={{ marginBottom: 28 }}>{meta}</Eyebrow>
-          <Heading
-            level="display"
-            italic
-            style={{ fontSize: 'clamp(48px, 7vw, 110px)', lineHeight: 0.98, letterSpacing: '-0.012em', maxWidth: '14ch' }}>
-            {project.title}
-          </Heading>
-          {/* One <p> per paragraph. Rendering the array directly would type-check and then silently run the
-              paragraphs together, since React concatenates an array of strings with nothing between them. */}
-          <div style={{ marginTop: 8, maxWidth: '80ch' }}>
-            {project.intro.map((paragraph, i) => (
-              <p key={i} style={{ ...text.body, fontSize: 19, margin: i === 0 ? 0 : '1.1em 0 0' }}>
-                {paragraph}
-              </p>
-            ))}
-          </div>
-        </Container>
-      </Section>
+      {/* Hero. Which layout renders is per-project data, exactly like the gallery below — a landscape opening frame
+          wants the full-bleed banner, a portrait one wants the split. This branch stays dumb on purpose: both
+          templates take the same props, and each owns the photograph *and* the title block, because the split is
+          precisely the arrangement where those two stop being stacked siblings. `components/project/Hero*.tsx`.
+          The meta line is built above rather than in either template so they cannot word it differently. */}
+      {project.heroTemplate === 'split' ? (
+        <HeroSplit image={heroImage} title={project.title} meta={meta} intro={project.intro} opening={opening} />
+      ) : (
+        <HeroBanner image={heroImage} title={project.title} meta={meta} intro={project.intro} opening={opening} />
+      )}
 
       {/* Gallery. The layout is per-project data, not a decision this component makes — a shoot cut to a few frames
           wants the full-bleed plates, a full one wants the masonry. `components/project/Gallery*.tsx`. */}
       <Section padTop="none" padBottom="sm">
-        {project.galleryTemplate === 'masonry' ? (
-          // Masonry tiles are inert, so they neither read nor set the hero index — see the note in GalleryMasonry.
-          <GalleryMasonry gallery={project.gallery} />
-        ) : (
-          <GalleryPlates gallery={project.gallery} selected={imgIndex} onSelect={setImgIndex} title={project.title} />
-        )}
+        {/* Empty only for a one-frame shoot whose single plate is the hero — there is genuinely nothing left to show,
+            and rendering the template anyway would leave an empty grid above the `Built by` line. */}
+        {galleryImages.length > 0 &&
+          (project.galleryTemplate === 'masonry' ? (
+            // Masonry tiles are inert, so they neither read nor set the hero index — see the note in GalleryMasonry.
+            <GalleryMasonry gallery={galleryImages} />
+          ) : (
+            <GalleryPlates gallery={galleryImages} selected={selected} onSelect={setSelected} title={project.title} />
+          ))}
         <Eyebrow opacity={0.6} style={{ marginTop: 24 }}>
           Built by {project.builder}
         </Eyebrow>
