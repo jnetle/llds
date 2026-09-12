@@ -87,7 +87,7 @@ const FEATURE_META: [string, string][] = [
   ['Builder', 'Southern State Builders']
 ];
 
-// The same entrance the project tiles get in ProjectsGrid. Only `.is-in` is decided here — see `.press-reveal` in
+// The same entrance the project tiles get in ProjectsGrid. Only `.is-in` is decided here — see `.reveal` in
 // globals.css for the hidden state and the reduced-motion / no-JS fallbacks. `index` staggers tiles within a row.
 function RevealImage({ src, index = 0, style }: { src: string; index?: number; style?: CSSProperties }) {
   const [ref, seen] = useReveal<HTMLDivElement>();
@@ -95,7 +95,7 @@ function RevealImage({ src, index = 0, style }: { src: string; index?: number; s
   return (
     <div
       ref={ref}
-      className={seen ? 'press-reveal is-in' : 'press-reveal'}
+      className={seen ? 'reveal is-in' : 'reveal'}
       style={
         {
           backgroundImage: `url("${src}")`,

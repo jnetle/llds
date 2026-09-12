@@ -1,5 +1,6 @@
 import { SITE, absoluteUrl } from '@/lib/site';
 import { splitLocation, type Project } from '@/lib/projects';
+import { expandStateCode } from '@/lib/usStates';
 
 /**
  * schema.org builders. Every fact comes from `lib/site.ts` or `lib/projects.ts` — the same values the pages render —
@@ -10,9 +11,6 @@ import { splitLocation, type Project } from '@/lib/projects';
  */
 
 type Node = Record<string, unknown>;
-
-/** schema.org wants a state's name, not its postal abbreviation. */
-const US_STATES: Record<string, string> = { GA: 'Georgia', SC: 'South Carolina' };
 
 /** Stable @id for the studio, so other nodes can reference it instead of restating it. */
 export const STUDIO_ID = `${SITE.url}/#studio`;
@@ -40,7 +38,7 @@ export function studioSchema(): Node {
       return {
         '@type': 'City',
         name: city,
-        ...(region ? { containedInPlace: { '@type': 'State', name: US_STATES[region] ?? region } } : {})
+        ...(region ? { containedInPlace: { '@type': 'State', name: expandStateCode(region) } } : {})
       };
     }),
     sameAs: SITE.social.map(s => s.href),
@@ -90,6 +88,12 @@ export function breadcrumbSchema(trail: [name: string, path: string][]): Node {
 }
 
 /** One project. `CreativeWork` rather than `Product` — a portfolio piece, with no price and nothing to buy. */
+/**
+ * How many photographs a project node advertises. A finished shoot can run to dozens of frames, and listing all of
+ * them adds kilobytes of JSON-LD to every project page for no gain — the leading few are the ones worth surfacing.
+ */
+const SCHEMA_IMAGE_LIMIT = 6;
+
 export function projectSchema(project: Project): Node {
   const { city, region } = splitLocation(project.location);
 
@@ -109,7 +113,11 @@ export function projectSchema(project: Project): Node {
     },
     // Omitted while the photos are placeholders: claiming a stock interior depicts this project would be false, and
     // the pooled images repeat across projects, so several @ids would assert the same photographs.
-    ...(project.hasRealAssets ? { image: [project.cover, ...project.gallery].map(i => i.src) } : {}),
+    // Deduped: `cover` normally names a plate that is already in `gallery` (it defaults to the first one), and a
+    // repeated URL would spend one of the few slots restating the same photograph.
+    ...(project.hasRealAssets
+      ? { image: [...new Set([project.cover, ...project.gallery].map(i => i.src))].slice(0, SCHEMA_IMAGE_LIMIT) }
+      : {}),
     isPartOf: { '@id': WEBSITE_ID }
   };
 }

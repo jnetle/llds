@@ -434,6 +434,41 @@ a {
   transform: scale(1.03);
 }
 
+/* Masonry gallery template (components/project/GalleryMasonry.tsx). The columns are real elements and the plates
+   are dealt into them in the component, so there is no `column-count` here — CSS only sets the track and the gaps.
+   That is deliberate: CSS multi-column balanced the run above each full-width feature, and balancing cannot split
+   a tile, so it left a hole. Packing by known aspect closes it. Two columns at every width keeps the photographs
+   large enough that "uncropped" is the point rather than a technicality. */
+.project-masonry {
+  display: grid;
+  gap: 10px;
+}
+
+/* No `grid-template-columns` here on purpose: the track is written inline from `COLUMNS` in GalleryMasonry, which
+   is the same number the packing uses. A copy in this file would be overridden and would read as if it still set
+   the layout. */
+.project-masonry__run {
+  display: grid;
+  gap: 10px;
+  align-items: start;
+}
+
+/* `align-content: start` keeps a short column's plates their true height — stretch would smear the last one to
+   close the column, which is exactly the crop this template exists to avoid. */
+.project-masonry__col {
+  display: grid;
+  gap: 10px;
+  align-content: start;
+}
+
+@media (min-width: 601px) {
+  .project-masonry,
+  .project-masonry__run,
+  .project-masonry__col {
+    gap: 14px;
+  }
+}
+
 /* Project strip tile. Was two handlers writing currentTarget.style.filter — DOM mutations React did not know about,
    which never fired for keyboard users. */
 /* Stays a wrapper: it owns the 580px box, and `filter` on it applies to the image inside. `position: relative` is
@@ -748,7 +783,10 @@ a {
    fires. `--reveal-delay` is set inline per tile to stagger a row.
    ──────────────────────────────────────────────────────────────────────────── */
 
-.press-reveal {
+/* The site's one scroll entrance. Named for the effect rather than a route since /press, the project galleries and
+   anything later all want the same 24px rise — a second copy under another name is a second thing to keep in step.
+   `--reveal-delay` staggers neighbours; JS only ever adds `.is-in` (see hooks/useReveal.ts). */
+.reveal {
   opacity: 0;
   transform: translateY(24px);
   transition:
@@ -756,7 +794,7 @@ a {
     transform var(--dur-xslow) var(--ease-elegant) var(--reveal-delay, 0s);
 }
 
-.press-reveal.is-in {
+.reveal.is-in {
   opacity: 1;
   transform: translateY(0);
 }
@@ -764,7 +802,7 @@ a {
 /* (scripting: none) is the load-bearing arm — with no JS nothing adds `.is-in`, so the images would sit at opacity 0
    permanently. Mirrors the cover-panel and .mag-* escape hatches. */
 @media (prefers-reduced-motion: reduce), (scripting: none) {
-  .press-reveal {
+  .reveal {
     opacity: 1;
     transform: none;
     transition: none;

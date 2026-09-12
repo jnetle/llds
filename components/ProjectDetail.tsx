@@ -3,10 +3,12 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
-import { PROJECTS, type Project } from '@/lib/projects';
+import { PROJECTS, formatLocationLong, type Project } from '@/lib/projects';
 import { Container } from '@/components/ui/Container';
 import { Eyebrow } from '@/components/ui/Eyebrow';
 import { Grid } from '@/components/ui/Grid';
+import { GalleryMasonry } from '@/components/project/GalleryMasonry';
+import { GalleryPlates } from '@/components/project/GalleryPlates';
 import { Heading } from '@/components/ui/Heading';
 import { Section } from '@/components/ui/Section';
 import { brand, color, motion, text } from '@/lib/tokens';
@@ -23,6 +25,8 @@ export function ProjectDetail({ project }: Props) {
     const raf = requestAnimationFrame(() => setOpening(false));
     return () => cancelAnimationFrame(raf);
   }, []);
+
+  const meta = [`${formatLocationLong(project.location)} · ${project.year}`, project.scope].filter(Boolean).join(' | ');
 
   const idx = PROJECTS.findIndex(p => p.slug === project.slug);
   const prev = PROJECTS[(idx - 1 + PROJECTS.length) % PROJECTS.length];
@@ -70,11 +74,16 @@ export function ProjectDetail({ project }: Props) {
           transition: `transform ${motion.durXSlow} ${motion.ease}`
         }}>
         {/* No `key`: clicking a plate mutates src on the existing element rather than remounting. */}
+        {/* This is the LCP element on every project page, and it was on `preload` — which emits a preload link but
+            leaves the <img> lazy, so Next flagged it. `loading="eager"` + `fetchPriority="high"` matches HeroGrid:
+            React 19 emits the preload link itself for an eager high-priority image, without Next adding a second
+            competing one. */}
         <Image
           src={project.gallery[imgIndex].src}
           alt={project.gallery[imgIndex].alt}
           fill
-          preload
+          loading="eager"
+          fetchPriority="high"
           sizes="100vw"
           style={{ objectFit: 'cover' }}
           draggable={false}
@@ -84,44 +93,40 @@ export function ProjectDetail({ project }: Props) {
       {/* Title block */}
       <Section padY="xxs">
         <Container maxWidth={1400} align="center">
-          <Eyebrow style={{ marginBottom: 28 }}>
-            {project.location} · {project.year}
-          </Eyebrow>
+          {/* Built as a string rather than JSX fragments so the separators are exact — a project with no authored
+              `scope` drops the segment and its divider together, instead of leaving a trailing pipe. The region is
+              spelled out here and only here; see `formatLocationLong`. */}
+          <Eyebrow style={{ marginBottom: 28 }}>{meta}</Eyebrow>
           <Heading
             level="display"
             italic
             style={{ fontSize: 'clamp(48px, 7vw, 110px)', lineHeight: 0.98, letterSpacing: '-0.012em', maxWidth: '14ch' }}>
             {project.title}
           </Heading>
-          <p style={{ ...text.body, fontSize: 19, marginTop: 8, maxWidth: '80ch' }}>{project.intro}</p>
+          {/* One <p> per paragraph. Rendering the array directly would type-check and then silently run the
+              paragraphs together, since React concatenates an array of strings with nothing between them. */}
+          <div style={{ marginTop: 8, maxWidth: '80ch' }}>
+            {project.intro.map((paragraph, i) => (
+              <p key={i} style={{ ...text.body, fontSize: 19, margin: i === 0 ? 0 : '1.1em 0 0' }}>
+                {paragraph}
+              </p>
+            ))}
+          </div>
         </Container>
       </Section>
 
-      {/* Gallery */}
-      <Section padTop="none" padBottom="sm" style={{ display: 'grid', gap: 24 }}>
-        {project.gallery.map((image, i) => (
-          <button
-            key={image.src + i}
-            onClick={() => setImgIndex(i)}
-            aria-label={`View plate ${i + 1} of ${project.title}`}
-            aria-pressed={imgIndex === i}
-            style={{ cursor: 'pointer', textAlign: 'left', padding: 0, background: 'none', border: 'none' }}>
-            <div style={{ position: 'relative', height: i === 1 ? '60vh' : '80vh', background: brand.modernTan }}>
-              {/* The button's aria-label names the action, so the image inside is decorative. */}
-              <Image
-                src={image.src}
-                alt={image.alt}
-                fill
-                // 100vw rather than the ~84vw these occupy, so the srcset candidate matches the hero's and clicking a plate
-                // swaps it straight from cache instead of fetching a near-identical width.
-                sizes="100vw"
-                style={{ objectFit: 'cover' }}
-                draggable={false}
-              />
-            </div>
-          </button>
-        ))}
-        <Eyebrow opacity={0.6}>Built by {project.builder}</Eyebrow>
+      {/* Gallery. The layout is per-project data, not a decision this component makes — a shoot cut to a few frames
+          wants the full-bleed plates, a full one wants the masonry. `components/project/Gallery*.tsx`. */}
+      <Section padTop="none" padBottom="sm">
+        {project.galleryTemplate === 'masonry' ? (
+          // Masonry tiles are inert, so they neither read nor set the hero index — see the note in GalleryMasonry.
+          <GalleryMasonry gallery={project.gallery} />
+        ) : (
+          <GalleryPlates gallery={project.gallery} selected={imgIndex} onSelect={setImgIndex} title={project.title} />
+        )}
+        <Eyebrow opacity={0.6} style={{ marginTop: 24 }}>
+          Built by {project.builder}
+        </Eyebrow>
       </Section>
 
       {/* Footer nav between projects. Bespoke 36px gutter, to align with the top bar. */}

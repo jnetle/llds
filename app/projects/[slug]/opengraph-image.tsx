@@ -27,7 +27,7 @@ export const contentType = OG_CONTENT_TYPE;
 
 /**
  /**
-  * A typographic card per project. Once real photography lands (`assetsReady` in lib/projects.ts) this could render
+  * A typographic card per project. Once real photography lands (a record's `gallery` in lib/projects.ts) this could render
   * the cover photo — but only then: a card showing stock over a real project's name would misrepresent the work.
   */
 export default async function Image({ params }: { params: Promise<{ slug: string }> }) {

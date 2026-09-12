@@ -5,7 +5,7 @@
 //
 // Usage: node scripts/compress-images.mjs <inputDir> <outputDir>
 
-import { readdir, mkdir } from 'node:fs/promises';
+import { readdir, mkdir, writeFile } from 'node:fs/promises';
 import { join, relative, dirname, extname, basename } from 'node:path';
 import sharp from 'sharp';
 
@@ -39,10 +39,15 @@ async function compress(src) {
   for (let quality = 82; quality >= MIN_QUALITY; quality -= 6) {
     const buf = await base.clone().jpeg({ quality, mozjpeg: true }).toBuffer();
     if (buf.byteLength <= MAX_BYTES || quality - 6 < MIN_QUALITY) {
-      await sharp(buf).toFile(out);
+      // Write the measured buffer itself — sharp(buf).toFile() would re-encode at the default quality,
+      // inflating the file well past the byteLength this loop just checked against MAX_BYTES.
+      await writeFile(out, buf);
       const kb = (buf.byteLength / 1024).toFixed(0);
       const flag = buf.byteLength > MAX_BYTES ? ' (over budget at min quality)' : '';
-      console.log(`${outRel}  ${kb} KB  q${quality}${flag}`);
+      // Dimensions are printed because a gallery plate's `aspect` in lib/projects.ts is read off this output —
+      // the masonry template reserves each tile's box from it before the file loads.
+      const { width, height } = await sharp(buf).metadata();
+      console.log(`${outRel}  ${width}x${height}  ${kb} KB  q${quality}${flag}`);
       return;
     }
   }

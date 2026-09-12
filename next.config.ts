@@ -22,6 +22,11 @@ const nextConfig: NextConfig = {
     // transformation, so widths nothing can use are pure waste. 2400 is last because it is exactly the source cap
     // (AGENTS.md § Images) and what a full-bleed hero on a retina desktop resolves to; stopping at 2048 measurably
     // downgraded /projects/[slug], and 3840 bought nothing since the optimizer never upscales past the original.
+    // AVIF first, WebP behind it. Measured on a gallery plate at w=1200: 186 KB source -> 61 KB WebP -> 37 KB AVIF,
+    // so a 41-plate project page sheds roughly a megabyte. The cost is that a width can now be encoded twice (once
+    // per format) for browsers that split, and AVIF encodes slower — both one-offs, amortised by the 31-day
+    // `minimumCacheTTL` below. Drop back to the default by deleting this line, not by re-encoding sources.
+    formats: ['image/avif', 'image/webp'],
     deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 2400],
     // Default starts at 32; the smallest image here is the ~128px header logo.
     imageSizes: [96, 128, 256, 384],
