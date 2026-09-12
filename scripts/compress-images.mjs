@@ -3,7 +3,13 @@
 // Walks <inputDir> recursively, caps width at MAX_WIDTH, and steps JPEG quality down until the file is <= MAX_BYTES,
 // mirroring the input tree into <outputDir>. Matches the <=200 KB / <=2400 px target in AGENTS.md.
 //
-// Usage: node scripts/compress-images.mjs <inputDir> <outputDir>
+// Usage: node scripts/compress-images.mjs <inputDir> <outputDir> [--min-quality=N]
+//
+// A handful of frames in a shoot are too detailed to reach MAX_BYTES at any usable quality — dense stone, grout,
+// foliage. Those bottom out at MIN_QUALITY with visible blocking baked into a file that is the *source* every
+// next/image derivative is made from, so the artifacts reach visitors even though these bytes never do. Raising the
+// floor with --min-quality trades bucket storage, which nobody downloads, for fidelity that everybody sees. See the
+// project-photography exception in AGENTS.md before reaching for it.
 
 import { readdir, mkdir, writeFile } from 'node:fs/promises';
 import { join, relative, dirname, extname, basename } from 'node:path';
@@ -11,12 +17,20 @@ import sharp from 'sharp';
 
 const MAX_WIDTH = 2400;
 const MAX_BYTES = 200 * 1024;
-const MIN_QUALITY = 40;
+const DEFAULT_MIN_QUALITY = 40;
 const EXTS = new Set(['.jpg', '.jpeg', '.png', '.webp', '.tif', '.tiff', '.heic']);
 
-const [inputDir, outputDir] = process.argv.slice(2);
+const args = process.argv.slice(2);
+const [inputDir, outputDir] = args.filter(a => !a.startsWith('--'));
 if (!inputDir || !outputDir) {
-  console.error('Usage: node scripts/compress-images.mjs <inputDir> <outputDir>');
+  console.error('Usage: node scripts/compress-images.mjs <inputDir> <outputDir> [--min-quality=N]');
+  process.exit(1);
+}
+
+const minQualityArg = args.find(a => a.startsWith('--min-quality='))?.split('=')[1];
+const MIN_QUALITY = minQualityArg === undefined ? DEFAULT_MIN_QUALITY : Number(minQualityArg);
+if (!Number.isInteger(MIN_QUALITY) || MIN_QUALITY < 1 || MIN_QUALITY > 100) {
+  console.error(`--min-quality must be an integer from 1 to 100; received ${minQualityArg}`);
   process.exit(1);
 }
 
