@@ -1,6 +1,7 @@
 'use client';
 
 import Image from 'next/image';
+import Link from 'next/link';
 
 import { useEffect, useRef, useState } from 'react';
 import type { Project } from '@/lib/projects';
@@ -54,14 +55,18 @@ export function ProjectStrip({ projects, onOpen }: Props) {
           }}>
           More from the studio
         </h3>
-        <button
+        {/* The strip deliberately shows only what the hero did not, so this is the way to the rest of them. A real
+            <Link> rather than a button and a router push: it is a navigation, and only a link prefetches, opens in a
+            new tab on cmd-click, and reads as a route to /projects rather than as a control. */}
+        <Link
+          href="/projects"
           className="micro"
           style={{
             borderBottom: '1px solid currentColor',
             paddingBottom: 4
           }}>
           Index of Works · ↗
-        </button>
+        </Link>
       </div>
 
       <div
@@ -72,7 +77,11 @@ export function ProjectStrip({ projects, onOpen }: Props) {
           transform: `translateX(${-offset * 0.6}px)`,
           transition: 'transform 0.05s linear'
         }}>
-        {[...projects, ...projects].map((p, i) => (
+        {/* Once through, not the doubled pass this used to render. The strip is fed the projects the hero did not
+            show, so it is now short enough that a second copy is reachable rather than theoretical — and a repeated
+            cover under "More from the studio" is exactly what the section promises not to be. The row still overruns
+            the viewport on any display up to ~2100px wide; past that it ends early, which reads as the list ending. */}
+        {projects.map((p, i) => (
           <button
             key={`${p.slug}-${i}`}
             onClick={() => onOpen(p)}
