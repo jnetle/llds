@@ -1114,11 +1114,187 @@ const PROJECT_META: ProjectRecord[] = [
   // Guha
   {
     slug: 'augusta-conifer-modern-tudor',
-    assetKey: 'conifer-rd',
+    assetKey: 'conifer-modern-tudor',
     title: 'Conifer Modern Tudor',
     location: 'Augusta, GA',
     year: '2022',
-    builder: 'Southern State Builders'
+    builder: 'Southern State Builders',
+    scope: 'Custom New Construction',
+    intro: [
+      'From the beginning, this home was designed to have a character all its own. Inspired by Tudor architecture but interpreted with a fresh perspective, the exterior pairs painted brick, an arched entry, and warm wood details with dramatic black-framed windows that fill the home with natural light.',
+      'Inside, that same balance of old and new continues with a mix of painted and white oak cabinetry, warm metals, and thoughtfully layered details. A hidden pantry keeps the kitchen functional and uncluttered, while unexpected moments, like the color-drenched powder room beneath the stairs and skylights flooding the primary bath with light, give the home personality.',
+      'The result is a home that feels distinctive yet inviting, with details considered from the floor plan all the way through the finishing touches.'
+    ],
+    summary:
+      'A fresh Tudor-inspired home in Augusta, Georgia, pairing timeless character with layered interiors and thoughtful custom details.',
+    updatedAt: '2026-09-12',
+    galleryTemplate: 'masonry',
+    // Portrait, and the frame that carries the whole house at tile size — the gable, the arched entry, the black
+    // window wall and the paver walk, in the only light the shoot caught at dusk.
+    cover: 'front-elevation-dusk-2571.jpg',
+    // Display order follows the lede: the exterior it is named for, then the door and what is behind it, then the
+    // kitchen and the cabinetry mix, then the stair and the two rooms off it the lede calls out by name — the
+    // colour-drenched powder room and the office — and last the skylit primary bath and the guest bath. File names
+    // carry the camera number, as at Heathwood House, Aiken Homestead, Heatherstone, River Club and Kestwick, so a
+    // frame can be matched back to the photographer's original from the bucket listing alone.
+    //
+    // The delivery is 53 frames and 22 are left off. Five are phone screenshots of frames already here, letterboxed
+    // with black bars at 1125 px (three exteriors and two kitchens), and one of those also carries construction
+    // debris on the lawn. Twelve more are second and third crops of a frame already published — the delivery ships
+    // IMG_2659 three times, IMG_2759 three times, and 2655, 2665, 2680, 2698 twice each. The rest are frames another
+    // says better: two overcast exteriors against the dusk ones, a warm-cast primary bath wide that does not match
+    // the colour of the set around it, and a third bathroom with a single generic frame and nothing else of its room.
+    //
+    // 20 of the 31 run 202–583 KB at the default quality floor. Like Heatherstone, River Club and Kestwick, and
+    // unlike Aiken Homestead, this shoot is NOT held at a raised floor: --min-quality=64 was measured against the
+    // default on the five densest frames and buys 1–6% on the 1200 px WebP derivative next/image actually serves
+    // (325/236/222/189/154 KB vs 329/251/228/198/165 KB) while making each bucket object ~50% heavier (855/651/628/
+    // 530/526 KB vs 583/436/425/353/331 KB), and at 100% on the densest frame — pine foliage against a dusk sky —
+    // the two sources are indistinguishable. The over-budget frames are dense the way AGENTS.md describes: painted
+    // brick tooth, foliage, and a lawn, not the stone veining that made Aiken's floor bite.
+    //
+    // `primary-bath-skylights-wide-2745.jpg` is the shoot's ONLY landscape frame, so it is the only `feature`, and
+    // it opens the primary bath. It splits the masonry into runs of 20 and 10 — both even, so each run's two columns
+    // carry the same number of plates. The ten-plate run ends dead level; the twenty-plate run ends 0.17 column
+    // widths apart, which is the minimum this set of aspects allows (an exact split is arithmetically impossible —
+    // the heights are ninths of a column width and the total is not an even number of them). Reaching it costs one
+    // swap: the range detail is published before the hood elevation rather than after.
+    //
+    // `aspect` is set only on the six frames that are not the 3/4 default: four 9/16 kitchen frames, the 2/3 stair
+    // detail (the shoot's one DSLR frame, delivered at 1024 px), and the 4/3 feature.
+    gallery: [
+      {
+        file: 'front-elevation-dusk-2571.jpg',
+        alt: 'The Conifer front elevation at dusk — a steep painted-brick gable, an arched entry between copper gas lanterns, and black-framed windows lit warm from inside'
+      },
+      {
+        file: 'front-elevation-from-lawn-dusk-2573.jpg',
+        alt: 'The Conifer house from the lawn at dusk, the sweeping brick eave carrying from the gable down past the two-storey window to the entry'
+      },
+      {
+        file: 'arched-entry-curved-eave-2785.jpg',
+        alt: 'Where the curved eave of the Conifer entry meets the sided wing, the arched brick surround and the tall black-framed window side by side'
+      },
+      {
+        file: 'arched-front-door-slate-porch-2786.jpg',
+        alt: 'The Conifer front door — an arched stained-wood door set in painted brick above a slate porch, boxwoods in the bed beside it'
+      },
+      {
+        file: 'copper-gas-lantern-painted-brick-2787.jpg',
+        alt: 'A copper gas lantern on the Conifer entry wall, the tooth of the painted brick running behind it'
+      },
+      {
+        file: 'foyer-arched-door-reclaimed-beams-2685.jpg',
+        alt: 'The Conifer foyer from inside, the arched front door framed under a reclaimed hand-hewn beam with white oak floors running toward it'
+      },
+      {
+        file: 'kitchen-from-living-room-beams-2668.jpg',
+        alt: 'The Conifer kitchen seen from the living room, reclaimed beams crossing the ceiling between the two rooms'
+      },
+      {
+        file: 'white-oak-island-under-beams-2654.jpg',
+        alt: 'The white oak island of the Conifer kitchen under its two pendants, the hand-hewn beams overhead and the plaster hood beyond',
+        aspect: 9 / 16
+      },
+      {
+        file: 'kitchen-run-toward-range-2655.jpg',
+        alt: 'Down the Conifer kitchen past the island toward the range, painted cabinetry on both sides under a quartz backsplash'
+      },
+      {
+        file: 'cabinetry-run-panelled-refrigerator-2665.jpg',
+        alt: 'The painted cabinetry run of the Conifer kitchen, the panelled refrigerator at one end and glass-front white oak uppers at the other',
+        aspect: 9 / 16
+      },
+      {
+        file: 'glass-cabinets-hidden-pantry-door-2659.jpg',
+        alt: 'The glass-front white oak cabinets of the Conifer kitchen beside the panelled door that hides the pantry',
+        aspect: 9 / 16
+      },
+      {
+        file: 'range-pot-filler-glass-uppers-2676.jpg',
+        alt: 'The Conifer range and its black pot filler, quartz carried up the wall between the white oak glass uppers'
+      },
+      {
+        file: 'plaster-hood-quartz-backsplash-2671.jpg',
+        alt: 'The plaster hood of the Conifer kitchen straight on, flanked by glass-front white oak cabinets above the range',
+        aspect: 9 / 16
+      },
+      {
+        file: 'stair-hall-window-wall-chandelier-2691.jpg',
+        alt: 'The Conifer stair hall, two storeys of black-framed glass on the landing wall with an iron chandelier hanging in front of them'
+      },
+      {
+        file: 'chandelier-from-upper-landing-2695.jpg',
+        alt: 'The Conifer stair chandelier from the upper landing, the window wall and the clerestory above it carrying the light down'
+      },
+      {
+        file: 'upper-landing-toward-office-2694.jpg',
+        alt: 'The Conifer upper landing looking back toward the office, the round window visible between the built-in bookcases'
+      },
+      {
+        file: 'stair-treads-black-balusters-2692.jpg',
+        alt: 'The Conifer stair from below — stained oak treads and white risers behind squared black balusters'
+      },
+      {
+        file: 'stair-treads-overhead-detail-4452.jpg',
+        alt: 'The Conifer stair from above, the black handrail running down across the grain of the oak treads',
+        aspect: 2 / 3
+      },
+      {
+        file: 'powder-room-sage-vanity-2680.jpg',
+        alt: 'The colour-drenched powder room beneath the Conifer stair — sage walls and panelling around a white vanity with a shaped quartz splash and a round brass mirror'
+      },
+      {
+        file: 'office-built-ins-round-window-2698.jpg',
+        alt: 'The Conifer office built-ins, two dark-backed bookcases over a drawer bank with the round window centred between them'
+      },
+      {
+        file: 'primary-bath-skylights-wide-2745.jpg',
+        alt: 'The Conifer primary bath the width of the room — the floating white oak double vanity, the marble shower under the vaulted ceiling, and the two skylights cut into it',
+        aspect: 4 / 3,
+        feature: true
+      },
+      {
+        file: 'primary-bath-double-vanity-skylights-2743.jpg',
+        alt: 'The Conifer primary bath from the door, both skylights open to the trees above the double vanity and the marble-lined shower'
+      },
+      {
+        file: 'primary-bath-vanity-mirrors-sconces-2747.jpg',
+        alt: 'The Conifer primary vanity straight on — two brass-framed mirrors and paired sconces above the floating white oak run'
+      },
+      {
+        file: 'primary-vanity-brass-mirror-shower-2756.jpg',
+        alt: 'One end of the Conifer primary vanity, a brass-framed mirror beside the glass wall of the marble shower'
+      },
+      {
+        file: 'primary-vanity-run-under-skylight-2757.jpg',
+        alt: 'Along the Conifer primary vanity toward the shower, the skylight throwing light down the marble slab wall'
+      },
+      {
+        file: 'soaking-tub-marble-shower-wall-2759.jpg',
+        alt: 'The freestanding tub in the Conifer primary bath, set on slate against the marble slab wall under the vaulted skylight'
+      },
+      {
+        file: 'guest-bath-tub-stacked-tile-2573.jpg',
+        alt: 'The Conifer guest bath — a tub under stacked white tile beside the fluted white oak vanity and its arched black mirror'
+      },
+      {
+        file: 'fluted-oak-vanity-arched-mirror-2557.jpg',
+        alt: 'The fluted white oak vanity of the Conifer guest bath under an arched black mirror, brass fittings on a marble top'
+      },
+      {
+        file: 'fluted-oak-vanity-marble-top-2570.jpg',
+        alt: 'The Conifer guest vanity from the side, the marble top overhanging the fluted white oak and its brass pull'
+      },
+      {
+        file: 'fluted-oak-brass-pull-detail-2568.jpg',
+        alt: 'The fluting of the Conifer guest vanity close up, the brass bar pull and knobs catching across it'
+      },
+      {
+        file: 'fluted-oak-hex-marble-floor-2577.jpg',
+        alt: 'Where the Conifer guest vanity meets the floor, fluted white oak above large hexagonal marble tile'
+      }
+    ]
   },
   // Wachowicz
   {
