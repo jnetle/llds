@@ -18,20 +18,21 @@ export function useTrackProgress(trackRef: RefObject<HTMLElement | null>, onProg
 
   useEffect(() => {
     let raf: number | null = null;
-    // Measured once — getBoundingClientRect in the scroll handler would force layout every frame.
-    let top = 0;
-    let range = 1;
-
-    const measure = () => {
-      const el = trackRef.current;
-      if (!el) return;
-      top = el.getBoundingClientRect().top + window.scrollY;
-      // A track shorter than the viewport (the reduced-motion / no-JS fallback) would divide by zero.
-      range = Math.max(1, el.offsetHeight - window.innerHeight);
-    };
 
     const update = () => {
-      const p = (window.scrollY - top) / range;
+      const el = trackRef.current;
+      if (!el) return;
+      // Read live, not from geometry cached at mount. A track's document offset moves whenever anything above it
+      // changes height, and on the home page something does: the cover panel unmounts and takes a viewport of lead
+      // stage with it, sliding the project strip's track ~100svh up the page. A cached offset then places the pinned
+      // range where the reader has already scrolled past, and the scrub never runs at all — the strip sat still for
+      // its whole pass. A ResizeObserver is not the fix either: `html` here is viewport-height, so observing the
+      // document element never fires. One rect read at the top of the frame, before any of the writes the callback
+      // goes on to make, is a layout read and not a thrash.
+      const rect = el.getBoundingClientRect();
+      // A track shorter than the viewport (the reduced-motion / no-JS fallback) would divide by zero.
+      const range = Math.max(1, rect.height - window.innerHeight);
+      const p = -rect.top / range;
       cb.current(p < 0 ? 0 : p > 1 ? 1 : p);
     };
 
@@ -43,20 +44,15 @@ export function useTrackProgress(trackRef: RefObject<HTMLElement | null>, onProg
       });
     };
 
-    const onResize = () => {
-      measure();
-      onScroll();
-    };
-
-    // Measure on a frame so layout has settled, then seed the first value.
-    const first = requestAnimationFrame(onResize);
+    // Seed on a frame so layout has settled.
+    const first = requestAnimationFrame(update);
 
     window.addEventListener('scroll', onScroll, { passive: true });
-    window.addEventListener('resize', onResize);
+    window.addEventListener('resize', onScroll);
 
     return () => {
       window.removeEventListener('scroll', onScroll);
-      window.removeEventListener('resize', onResize);
+      window.removeEventListener('resize', onScroll);
       cancelAnimationFrame(first);
       if (raf) cancelAnimationFrame(raf);
     };
