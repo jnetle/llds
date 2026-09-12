@@ -39,10 +39,12 @@ describe('projects data', () => {
     }
   });
 
-  it('gives every project a known gallery template and a positive aspect on every plate', () => {
+  it('gives every project known hero and gallery templates, and a positive aspect on every plate', () => {
     for (const project of ALL_PROJECTS) {
+      expect(['banner', 'split']).toContain(project.heroTemplate);
       expect(['plates', 'masonry']).toContain(project.galleryTemplate);
-      // A zero or negative aspect collapses the masonry tile to nothing, and `aspect-ratio` fails silently.
+      // A zero or negative aspect collapses the masonry tile — and the split hero's frame — to nothing, and
+      // `aspect-ratio` fails silently.
       for (const image of project.gallery) expect(image.aspect).toBeGreaterThan(0);
     }
   });
@@ -64,6 +66,53 @@ describe('projects data', () => {
     for (const project of ALL_PROJECTS.filter(p => p.hasRealAssets)) {
       expect(project.cover.src).toContain(`/projects/${project.assetKey}/`);
       expect(project.cover.src.split('/').pop()).toMatch(/^[a-z0-9]+(?:-[a-z0-9]+)*\.(?:jpg|png|webp)$/);
+    }
+  });
+
+  it('resolves every hero inside its own project folder', () => {
+    // Same hazard as `cover`, different surface: a wrong file name here breaks the detail page's opening frame.
+    // It may legitimately name a file outside `gallery`, so the invariant is the folder, not membership.
+    for (const project of ALL_PROJECTS.filter(p => p.hasRealAssets)) {
+      expect(project.hero.src).toContain(`/projects/${project.assetKey}/`);
+      expect(project.hero.src.split('/').pop()).toMatch(/^[a-z0-9]+(?:-[a-z0-9]+)*\.(?:jpg|png|webp)$/);
+    }
+  });
+
+  it('carries real alt text on the banner, which the gallery no longer renders', () => {
+    // The detail page drops the hero frame from the gallery, so the plate that described it is gone from the page and
+    // the banner is the only thing left saying what that photograph is. Derived alt is a floor for a tile in a
+    // sequence; on the one image that opens the page it is a regression, and it is what a `hero` pointing at a frame
+    // with no authored `alt` would silently produce.
+    const derived = [/interior view \d+ —/, /— interior design in .* by Laurel Leaf Design Studio$/, /^Placeholder interior/];
+    for (const project of PROJECTS) {
+      expect(project.hero.alt.trim()).not.toBe('');
+      for (const pattern of derived) expect(project.hero.alt).not.toMatch(pattern);
+    }
+  });
+
+  it('gives a placeholder record a banner that is not one of its own tiles', () => {
+    // The pool names `hero` as its own role rather than letting the banner borrow `gallery[0]`. Borrowing made the
+    // pool the one place where banner and first tile were necessarily the same frame — which the gallery's de-dupe
+    // then charged a tile for, leaving three placeholder plates rendering as two, numbered "view 2, view 3".
+    for (const project of ALL_PROJECTS.filter(p => !p.hasRealAssets)) {
+      expect(project.gallery.map(image => image.src)).not.toContain(project.hero.src);
+      expect(project.gallery).toHaveLength(3);
+    }
+  });
+
+  it('keeps the hero and the cover independent of each other', () => {
+    // There is no fallback left to test — `hero` is required alongside `gallery`, so tsc is what enforces that every
+    // shot project states its opening frame. What a runtime test can still catch is the two being wired to the same
+    // source by accident: several records deliberately lead the tile on one frame and the page on another, so if
+    // nothing here differs, the fields have collapsed into one.
+    const shot = ALL_PROJECTS.filter(p => p.hasRealAssets);
+    expect(shot.some(p => p.hero.src !== p.cover.src)).toBe(true);
+  });
+
+  it('lets a hero that names a gallery plate inherit that plate’s alt text', () => {
+    for (const project of ALL_PROJECTS.filter(p => p.hasRealAssets)) {
+      const plate = project.gallery.find(image => image.src === project.hero.src);
+      if (plate) expect(project.hero.alt).toBe(plate.alt);
     }
   });
 
@@ -101,7 +150,7 @@ describe('what the site publishes', () => {
     for (const project of PROJECTS) expect(project.hasRealAssets).toBe(true);
     // A stock interior under the studio's name is the thing being prevented; assert the pool itself never ships.
     for (const project of PROJECTS) {
-      for (const image of [project.cover, ...project.gallery]) expect(image.src).not.toContain('images.unsplash.com');
+      for (const image of [project.cover, project.hero, ...project.gallery]) expect(image.src).not.toContain('images.unsplash.com');
     }
   });
 

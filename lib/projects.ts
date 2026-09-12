@@ -42,6 +42,16 @@ export type GalleryPlate = {
 };
 
 /**
+ * Which layout the detail page's hero renders — the opening photograph and the title block together.
+ * - `banner` — one photograph cropped to the full viewport width, title block stacked beneath. The original.
+ * - `split`  — photograph on the left at its own aspect, title block beside it, the way the About hero reads.
+ *
+ * Pick it from the shape of the opening frame, which is `gallery[0]`: `banner` crops to a wide band, so a portrait
+ * loses its top and bottom to it. `components/project/Hero*.tsx`.
+ */
+export type HeroTemplate = 'banner' | 'split';
+
+/**
  * Which layout the detail page's gallery renders.
  * - `plates`   — full-bleed stacked bands, each cropped to a fixed height. The original treatment.
  * - `masonry`  — an Unsplash-style column grid; every photograph uncropped, at its own aspect.
@@ -64,8 +74,11 @@ export type Project = {
   /** <=160 chars — this is the meta description and the OG description. */
   summary: string;
   cover: ProjectImage;
+  /** The detail page's opening photograph. A separate choice from `cover` — see `ProjectRecord.hero`. */
+  hero: ProjectImage;
   /** Variable length: as many plates as the project has on R2. Placeholder projects always carry 3. */
   gallery: GalleryImage[];
+  heroTemplate: HeroTemplate;
   galleryTemplate: GalleryTemplate;
   /** ISO date. Feeds `lastModified` in app/sitemap.ts; falls back to build time. */
   updatedAt?: string;
@@ -74,11 +87,20 @@ export type Project = {
 };
 
 // Unsplash placeholders, cycled across every project until real assets land on R2 under `projects/<assetKey>/`.
-type PlaceholderAssets = { cover: string; gallery: string[] };
+//
+// One entry per role the bucket layout names, `hero` included — a placeholder record has a detail page to stand up
+// too, and leaving it to borrow `gallery[0]` made the pool the one place where the banner and the first tile were
+// necessarily the same photograph. `ProjectDetail` drops the hero frame from the rendered gallery, so that borrowing
+// also cost a placeholder record one of its three tiles and left the derived alt text numbered "view 2, view 3".
+// Each `hero` below therefore names a frame that is **not** in its own entry's `gallery`, which is the shape a real
+// record has when its `hero` names an unpublished frame. They are existing pool photographs rotated by one rather
+// than new Unsplash IDs: nothing here should be a URL nobody has checked resolves.
+type PlaceholderAssets = { cover: string; hero: string; gallery: string[] };
 
 const PLACEHOLDER_ASSETS: PlaceholderAssets[] = [
   {
     cover: 'https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=2400&q=80',
+    hero: 'https://images.unsplash.com/photo-1505691938895-1758d7feb511?auto=format&fit=crop&w=2400&q=80',
     gallery: [
       'https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=1600&q=80',
       'https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?auto=format&fit=crop&w=1600&q=80',
@@ -87,6 +109,7 @@ const PLACEHOLDER_ASSETS: PlaceholderAssets[] = [
   },
   {
     cover: 'https://images.unsplash.com/photo-1505691938895-1758d7feb511?auto=format&fit=crop&w=2400&q=80',
+    hero: 'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=2400&q=80',
     gallery: [
       'https://images.unsplash.com/photo-1505691938895-1758d7feb511?auto=format&fit=crop&w=1600&q=80',
       'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?auto=format&fit=crop&w=1600&q=80',
@@ -95,6 +118,7 @@ const PLACEHOLDER_ASSETS: PlaceholderAssets[] = [
   },
   {
     cover: 'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=2400&q=80',
+    hero: 'https://images.unsplash.com/photo-1616137466211-f939a420be84?auto=format&fit=crop&w=2400&q=80',
     gallery: [
       'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=1600&q=80',
       'https://images.unsplash.com/photo-1583847268964-b28dc8f51f92?auto=format&fit=crop&w=1600&q=80',
@@ -103,6 +127,7 @@ const PLACEHOLDER_ASSETS: PlaceholderAssets[] = [
   },
   {
     cover: 'https://images.unsplash.com/photo-1616137466211-f939a420be84?auto=format&fit=crop&w=2400&q=80',
+    hero: 'https://images.unsplash.com/photo-1616593969747-4797dc75033e?auto=format&fit=crop&w=2400&q=80',
     gallery: [
       'https://images.unsplash.com/photo-1616137466211-f939a420be84?auto=format&fit=crop&w=1600&q=80',
       'https://images.unsplash.com/photo-1618220179428-22790b461013?auto=format&fit=crop&w=1600&q=80',
@@ -111,6 +136,7 @@ const PLACEHOLDER_ASSETS: PlaceholderAssets[] = [
   },
   {
     cover: 'https://images.unsplash.com/photo-1616593969747-4797dc75033e?auto=format&fit=crop&w=2400&q=80',
+    hero: 'https://images.unsplash.com/photo-1598928506311-c55ded91a20c?auto=format&fit=crop&w=2400&q=80',
     gallery: [
       'https://images.unsplash.com/photo-1616593969747-4797dc75033e?auto=format&fit=crop&w=1600&q=80',
       'https://images.unsplash.com/photo-1616137466211-f939a420be84?auto=format&fit=crop&w=1600&q=80',
@@ -119,6 +145,7 @@ const PLACEHOLDER_ASSETS: PlaceholderAssets[] = [
   },
   {
     cover: 'https://images.unsplash.com/photo-1598928506311-c55ded91a20c?auto=format&fit=crop&w=2400&q=80',
+    hero: 'https://images.unsplash.com/photo-1600566753376-12c8ab7fb75b?auto=format&fit=crop&w=2400&q=80',
     gallery: [
       'https://images.unsplash.com/photo-1598928506311-c55ded91a20c?auto=format&fit=crop&w=1600&q=80',
       'https://images.unsplash.com/photo-1560185007-cde436f6a4d0?auto=format&fit=crop&w=1600&q=80',
@@ -127,6 +154,7 @@ const PLACEHOLDER_ASSETS: PlaceholderAssets[] = [
   },
   {
     cover: 'https://images.unsplash.com/photo-1600566753376-12c8ab7fb75b?auto=format&fit=crop&w=2400&q=80',
+    hero: 'https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=2400&q=80',
     gallery: [
       'https://images.unsplash.com/photo-1600566753376-12c8ab7fb75b?auto=format&fit=crop&w=1600&q=80',
       'https://images.unsplash.com/photo-1560448075-bb485b067938?auto=format&fit=crop&w=1600&q=80',
@@ -138,10 +166,11 @@ const PLACEHOLDER_ASSETS: PlaceholderAssets[] = [
 // Titles are the street name; owners' surnames are kept out of every value and slug for privacy, and survive only as
 // the `// <surname>` mapping comments below, which are stripped from the production bundle.
 /**
- * What you author. Only the first five fields are required; the rest are slots for content that has not arrived and is
- * derived until it does — so importing a finished project is an edit to one record, never to a component.
+ * What you author, minus the two fields that only exist once a project has been shot — see `ProjectRecord` below.
+ * Most of these are slots for content that has not arrived and is derived until it does, so importing a finished
+ * project is an edit to one record, never to a component.
  */
-type ProjectRecord = {
+type ProjectRecordBase = {
   slug: string;
   /**
    * Stable storage key for R2 object paths; keep immutable once images are uploaded.
@@ -159,16 +188,6 @@ type ProjectRecord = {
    */
   scope?: string;
   /**
-   * The shoot, in display order, naming files inside `projects/<assetKey>/`. Authoring the names rather than deriving
-   * `gallery-N.jpg` is what makes **reordering a move in this array** — under a derived numbering it meant renaming
-   * objects on R2, and `next.config.ts` caches each optimized derivative for `minimumCacheTTL` (31 days), so every
-   * renamed URL would serve a stale image for a month unless invalidated by hand.
-   *
-   * Present and non-empty is what "this project has real photography" means; there is no separate flag to forget.
-   * Omitted -> the project renders from the shared Unsplash placeholder pool.
-   */
-  gallery?: GalleryPlate[];
-  /**
    * File backing the cover tile, in the same folder. Usually one already in `gallery` — pointing at it costs no
    * second object, and re-picking the cover becomes a one-word edit with nothing to re-upload or invalidate.
    * Omitted -> the first plate.
@@ -176,6 +195,8 @@ type ProjectRecord = {
   cover?: string;
   /** Cover alt. Omitted -> the alt of the plate `cover` names, else derived. */
   coverAlt?: string;
+  /** Hero alt. Omitted -> the alt of the plate `hero` names, else derived. */
+  heroAlt?: string;
   /** Real lede copy, one entry per paragraph. Omitted -> derived from location/year/builder. */
   intro?: string[];
   /**
@@ -184,11 +205,59 @@ type ProjectRecord = {
    * paragraph is the derived one-liner; real lede copy runs far past 160, so author this whenever `intro` is authored.
    */
   summary?: string;
+  /**
+   * Hero layout. Omitted -> `banner`, the original full-bleed treatment, which is right whenever the opening frame
+   * is landscape. Set `split` when it is portrait — the banner's crop would take the top and bottom off it.
+   */
+  heroTemplate?: HeroTemplate;
   /** Gallery layout. Omitted -> `plates`, the original full-bleed treatment. */
   galleryTemplate?: GalleryTemplate;
   /** ISO date of the last meaningful change, for the sitemap. */
   updatedAt?: string;
 };
+
+/**
+ * A project whose shoot has been authored — which is also what publishes it, since `PROJECTS` filters on the gallery.
+ *
+ * `gallery` and `hero` are required **together**, and that pairing is the point of the union: the frame a detail page
+ * opens on is an editorial decision, so it is stated, never inferred. It used to fall back to the first plate, which
+ * read as a choice while being an accident — four of these eight records had re-picked `cover` away from plate one
+ * and their pages went on opening on plate one because nothing said otherwise. A fallback cannot be reviewed; a
+ * missing `hero` here is a compile error.
+ */
+type ShotRecord = ProjectRecordBase & {
+  /**
+   * The shoot, in display order, naming files inside `projects/<assetKey>/`. Authoring the names rather than deriving
+   * `gallery-N.jpg` is what makes **reordering a move in this array** — under a derived numbering it meant renaming
+   * objects on R2, and `next.config.ts` caches each optimized derivative for `minimumCacheTTL` (31 days), so every
+   * renamed URL would serve a stale image for a month unless invalidated by hand.
+   *
+   * Present and non-empty is what "this project has real photography" means; there is no separate flag to forget.
+   */
+  gallery: GalleryPlate[];
+  /**
+   * File backing the **detail page's opening photograph**, in the same folder. Required, and deliberately separate
+   * from `cover`: the two are seen in different places at different sizes and are not the same editorial decision.
+   * `cover` is a tile in a grid of other projects — it has to read at thumbnail size, against its neighbours, and say
+   * which project this is. `hero` opens the project's own page at full bleed or half a viewport, with nothing to
+   * compete with and the title beside it, so it can be the quieter or wider frame that would vanish in a tile.
+   *
+   * Naming one file in both places is fine and costs no second object on R2; it just has to be said.
+   *
+   * Named `hero`, not `banner`, because `heroTemplate` is the sibling field that chooses its *layout* — `banner` is
+   * one of that field's two values, so a `banner` key here would read as though it only applied to one of them.
+   */
+  hero: string;
+};
+
+/** Not yet shot: no gallery, so there is no frame to open on either. Renders from the shared placeholder pool. */
+type UnshotRecord = ProjectRecordBase & {
+  gallery?: undefined;
+  hero?: undefined;
+};
+
+/** What you author. A record is one or the other — there is no state where a shoot exists but its opening frame does not. */
+type ProjectRecord = ShotRecord | UnshotRecord;
 
 // The authored source for every project on the site. `PROJECTS` below is what the pages actually render — it drops
 // the records still on placeholder photography — and is the single ordering source for the Projects index, the home
@@ -240,6 +309,9 @@ const PROJECT_META: ProjectRecord[] = [
     galleryTemplate: 'masonry',
     // The cover names a file already in the shoot, so there is no second copy of it in the bucket.
     cover: 'kitchen-range-island-flowers.jpg',
+    // Not the cover: the tile leads on the range wall and flowers, the page opens on the island table under its
+    // pendant — the wider frame, which has room to breathe at full bleed and would lose its subject in a tile.
+    hero: 'kitchen-island-table-pendant.jpg',
     updatedAt: '2026-09-11',
     // Display order. Reordering this array reorders the page; nothing on R2 moves.
     // The two `feature` plates also set the masonry's run boundaries, so their positions are load-bearing for the
@@ -465,6 +537,9 @@ const PROJECT_META: ProjectRecord[] = [
     galleryTemplate: 'masonry',
     // Portrait, and the frame that holds the whole room at tile size — across the island to the range wall, pendants overhead.
     cover: 'island-counter-pendants-range-3215.jpg',
+    // Not the cover: the tile is the tight frame across the island to the range, the page opens on the room in
+    // full — island, pendants, stools and the marble wall beyond.
+    hero: 'kitchen-island-pendants-stools-3182.jpg',
     // Display order follows the lede: the island the house gathers at, then the opened plan the wall used to divide,
     // then the working walls, and last the three spaces the second paragraph names — pantry, mudroom, coffee bar.
     // File names carry the camera number, as at Heathwood House, Aiken Homestead and Heatherstone, so a frame can be
@@ -627,6 +702,7 @@ const PROJECT_META: ProjectRecord[] = [
     galleryTemplate: 'masonry',
     // Portrait, and the one frame that holds the whole room — island, pendants, sink window and range wall — at tile size.
     cover: 'kitchen-island-pendants-wide-8020.jpg',
+    hero: 'kitchen-island-pendants-wide-8020.jpg',
     updatedAt: '2026-09-12',
     // Display order follows the lede: the room whole, then the sink beneath its oversized window, then the island the
     // family gathers at, then the range wall, and last the cabinetry run that carries the wall oven, the beverage
@@ -802,6 +878,7 @@ const PROJECT_META: ProjectRecord[] = [
     galleryTemplate: 'masonry',
     // Portrait, and the one frame that carries the whole room — vanity, tub, and the custom floor — at tile size.
     cover: 'bath-vanity-tub-window-wide-7075.jpg',
+    hero: 'bath-vanity-tub-window-wide-7075.jpg',
     updatedAt: '2026-09-12',
     // Display order follows the lede: the room whole, then the shower it was designed around, then the tub, then the
     // vanities and the details. File names carry the camera number, as at Heathwood House, so a frame can be matched
@@ -968,6 +1045,8 @@ const PROJECT_META: ProjectRecord[] = [
     // Portrait, and the frame that reads best at tile size — the primary bath, tub and glass shower together. Already in
     // `gallery`, so no second object.
     cover: 'bath-tub-shower-glass-6594.jpg',
+    // Not the cover: the tile leads on the bath, the page opens on the kitchen the lede talks about first.
+    hero: 'kitchen-island-pendants-wide-6573.jpg',
     updatedAt: '2026-09-11',
     // Display order, following the lede: kitchen, then the coffee bar and the pantry it hides, then the primary bath.
     // Unlike Two Mile House these file names carry the camera number, so a frame can be matched back to the
@@ -1126,6 +1205,8 @@ const PROJECT_META: ProjectRecord[] = [
     // Portrait, and the frame that introduces the house at tile size: the front elevation from the curve of the drive,
     // black gables over white board-and-batten, hardwoods over the approach.
     cover: 'front-elevation-from-drive-7063.jpg',
+    hero: 'front-elevation-from-drive-7063.jpg',
+    heroTemplate: 'split',
     // Display order follows the lede: the approach and the black-trimmed siding the second paragraph names, then
     // the living room and the kitchen at the heart of the open plan, then the primary bath the lede singles out,
     // the two smaller baths, and last the pool, the lake and the screened porch — closing where the copy closes,
@@ -1345,10 +1426,14 @@ const PROJECT_META: ProjectRecord[] = [
     summary:
       'A fresh Tudor-inspired home in Augusta, Georgia, pairing timeless character with layered interiors and thoughtful custom details.',
     updatedAt: '2026-09-12',
+    // The opening frame is the dusk front elevation, and it is portrait — the banner's full-bleed crop would
+    // take the gable off the top and the paver walk off the bottom, which is the whole of what it shows.
+    heroTemplate: 'split',
     galleryTemplate: 'masonry',
     // Portrait, and the frame that carries the whole house at tile size — the gable, the arched entry, the black
     // window wall and the paver walk, in the only light the shoot caught at dusk.
     cover: 'front-elevation-dusk-2571.jpg',
+    hero: 'front-elevation-dusk-2571.jpg',
     // Display order follows the lede: the exterior it is named for, then the door and what is behind it, then the
     // kitchen and the cabinetry mix, then the stair and the two rooms off it the lede calls out by name — the
     // colour-drenched powder room and the office — and last the skylit primary bath and the guest bath. File names
@@ -1532,6 +1617,9 @@ const PROJECT_META: ProjectRecord[] = [
     galleryTemplate: 'masonry',
     // Portrait, and the frame that holds the cooking wall at tile size — the wall ovens at one end, the hood and cooktop at the other.
     cover: 'wall-ovens-and-cooktop-wall-6726.jpg',
+    // Not the cover: the tile leads on the ovens and cooktop wall, the page opens on the quartzite island under
+    // its lantern pendants.
+    hero: 'island-quartzite-lantern-pendants-6466.jpg',
     // Display order follows the lede: the island and the room it now opens into, then the wall that came out, then the
     // working walls and the run past them, and last the details — the stone, the hood, and the panelled fireplace wall
     // the kitchen now reads toward. File names carry the camera number, as at Heathwood House, Aiken Homestead,
@@ -1689,10 +1777,12 @@ const deriveIntro = (m: ProjectRecord): string[] => [`A home in ${m.location}, c
 const hasRealAssets = (m: ProjectRecord): boolean => Boolean(m.gallery?.length);
 
 /** Derived alt text — a floor, not a finish. Search engines discount formulaic alt text; set `alt` on the plate. */
-const deriveAlt = (m: ProjectRecord, index: number | 'cover'): string => {
+const deriveAlt = (m: ProjectRecord, index: number | 'cover' | 'hero'): string => {
   // A placeholder must not claim to depict this project: it is a stock interior reused under other project names.
   if (!hasRealAssets(m)) return `Placeholder interior photograph for ${m.title}`;
-  return index === 'cover'
+  // 'hero' reads as the cover does — both name the project whole rather than one view of it — but it is its own role
+  // so a banner is never numbered into the gallery's sequence, which no longer contains it.
+  return index === 'cover' || index === 'hero'
     ? `${m.title} — interior design in ${m.location} by Laurel Leaf Design Studio`
     : `${m.title}, interior view ${index + 1} — ${m.location}`;
 };
@@ -1732,6 +1822,16 @@ const buildProject = (m: ProjectRecord, i: number): Project => {
       }
     : { src: pool.cover, alt: deriveAlt(m, 'cover') };
 
+  // No `??` here, unlike `cover` above: `hero` is required alongside `gallery` (see `ShotRecord`), so a shot project
+  // always states the frame its page opens on and an unshot one has none to state. The branch is the shot/unshot
+  // split, not a default — which is why a record cannot quietly open on a frame nobody chose.
+  const heroImage: ProjectImage = m.hero
+    ? {
+        src: plateUrl(m.assetKey, m.hero),
+        alt: m.heroAlt ?? plates?.find(plate => plate.file === m.hero)?.alt ?? deriveAlt(m, 'hero')
+      }
+    : { src: pool.hero, alt: deriveAlt(m, 'hero') };
+
   return {
     slug: m.slug,
     assetKey: m.assetKey,
@@ -1745,6 +1845,8 @@ const buildProject = (m: ProjectRecord, i: number): Project => {
     updatedAt: m.updatedAt,
     hasRealAssets: hasRealAssets(m),
     cover,
+    hero: heroImage,
+    heroTemplate: m.heroTemplate ?? 'banner',
     galleryTemplate: m.galleryTemplate ?? 'plates',
     gallery
   };

@@ -5,7 +5,8 @@ import { brand } from '@/lib/tokens';
 
 type Props = {
   gallery: GalleryImage[];
-  selected: number;
+  /** Index of the plate currently promoted to the hero, or `null` while the hero shows the project's own frame. */
+  selected: number | null;
   onSelect: (index: number) => void;
   title: string;
 };
