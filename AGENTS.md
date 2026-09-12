@@ -117,6 +117,15 @@ are deterministic from data:
   candidate the q40 source visibly smears the wallpaper's petal edges and the floor's veining. The budget is a proxy
   for what visitors download, and `next/image` already governs that — so where the two conflict, the source keeps its
   fidelity.
+- **A dense shoot is not automatically a raised-floor shoot — measure before reaching for `--min-quality`.**
+  `projects/heatherstone-kitchen/` looks like the Aiken case and is not: an arabesque mosaic backsplash, quartz
+  veining and a lot of hardwood put 20 of its 31 plates over budget at the default floor (183–336 KB), but q64 was
+  tried against q40 and bought nothing. At 100% on the three densest frames the two sources are indistinguishable,
+  and the 1200 px WebP derivative comes out _no smaller_ from the q64 source (196/147/193 KB vs 191/143/185 KB) —
+  the raised floor only made each bucket object ~50% heavier. The capture is what separates it from Aiken: these are
+  iPhone frames, already smooth enough that the compressor's floor never bites the way a full-frame file's stone
+  veining does. So the shoot holds the default floor and simply runs over budget, which is the ordinary exception
+  two bullets up, not this one.
 - A third party's masthead is displayed with `mix-blend-mode: multiply` over Bone White rather than an alpha-knockout PNG (see the `press/magazine/hh-masthead.png` usage in `app/press/page.tsx`). The artwork is black on white, so multiply removes the box for free — and leaves the publication's mark in its own color, which recoloring to `ink` would not.
 - Rename on upload to meaningful slugs — don't carry `photo-160058…` IDs over.
 - **Project photos are switched on per project, not globally.** Upload the shoot to `projects/<asset-key>/` and author it as the record's `gallery` — one `{ file, alt, aspect? }` entry per photograph, in display order. That array _is_ the switch: present and non-empty means the project has real photography, so there is no `assetsReady` flag to forget. Only the folder is derived (`assetKey`); the leaf is authored, so no URL is ever pasted into the data. **Order lives in the array, never in the file names** — renaming objects on R2 to reorder would leave every renamed URL serving a stale optimized derivative for `minimumCacheTTL` (31 days). `cover` names one file in the same folder, normally one already in `gallery`, which costs no second object and inherits that plate's alt text. Route slugs can differ; storage paths stay stable via `assetKey`. Until a record has a `gallery`, that project renders from the Unsplash placeholder pool. When every record has one, delete `PLACEHOLDER_ASSETS` and drop `images.unsplash.com` from `next.config.ts`.
