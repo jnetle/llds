@@ -520,11 +520,188 @@ const PROJECT_META: ProjectRecord[] = [
   // Woodward
   {
     slug: 'aiken-heathwood-house',
-    assetKey: 'heathwood-dr',
+    assetKey: 'heathwood-house',
     title: 'Heathwood House',
     location: 'Aiken, SC',
     year: '2024',
-    builder: 'Chandler Homes'
+    builder: 'Chandler Homes',
+    scope: 'Kitchen + Bathroom Renovation',
+    intro: [
+      'After years of raising a family in this Aiken home, these homeowners were ready to rethink it for the years ahead, creating spaces they could enjoy every day and a home where their grown children and family could comfortably gather. We reworked the existing kitchen layout to create a more open, connected space, adding a large central island and dining area and transforming the former dining room into a hidden walk-in pantry with dedicated storage and space for a secondary refrigerator. A separate coffee bar gives a longtime daily ritual a place of its own.',
+      'The renovation continued into the bathrooms, where borrowing space from the hall bath allowed us to turn a small shared primary bathroom into a true two-person space with a double vanity, freestanding tub, and walk-in shower. Throughout the home, clean lines, durable finishes, and thoughtfully planned storage brought a sense of order and ease to spaces that simply weren’t working for them anymore.'
+    ],
+    summary:
+      'An Aiken, South Carolina kitchen and bathroom renovation designed for everyday ease, family gatherings, and the homeowners’ next chapter.',
+    galleryTemplate: 'masonry',
+    // Portrait, and the frame that reads as this kitchen at tile size. Already in `gallery`, so no second object.
+    cover: 'kitchen-island-range-wall-6504.jpg',
+    updatedAt: '2026-09-11',
+    // Display order, following the lede: kitchen, then the coffee bar and the pantry it hides, then the primary bath.
+    // Unlike Two Mile House these file names carry the camera number, so a frame can be matched back to the
+    // photographer’s original from the bucket listing alone; `source` keeps the room label the number drops.
+    // The single `feature` is the one landscape frame in the shoot — it splits the masonry into runs of 20 and 10,
+    // both even, so each run’s two columns end level. `aspect` is set only where the frame is not the 3/4 default.
+    gallery: [
+      {
+        file: 'kitchen-island-pendants-wide-6573.jpg',
+        source: 'Woodward - Kitchen 1 IMG_6573.jpg',
+        alt: 'The Heathwood House kitchen in full — a black granite island centred beneath two lantern pendants, cream cabinetry carried around the walls',
+        aspect: 1
+      },
+      {
+        file: 'kitchen-island-range-wall-6504.jpg',
+        source: 'Woodward - Kitchen 2 IMG_6504.jpg',
+        alt: 'The Heathwood House kitchen from the dining side, the island in line with the range wall and a window beyond'
+      },
+      {
+        file: 'kitchen-wall-oven-island-6503.jpg',
+        source: 'Woodward - Kitchen 3 IMG_6503.jpg',
+        alt: 'The Heathwood House kitchen looking toward the built-in wall oven, the island running the length of the room'
+      },
+      {
+        file: 'kitchen-island-faucet-pendants-6488.jpg',
+        source: 'Woodward - Kitchen 1 IMG_6488.jpg',
+        alt: 'Gooseneck faucet at the island in the Heathwood House kitchen, lantern pendants overhead and the range wall beyond'
+      },
+      {
+        file: 'kitchen-pendants-olive-branch-6505.jpg',
+        source: 'Woodward - Kitchen 1 IMG_6505 Detail.jpg',
+        alt: 'Lantern pendants over the black granite island in the Heathwood House kitchen, olive branches on the counter'
+      },
+      {
+        file: 'kitchen-island-farmhouse-sink-6518.jpg',
+        source: 'Woodward - Kitchen 4 IMG_6518.jpg',
+        alt: 'The farmhouse sink set into the island in the Heathwood House kitchen, microwave and cabinetry behind'
+      },
+      {
+        file: 'kitchen-range-wall-pot-filler-6497.jpg',
+        source: 'Woodward - Kitchen 1 IMG_6497.jpg',
+        alt: 'Range wall in the Heathwood House kitchen — stacked tile backsplash, a brushed-nickel pot filler, and tulips on the counter'
+      },
+      {
+        file: 'kitchen-range-vent-hood-6517.jpg',
+        source: 'Woodward - Kitchen 1 IMG_6517.jpg',
+        alt: 'The shaped vent hood and range in the Heathwood House kitchen, pot filler mounted on the tiled wall'
+      },
+      {
+        file: 'kitchen-cooktop-brass-cruet-6495.jpg',
+        source: 'Woodward - Kitchen 2 IMG_6495.jpg',
+        alt: 'Cooktop and vent hood in the Heathwood House kitchen, with a brass oil cruet and tulips alongside'
+      },
+      {
+        file: 'kitchen-range-wall-from-island-6507.jpg',
+        source: 'Woodward - Kitchen 3 IMG_6507.jpg',
+        alt: 'The range wall of the Heathwood House kitchen seen across the island, hood and pot filler centred'
+      },
+      {
+        file: 'kitchen-backsplash-detail-6516.jpg',
+        source: 'Woodward - Kitchen 2 IMG_6516 Detail.jpg',
+        alt: 'Stacked tile backsplash in the Heathwood House kitchen, a marble board and brass cruet on the black granite'
+      },
+      {
+        file: 'kitchen-granite-counter-detail-6530.jpg',
+        source: 'Woodward - Kitchen 3 IMG_6530 Detail.jpg',
+        alt: 'Veining in the black granite counter of the Heathwood House kitchen, an olive branch casting its shadow across it'
+      },
+      {
+        file: 'coffee-bar-counter-6535.jpg',
+        source: 'Woodward - Kitchen 4 IMG_6535.jpg',
+        alt: 'The coffee bar in the Heathwood House kitchen — glasses on a stone tray, drawers below and cabinetry above'
+      },
+      {
+        file: 'coffee-bar-pantry-doors-closed-6538.jpg',
+        source: 'Woodward - Pantry 4 IMG_6538.jpg',
+        alt: 'The coffee bar wall in the Heathwood House kitchen, the walk-in pantry’s full-height doors sitting flush beside it'
+      },
+      {
+        file: 'pantry-doors-closed-6547.jpg',
+        source: 'Woodward - Pantry 1 IMG_6547.jpg',
+        alt: 'Closed, the Heathwood House pantry reads as a bank of full-height cabinetry next to the coffee bar'
+      },
+      {
+        file: 'pantry-doors-open-6548.jpg',
+        source: 'Woodward - Pantry 1 IMG_6548.jpg',
+        alt: 'The same doors opened, revealing the Heathwood House walk-in pantry: a window, open shelving, and the original hardwood floor'
+      },
+      {
+        file: 'pantry-doorway-open-6539.jpg',
+        source: 'Woodward - Pantry 4 IMG_6539.jpg',
+        alt: 'The hidden pantry doorway standing open off the Heathwood House coffee bar'
+      },
+      {
+        file: 'pantry-doorway-open-wide-6540.jpg',
+        source: 'Woodward - Pantry 4 IMG_6540.jpg',
+        alt: 'Both pantry doors open at the Heathwood House coffee bar, the former dining room beyond'
+      },
+      {
+        file: 'pantry-shelves-window-6546.jpg',
+        source: 'Woodward - Pantry 2 IMG_6546.jpg',
+        alt: 'Inside the Heathwood House walk-in pantry, floating shelves running toward the window'
+      },
+      {
+        file: 'pantry-shelving-run-6553.jpg',
+        source: 'Woodward - Pantry 2 IMG_6553.jpg',
+        alt: 'The length of the Heathwood House walk-in pantry, open shelving stocked along one wall and the kitchen through the doorway'
+      },
+      {
+        file: 'bath-tub-window-shower-6626.jpg',
+        feature: true,
+        source: 'Woodward - Primary Bath IMG_6626.jpg',
+        alt: 'A freestanding tub beneath the window in the Heathwood House primary bath, the glass shower alongside and a marble-look feature wall behind',
+        aspect: 4 / 3
+      },
+      {
+        file: 'bath-tub-vanity-wide-6580.jpg',
+        source: 'Woodward - Primary Bath IMG_6580.jpg',
+        alt: 'The Heathwood House primary bath in full — freestanding tub and feature wall on one side, the double vanity on the other'
+      },
+      {
+        file: 'bath-double-vanity-mirrors-6633.jpg',
+        source: 'Woodward - Primary Bath IMG_6633.jpg',
+        alt: 'Double vanity in the Heathwood House primary bath, two black-framed mirrors above a quartz top'
+      },
+      {
+        file: 'bath-double-vanity-head-on-6643.jpg',
+        source: 'Woodward - Primary Bath IMG_6643.jpg',
+        alt: 'The double vanity head-on in the Heathwood House primary bath, the mirrors flanking an olive branch set between the basins',
+        aspect: 2400 / 3427
+      },
+      {
+        file: 'bath-vanity-run-6644.jpg',
+        source: 'Woodward - Primary Bath IMG_6644.jpg',
+        alt: 'The vanity run in the Heathwood House primary bath, quartz carried the length of the cabinetry'
+      },
+      {
+        file: 'bath-tub-past-vanity-6608.jpg',
+        source: 'Woodward - Primary Bath IMG_6608.jpg',
+        alt: 'The freestanding tub in the Heathwood House primary bath, seen past the end of the vanity'
+      },
+      {
+        file: 'bath-tub-marble-wall-6627.jpg',
+        source: 'Woodward - Primary Bath IMG_6627.jpg',
+        alt: 'The slipper tub in the Heathwood House primary bath, set against the full-height marble-look wall'
+      },
+      {
+        file: 'bath-tub-shower-glass-6594.jpg',
+        source: 'Woodward - Primary Bath IMG_6594.jpg',
+        alt: 'Tub and glass shower together in the Heathwood House primary bath, a walnut side table alongside'
+      },
+      {
+        file: 'bath-tub-shower-wide-6585.jpg',
+        source: 'Woodward - Primary Bath IMG_6585.jpg',
+        alt: 'The Heathwood House primary bath across the tub toward the walk-in shower'
+      },
+      {
+        file: 'bath-tub-filler-detail-6591.jpg',
+        source: 'Woodward - Primary Bath IMG_6591 Detail.jpg',
+        alt: 'Floor-mounted tub filler in the Heathwood House primary bath, against the veining of the feature wall'
+      },
+      {
+        file: 'bath-shower-bench-niche-6588.jpg',
+        source: 'Woodward - Primary Bath IMG_6588.jpg',
+        alt: 'Inside the walk-in shower in the Heathwood House primary bath — a built-in bench, recessed niche, and hex mosaic floor'
+      }
+    ]
   },
   // Bernal
   {

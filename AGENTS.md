@@ -98,8 +98,17 @@ are deterministic from data:
 **Rules:**
 
 - Folder = feature/route; leaf = role (`hero`, `profile-N`) or, for project photography, a descriptive slug. Numbered variants are plain 1-based.
-- Compress before upload with `node scripts/compress-images.mjs <in> <out>`: target ≤ 200 KB per image, max 2400 px wide, output `.jpg`.
-- **Magazine spread pages are the one deliberate exception to the 200 KB target.** `press/magazine/page-{1,2}.jpg` are documents, not photographs — page 2 is two columns of 9pt body copy, and the reader's lightbox is meant to be read, not just looked at. They run 1500–1800 px and ~270/370 KB. The photo pages and the cover hold the normal budget.
+- Compress before upload with `node scripts/compress-images.mjs <in> <out>`: target ≤ 200 KB per image, max 2400 px wide, output `.jpg`. Two documented exceptions follow; everything else holds the budget.
+- **Magazine spread pages are the first deliberate exception to the 200 KB target.** `press/magazine/page-{1,2}.jpg` are documents, not photographs — page 2 is two columns of 9pt body copy, and the reader's lightbox is meant to be read, not just looked at. They run 1500–1800 px and ~270/370 KB. The photo pages and the cover hold the normal budget.
+- **A few frames per shoot are too dense to hit 200 KB at any usable quality — that is the second exception, and it is
+  resolved in favour of quality.** Stone veining, grout, and foliage defeat JPEG: the script steps quality down to its
+  floor and still writes an over-budget file, now with visible blocking. That file is the _source_ every `next/image`
+  derivative is built from, so the artifacts reach visitors even though these bytes never do — the optimizer fetches
+  the source once and serves resized WebP. Pass `--min-quality=N` to hold a quality floor instead, and let the size
+  run over. Seven frames in `projects/heathwood-dr/` are compressed this way (`--min-quality=64`, 298–503 KB); the
+  other 24 hold the normal budget. Shrinking the width instead was measured and rejected — reaching 200 KB needed
+  1800 px, which is a visible resolution drop against the rest of the shoot, and the densest frame stayed at the
+  quality floor even there.
 - A third party's masthead is displayed with `mix-blend-mode: multiply` over Bone White rather than an alpha-knockout PNG (see the `press/magazine/hh-masthead.png` usage in `app/press/page.tsx`). The artwork is black on white, so multiply removes the box for free — and leaves the publication's mark in its own color, which recoloring to `ink` would not.
 - Rename on upload to meaningful slugs — don't carry `photo-160058…` IDs over.
 - **Project photos are switched on per project, not globally.** Upload the shoot to `projects/<asset-key>/` and author it as the record's `gallery` — one `{ file, alt, aspect? }` entry per photograph, in display order. That array _is_ the switch: present and non-empty means the project has real photography, so there is no `assetsReady` flag to forget. Only the folder is derived (`assetKey`); the leaf is authored, so no URL is ever pasted into the data. **Order lives in the array, never in the file names** — renaming objects on R2 to reorder would leave every renamed URL serving a stale optimized derivative for `minimumCacheTTL` (31 days). `cover` names one file in the same folder, normally one already in `gallery`, which costs no second object and inherits that plate's alt text. Route slugs can differ; storage paths stay stable via `assetKey`. Until a record has a `gallery`, that project renders from the Unsplash placeholder pool. When every record has one, delete `PLACEHOLDER_ASSETS` and drop `images.unsplash.com` from `next.config.ts`.
