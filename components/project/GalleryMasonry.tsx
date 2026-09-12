@@ -1,5 +1,5 @@
 import Image from 'next/image';
-import type { CSSProperties } from 'react';
+import { useEffect, useRef, useState, type CSSProperties } from 'react';
 import { useReveal } from '@/hooks/useReveal';
 import type { GalleryImage } from '@/lib/projects';
 import { brand } from '@/lib/tokens';
@@ -123,6 +123,8 @@ function MasonryTile({ image, column, feature = false }: TileProps) {
           '--reveal-delay': `${column * 0.08}s`
         } as CSSProperties
       }>
+      {/* TEMPORARY — review aid, see FileBadge below. */}
+      <FileBadge src={image.src} />
       {/* Nothing wraps this any more, so the alt text is the only description of the photograph — it carries it. */}
       <Image
         src={image.src}
@@ -136,5 +138,106 @@ function MasonryTile({ image, column, feature = false }: TileProps) {
         draggable={false}
       />
     </div>
+  );
+}
+
+/**
+ * TEMPORARY — stamps each tile with its file name so a shoot can be reviewed by name ("drop 6664", "move this up")
+ * against the live page. The name is selectable, and the button beside it copies it to the clipboard. Not part of
+ * the design: delete this function and the <FileBadge /> call in MasonryTile above to remove it, and nothing else
+ * changes.
+ */
+function FileBadge({ src }: { src: string }) {
+  const file = src.split('/').pop() ?? src;
+  const [copied, setCopied] = useState(false);
+
+  // The timer is cleared on unmount, and on a second click before the first has elapsed — otherwise a stale timeout
+  // would flip the icon back while the newer copy is still being acknowledged.
+  const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(
+    () => () => {
+      if (timer.current) clearTimeout(timer.current);
+    },
+    []
+  );
+
+  const copy = async () => {
+    try {
+      await navigator.clipboard.writeText(file);
+    } catch {
+      // Clipboard access can be refused (an insecure origin, or a denied permission). The name stays selectable, so
+      // failing silently still leaves a way to copy it by hand.
+      return;
+    }
+    setCopied(true);
+    if (timer.current) clearTimeout(timer.current);
+    timer.current = setTimeout(() => setCopied(false), 1400);
+  };
+
+  return (
+    <span
+      style={{
+        position: 'absolute',
+        left: 8,
+        bottom: 8,
+        zIndex: 2,
+        display: 'inline-flex',
+        alignItems: 'center',
+        gap: 6,
+        maxWidth: 'calc(100% - 16px)',
+        padding: '4px 4px 4px 7px',
+        background: brand.navyInk,
+        color: brand.boneWhite,
+        font: '500 11px/1.35 ui-monospace, SFMono-Regular, Menlo, monospace',
+        letterSpacing: '0.02em'
+      }}>
+      <span
+        style={{
+          // Filenames are long and the columns are narrow on a phone; wrapping keeps the whole name readable, which
+          // truncating it would defeat.
+          overflowWrap: 'anywhere',
+          userSelect: 'text',
+          cursor: 'text'
+        }}>
+        {file}
+      </span>
+      <button
+        type="button"
+        onClick={copy}
+        aria-label={copied ? `Copied ${file}` : `Copy ${file}`}
+        title={copied ? 'Copied' : 'Copy file name'}
+        style={{
+          flex: 'none',
+          display: 'inline-flex',
+          padding: 3,
+          border: 'none',
+          borderRadius: 2,
+          background: 'none',
+          color: 'inherit',
+          cursor: 'pointer',
+          opacity: copied ? 1 : 0.75
+        }}>
+        {copied ? <CheckIcon /> : <CopyIcon />}
+      </button>
+    </span>
+  );
+}
+
+/** TEMPORARY — goes with FileBadge. */
+function CopyIcon() {
+  return (
+    <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
+      <rect x="5.75" y="5.75" width="8.5" height="8.5" rx="1.5" />
+      <path d="M10.5 3.75A1.75 1.75 0 0 0 8.75 2h-5A1.75 1.75 0 0 0 2 3.75v5c0 .966.784 1.75 1.75 1.75" />
+    </svg>
+  );
+}
+
+/** TEMPORARY — goes with FileBadge. */
+function CheckIcon() {
+  return (
+    <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.75" aria-hidden="true">
+      <path d="M3 8.5 6.25 12 13 4.5" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
   );
 }

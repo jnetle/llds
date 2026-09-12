@@ -1123,11 +1123,166 @@ const PROJECT_META: ProjectRecord[] = [
   // Wachowicz
   {
     slug: 'martinez-kestwick-kitchen',
-    assetKey: 'kestwick-dr',
+    assetKey: 'kestwick-kitchen',
     title: 'Kestwick Kitchen',
     location: 'Martinez, GA',
     year: '2022',
-    builder: 'Southern State Builders'
+    builder: 'Southern State Builders',
+    scope: 'Kitchen Renovation',
+    intro: [
+      'Removing the wall between the kitchen and living room completely changed how this Martinez, GA home lives. We reworked the kitchen layout and relocated every major appliance, creating better flow, generous work space around the range, and a much more open connection to the adjoining living area.',
+      'Classic white custom cabinetry keeps the kitchen light and timeless, while quartzite countertops, oversized lantern pendants, and floating wood shelves bring in warmth and character. The result is a kitchen that feels brighter, larger, and far more functional without feeling overly new or trendy.'
+    ],
+    summary:
+      'A Martinez, Georgia kitchen renovation with an open layout, custom white cabinetry, quartzite countertops, floating wood shelves, and improved flow.',
+    updatedAt: '2026-09-12',
+    galleryTemplate: 'masonry',
+    // Portrait, and the frame that holds the whole room at tile size — island, quartzite, both lanterns and the cooking wall behind.
+    cover: 'island-quartzite-lantern-pendants-6466.jpg',
+    // Display order follows the lede: the island and the room it now opens into, then the wall that came out, then the
+    // working walls and the run past them, and last the details — the stone, the hood, and the panelled fireplace wall
+    // the kitchen now reads toward. File names carry the camera number, as at Heathwood House, Aiken Homestead,
+    // Heatherstone and River Club, so a frame can be matched back to the photographer's original from the bucket
+    // listing alone.
+    //
+    // The delivery is 40 frames, 34 of the kitchen and 6 of the living room. Twelve are left off: nine where another
+    // frame says the same thing better, and three for their own reasons — two wides shot from the living room carry
+    // painter's plastic on the floor and a muddy unlit ceiling, and four of the six fireplace frames repeat the two
+    // kept here. The living room is in scope only as the space the kitchen now opens onto, which is what its two
+    // plates are placed to show; the record's `scope` still reads Kitchen Renovation.
+    //
+    // 17 of the 28 run 201–350 KB at the default quality floor. Like Heatherstone and River Club, and unlike Aiken
+    // Homestead, this shoot is NOT held at a raised floor: --min-quality=64 was measured against the default on the
+    // three densest frames and buys ~5% on the 1200 px WebP derivative next/image actually serves (187/160/147 KB vs
+    // 198/168/155 KB) while making each bucket object ~60% heavier (515–562 KB vs 319–350 KB), and at 100% the two
+    // sources are indistinguishable. EXIF puts these on an iPhone 11 Pro — the same reason as those two shoots: the
+    // capture is already smooth enough that the floor never bites.
+    //
+    // The four `feature` plates are the shoot's only landscape frames, and they split the masonry into runs of
+    // 6, 4, 6, 4 and 4 — all even, so each run's two columns end level. `aspect` is set only on those four, the
+    // frames that are not the 3/4 default.
+    gallery: [
+      {
+        file: 'island-quartzite-lantern-pendants-6466.jpg',
+        alt: 'The Kestwick kitchen in full — a quartzite-topped island beneath two oversized lantern pendants, the white cabinetry and tiled cooking wall beyond'
+      },
+      {
+        file: 'island-toward-refrigerator-wall-6732.jpg',
+        alt: 'Along the Kestwick island toward the refrigerator wall, an upholstered stool drawn up at the near end'
+      },
+      {
+        file: 'kitchen-from-far-corner-stools-6705.jpg',
+        alt: 'The Kestwick kitchen from its far corner, three grey stools along the island and the appliance wall running away to the right'
+      },
+      {
+        file: 'island-end-on-quartzite-top-6481.jpg',
+        alt: 'The Kestwick island end-on, its quartzite top reading the length of the room between the two lanterns'
+      },
+      {
+        file: 'kitchen-from-living-room-side-6440.jpg',
+        alt: 'The Kestwick kitchen from the living room side, floor-to-ceiling cabinetry on the left and the cooktop wall on the right'
+      },
+      {
+        file: 'island-end-opening-to-living-room-6452.jpg',
+        alt: 'The end of the Kestwick island and the cased opening beside it, the living room’s panelled fireplace wall visible through it'
+      },
+      {
+        file: 'kitchen-wide-island-stools-6669.jpg',
+        alt: 'The Kestwick kitchen seen whole from the living room, the island and its three stools centred under the lantern pendants where a wall used to stand',
+        aspect: 4 / 3,
+        feature: true
+      },
+      {
+        file: 'island-sink-end-refrigerator-6700.jpg',
+        alt: 'The sink end of the Kestwick island, the refrigerator and the back hall beyond it'
+      },
+      {
+        file: 'island-toward-back-hall-6478.jpg',
+        alt: 'Past the Kestwick island toward the back hall, the cooking wall running along the right'
+      },
+      {
+        file: 'island-dishwasher-sink-run-6501.jpg',
+        alt: 'The working side of the Kestwick island — sink, faucet and dishwasher set into the quartzite run'
+      },
+      {
+        file: 'cooking-wall-across-island-sink-6685.jpg',
+        alt: 'The Kestwick cooking wall across the island sink, the gas cooktop set below its painted hood and handmade-look tile'
+      },
+      {
+        file: 'kitchen-wide-empty-island-run-6449.jpg',
+        alt: 'The Kestwick kitchen unfurnished, the full run from the tall cabinets past the wall ovens to the cooktop',
+        aspect: 4 / 3,
+        feature: true
+      },
+      {
+        file: 'refrigerator-wall-ovens-cooktop-6686.jpg',
+        alt: 'The appliance wall of the Kestwick kitchen — refrigerator, double wall ovens and the cooktop beyond them'
+      },
+      {
+        file: 'pantry-cabinets-refrigerator-run-6687.jpg',
+        alt: 'Floor-to-ceiling pantry cabinetry beside the Kestwick refrigerator, brushed brass pulls the length of the run'
+      },
+      {
+        file: 'wall-ovens-and-cooktop-wall-6726.jpg',
+        alt: 'The Kestwick double wall ovens at one end of the cooking wall and the hood and cooktop at the other'
+      },
+      {
+        file: 'wall-ovens-lantern-island-6667.jpg',
+        alt: 'The Kestwick cooking wall from the island, one lantern pendant hanging in front of the wall ovens'
+      },
+      {
+        file: 'cooktop-wall-straight-on-6684.jpg',
+        alt: 'The Kestwick cooktop wall straight on — the painted hood between its floating wood shelves, tile carried the width of the wall'
+      },
+      {
+        file: 'aisle-toward-window-nook-6442.jpg',
+        alt: 'The working aisle of the Kestwick kitchen, wall ovens and cooktop on one side and the island on the other, the window at the end'
+      },
+      {
+        file: 'kitchen-wide-from-refrigerator-corner-6730.jpg',
+        alt: 'The Kestwick kitchen from the refrigerator corner, the island sink in front of the cooktop wall and both lanterns overhead',
+        aspect: 4 / 3,
+        feature: true
+      },
+      {
+        file: 'aisle-from-back-hall-doorway-6631.jpg',
+        alt: 'The Kestwick kitchen from the back hall doorway, the aisle running between the ovens and the island to the window'
+      },
+      {
+        file: 'aisle-toward-window-pendants-6664.jpg',
+        alt: 'Down the Kestwick aisle toward the window, the lantern pendants hanging over the island on the right'
+      },
+      {
+        file: 'island-quartzite-close-up-6471.jpg',
+        alt: 'The quartzite top of the Kestwick island close up, its grey and amber veining running under the faucet'
+      },
+      {
+        file: 'cooktop-run-quartzite-counter-6661.jpg',
+        alt: 'The Kestwick cooktop and the quartzite counter run beside it, tall cabinetry squared up to the hood'
+      },
+      {
+        file: 'island-cooktop-wall-windows-6446.jpg',
+        alt: 'The Kestwick island and cooking wall together, daylight from the window wall on the right',
+        aspect: 4 / 3,
+        feature: true
+      },
+      {
+        file: 'cooktop-hood-floating-shelves-6657.jpg',
+        alt: 'The painted hood of the Kestwick kitchen flanked by floating wood shelves, the cooktop and drawer run below it'
+      },
+      {
+        file: 'hood-shelf-handmade-tile-6658.jpg',
+        alt: 'Where the Kestwick hood meets its wood shelf, the handmade-look tile stepping up behind it'
+      },
+      {
+        file: 'living-room-panelled-fireplace-wall-6709.jpg',
+        alt: 'The living room the Kestwick kitchen now opens onto — a floor-to-ceiling panelled fireplace wall with a herringbone marble surround'
+      },
+      {
+        file: 'fireplace-herringbone-marble-detail-6712.jpg',
+        alt: 'The corner of the Kestwick fireplace, herringbone marble mosaic meeting the painted mantel and panelling'
+      }
+    ]
   }
 ];
 
