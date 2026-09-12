@@ -29,11 +29,6 @@ export type GalleryPlate = {
    * name: the file name is a subject-matter signal to image search, and this is the only place it can be given one.
    */
   file: string;
-  /**
-   * The photographer's original file name, when `file` renames it. Nothing renders this — it is the thread back to
-   * the delivered shoot, so a re-edit of one frame can be matched to the plate it replaces without guessing.
-   */
-  source?: string;
   /** Real alt text. Omitted -> derived, which reads as unfinished on purpose. */
   alt?: string;
   /** width ÷ height. Only the masonry template reads it; omitted -> 3/4. */
@@ -251,212 +246,171 @@ const PROJECT_META: ProjectRecord[] = [
     gallery: [
       {
         file: 'kitchen-island-table-pendant.jpg',
-        source: 'IMG-6260.jpg',
         alt: 'The Two Mile House kitchen, a stone-topped island table under a drum pendant with cream inset cabinetry run to the ceiling',
         aspect: 4 / 3
       },
       {
         file: 'kitchen-island-range-wall.jpg',
-        source: 'IMG-6240.jpg',
         alt: 'Island and range wall in the Two Mile House kitchen, lit by a pair of patterned drum pendants'
       },
       {
         file: 'kitchen-island-microwave-run.jpg',
-        source: 'IMG-6262.jpg',
         alt: 'The long marble island in the Two Mile House kitchen, with a built-in microwave and open shelving beyond'
       },
       {
         file: 'kitchen-island-table-legs.jpg',
-        source: 'IMG-6265.jpg',
         alt: 'Turned legs of the island table in the Two Mile House kitchen, the floor opening through to the living room'
       },
       {
         file: 'kitchen-range-island-flowers.jpg',
-        source: 'IMG-6419.jpg',
         alt: 'Range and island in the Two Mile House kitchen, with cut flowers and a potted fern on the counter'
       },
       {
         file: 'kitchen-island-window-sink.jpg',
-        source: 'IMG-6244.jpg',
         alt: 'Island, pendants, and a window over the sink in the Two Mile House kitchen'
       },
       {
         file: 'kitchen-island-stools.jpg',
-        source: 'IMG-6258.jpg',
         alt: 'The island in the Two Mile House kitchen with two wooden stools drawn up to it'
       },
       {
         file: 'kitchen-pendant-shades.jpg',
-        source: 'IMG-6266.jpg',
         alt: 'The two patterned pendant shades hanging close over the sink run in the Two Mile House kitchen'
       },
       {
         file: 'kitchen-refrigerator-island-run.jpg',
-        source: 'IMG-6270.jpg',
         alt: 'The Two Mile House kitchen seen past the refrigerator, island and sink run in line'
       },
       {
         file: 'kitchen-island-length-doorway.jpg',
-        source: 'IMG-6389.jpg',
         alt: 'The length of the island in the Two Mile House kitchen, looking down the hardwood toward a lit doorway'
       },
       {
         file: 'kitchen-island-fern-detail.jpg',
-        source: 'IMG-6410.jpg',
         alt: 'Potted fern on the marble island in the Two Mile House kitchen, built-in shelving behind'
       },
       {
         file: 'kitchen-range-hood-panelling.jpg',
-        source: 'IMG-6236.jpg',
         alt: 'Range wall in the Two Mile House kitchen — honed black counters, vertical panelling, and a shaped vent hood'
       },
       {
         file: 'kitchen-farmhouse-sink-window.jpg',
-        source: 'IMG-6252.jpg',
         alt: 'Window above the farmhouse sink in the Two Mile House kitchen, vent hood to one side'
       },
       {
         file: 'kitchen-island-greenery.jpg',
-        source: 'IMG-6254.jpg',
         alt: 'Island in the Two Mile House kitchen with potted greenery, the farmhouse sink and window behind'
       },
       {
         file: 'kitchen-toward-bay-window.jpg',
-        source: 'IMG-6278.jpg',
         alt: 'The Two Mile House kitchen looking toward the bay-window sitting area at the far end'
       },
       {
         file: 'kitchen-working-run-sitting-area.jpg',
         feature: true,
-        source: 'IMG-6255.jpg',
         alt: 'The working run of the Two Mile House kitchen — farmhouse sink and honed black counters, the island opening to a window-lit sitting area',
         aspect: 4 / 3
       },
       {
         file: 'kitchen-nook-lamp-decanter.jpg',
-        source: 'IMG-6234.jpg',
         alt: 'Built-in nook in the Two Mile House kitchen, with a lamp, framed art, and a decanter tray on black stone'
       },
       {
         file: 'kitchen-cabinetry-run-hall.jpg',
-        source: 'IMG-6246.jpg',
         alt: 'Floor-to-ceiling cabinetry running the length of the Two Mile House kitchen toward the hall'
       },
       {
         file: 'kitchen-nook-cookbooks.jpg',
-        source: 'IMG-6248.jpg',
         alt: 'The built-in nook in the Two Mile House kitchen, shelved with cookbooks above a framed picture and lamp'
       },
       {
         file: 'kitchen-cabinetry-glazed-door.jpg',
-        source: 'IMG-6249.jpg',
         alt: 'Tall cabinetry and the built-in nook in the Two Mile House kitchen, beside a glazed door'
       },
       {
         file: 'kitchen-island-nook-door.jpg',
-        source: 'IMG-6250.jpg',
         alt: 'Island and built-in nook in the Two Mile House kitchen, the door at the end framing greenery outside'
       },
       {
         file: 'kitchen-corner-range-sink.jpg',
-        source: 'IMG-6237.jpg',
         alt: 'Corner cabinetry, range, and farmhouse sink in the Two Mile House kitchen'
       },
       {
         file: 'kitchen-island-table-centred.jpg',
-        source: 'IMG-6259.jpg',
         alt: 'The Two Mile House kitchen head-on: the island table centred under its pendant, stools either side'
       },
       {
         file: 'kitchen-refrigerator-wall.jpg',
-        source: 'IMG-6261.jpg',
         alt: 'The refrigerator wall in the Two Mile House kitchen, cabinetry carried over the top'
       },
       {
         file: 'kitchen-range-island-greenery.jpg',
-        source: 'IMG-6275.jpg',
         alt: 'Range and island in the Two Mile House kitchen, greenery on the counter'
       },
       {
         file: 'kitchen-across-island-shelving.jpg',
-        source: 'IMG-6276.jpg',
         alt: 'The Two Mile House kitchen across the island, range wall and built-in shelving together'
       },
       {
         file: 'bath-double-vanity-mirrors.jpg',
-        source: 'IMG-6281.jpg',
         alt: 'Double vanity in the Two Mile House primary bath, arched mirrors flanked by brass sconces above pale cabinetry'
       },
       {
         file: 'bath-double-vanity-wide.jpg',
-        source: 'IMG-6282.jpg',
         alt: 'The full double vanity in the Two Mile House primary bath, mirrors and sconces in line'
       },
       {
         file: 'bath-vanity-corner-towels.jpg',
-        source: 'IMG-6284.jpg',
         alt: 'Corner of the vanity in the Two Mile House primary bath, folded towels on the open shelving'
       },
       {
         file: 'bath-vanity-mirrors-column.jpg',
-        source: 'IMG-6287.jpg',
         alt: 'Vanity corner in the Two Mile House primary bath, the arched mirrors meeting at the shelved column'
       },
       {
         file: 'bath-vanity-coral-shelf.jpg',
-        source: 'IMG-6295.jpg',
         alt: 'Vanity in the Two Mile House primary bath — arched mirror, brass sconces, and coral on the open shelf'
       },
       {
         file: 'bath-vanity-basin-faucet.jpg',
-        source: 'IMG-6310.jpg',
         alt: 'Basin and faucet at the vanity in the Two Mile House primary bath, mirror and sconce above'
       },
       {
         file: 'bath-vanity-basin-towels.jpg',
-        source: 'IMG-6311.jpg',
         alt: 'Vanity basin in the Two Mile House primary bath, with stacked towels on the shelving alongside'
       },
       {
         file: 'bath-folded-towels-detail.jpg',
-        source: 'IMG-6314.jpg',
         alt: 'Folded towels on the marble vanity top in the Two Mile House primary bath'
       },
       {
         file: 'bath-double-vanity-shelving.jpg',
         feature: true,
-        source: 'IMG-6337.jpg',
         alt: 'Double vanity in the Two Mile House primary bath, with arched mirrors, brass sconces, and open corner shelving between the two basins',
         aspect: 4 / 3
       },
       {
         file: 'bath-vanity-run-shower.jpg',
-        source: 'IMG-6338.jpg',
         alt: 'The vanity run in the Two Mile House primary bath, looking toward the tiled shower'
       },
       {
         file: 'bath-shower-tub-beyond.jpg',
-        source: 'IMG-6288.jpg',
         alt: 'Subway-tiled walk-in shower in the Two Mile House primary bath, the tub visible beyond the glass'
       },
       {
         file: 'bath-tub-beside-shower.jpg',
-        source: 'IMG-6289.jpg',
         alt: 'The freestanding tub in the Two Mile House primary bath, set beneath the windows beside the shower'
       },
       {
         file: 'bath-shower-glass-tub.jpg',
-        source: 'IMG-6290.jpg',
         alt: 'Shower glass and freestanding tub in the Two Mile House primary bath, daylight from the window bay'
       },
       {
         file: 'bath-tub-window-bay.jpg',
-        source: 'IMG-6309.jpg',
         alt: 'A freestanding tub beneath a bay of windows in the Two Mile House primary bath, a subway-tiled walk-in shower alongside'
       },
       {
         file: 'bath-mosaic-tile-floor.jpg',
-        source: 'IMG-6330.jpg',
         alt: 'Mosaic tile floor in the Two Mile House primary bath shower, laid around a patterned drain'
       }
     ]
@@ -511,11 +465,167 @@ const PROJECT_META: ProjectRecord[] = [
   // Willingham
   {
     slug: 'aiken-homestead',
-    assetKey: 'atomic-rd',
+    assetKey: 'aiken-homestead',
     title: 'Aiken Homestead',
     location: 'Aiken, SC',
     year: '2024',
-    builder: 'Southern State Builders'
+    builder: 'Southern State Builders',
+    scope: 'Primary Bathroom Renovation',
+    intro: [
+      'The inspiration for this Aiken primary bathroom renovation started with a favorite hotel shower discovered while traveling. The existing bathroom already had a good footprint, so rather than changing it for the sake of change, we focused on transforming the experience, creating a shower the homeowner now says is even better than the one that inspired it.',
+      'Dual shower heads, a rain head, heated marble floors, and a freestanding tub bring the hotel-level comforts home, while soft blue cabinetry, delicate wallpaper, and warm brass details keep the space elegant and personal. A custom marble floor pattern, shower accent wall, and dedicated vanity knee space finish a bathroom designed to make an ordinary morning feel a little less ordinary.'
+    ],
+    summary:
+      'An Aiken, South Carolina primary bathroom renovation inspired by a favorite hotel shower, with heated marble floors and elegant custom details.',
+    galleryTemplate: 'masonry',
+    // Portrait, and the one frame that carries the whole room — vanity, tub, and the custom floor — at tile size.
+    cover: 'bath-vanity-tub-window-wide-7075.jpg',
+    updatedAt: '2026-09-12',
+    // Display order follows the lede: the room whole, then the shower it was designed around, then the tub, then the
+    // vanities and the details. File names carry the camera number, as at Heathwood House, so a frame can be matched
+    // back to the photographer’s original from the bucket listing alone.
+    //
+    // The delivery holds three shoots of this one bathroom — this main set, a lower-resolution Instagram set, and a
+    // holiday-styled set. Only the main set is published, plus three frames from the small set that it has no
+    // equivalent of: the two landscape frames (nothing in the main shoot is anything but 3/4) and the close view of
+    // the floor pattern. The holiday set documents styling the lede never mentions, and is left off.
+    //
+    // The single `feature` is the landscape shower frame; it splits the masonry into runs of 16 and 15, and the first
+    // of those is even, so its two columns end level. `aspect` is set only where the frame is not the 3/4 default.
+    gallery: [
+      {
+        file: 'bath-vanity-tub-window-wide-7075.jpg',
+        alt: 'The Aiken Homestead primary bathroom in full — a soft blue vanity, a freestanding tub beneath a crystal chandelier, and a custom marble floor pattern running the length of the room'
+      },
+      {
+        file: 'bath-vanity-shower-wide-7020.jpg',
+        alt: 'The Aiken Homestead primary bathroom from the vanity, the glass shower and its marble knee wall beyond'
+      },
+      {
+        file: 'bath-tub-vanities-chandelier-7024.jpg',
+        alt: 'Both vanities and the freestanding tub in the Aiken Homestead primary bathroom, a shuttered window between them'
+      },
+      {
+        file: 'shower-glass-rain-head-7109.jpg',
+        alt: 'The walk-in shower in the Aiken Homestead primary bathroom, its ceiling-mounted rain head and hexagon marble panel seen through frameless glass'
+      },
+      {
+        file: 'shower-marble-knee-wall-7055.jpg',
+        alt: 'The shower’s marble knee wall and bench in the Aiken Homestead primary bathroom, blue cabinetry to one side'
+      },
+      {
+        file: 'shower-rain-head-dual-heads-7056.jpg',
+        alt: 'Inside the Aiken Homestead shower — a square rain head overhead and dual wall-mounted heads on the marble tile'
+      },
+      {
+        file: 'shower-hex-accent-wall-7058.jpg',
+        alt: 'The hexagon marble accent panel set into the tiled shower wall in the Aiken Homestead primary bathroom, bench below'
+      },
+      {
+        file: 'shower-heads-niche-7059.jpg',
+        alt: 'Dual brass shower heads and a recessed marble niche in the Aiken Homestead shower'
+      },
+      {
+        file: 'shower-bench-brass-valves-7064.jpg',
+        alt: 'Four brass valves above the marble bench in the Aiken Homestead shower, the room’s wallpaper reflected in the mirror behind'
+      },
+      {
+        file: 'shower-bench-tub-beyond-7072.jpg',
+        alt: 'The Aiken Homestead shower from its open corner — marble bench and hand shower inside, the freestanding tub beyond the glass'
+      },
+      {
+        file: 'shower-valves-tub-through-glass-7066.jpg',
+        alt: 'Brass valves on the shower’s marble wall in the Aiken Homestead primary bathroom, the tub and chandelier visible through the glass'
+      },
+      {
+        file: 'shower-valves-doorway-7089.jpg',
+        alt: 'The Aiken Homestead shower’s brass controls and marble bench, looking out across the checkerboard floor to the bathroom door'
+      },
+      {
+        file: 'shower-hand-shower-hex-7081.jpg',
+        alt: 'Brass hand shower against the hexagon marble accent wall in the Aiken Homestead shower'
+      },
+      {
+        file: 'shower-niche-detail-7079.jpg',
+        alt: 'The recessed marble niche in the Aiken Homestead shower, bottles on the upper shelf and a brush and pumice on the lower'
+      },
+      {
+        file: 'shower-hex-marble-mosaic-7061.jpg',
+        alt: 'The hexagon marble mosaic of the Aiken Homestead shower accent wall meeting the field tile at the corner'
+      },
+      {
+        file: 'shower-hex-mosaic-edge-7080.jpg',
+        alt: 'The shower’s hexagon marble panel turning the corner onto plain marble tile in the Aiken Homestead primary bathroom'
+      },
+      {
+        file: 'shower-bench-hex-panel-wide-006.jpg',
+        alt: 'The full width of the Aiken Homestead shower — marble bench, brass hand shower, and the hexagon mosaic panel centred on the back wall',
+        aspect: 3 / 2,
+        feature: true
+      },
+      {
+        file: 'tub-chandelier-shutters-7041.jpg',
+        alt: 'The freestanding tub in the Aiken Homestead primary bathroom, centred under a crystal chandelier between shuttered windows'
+      },
+      {
+        file: 'tub-corner-chandelier-7029.jpg',
+        alt: 'The tub corner of the Aiken Homestead primary bathroom, chandelier overhead and a blue vanity to either side'
+      },
+      {
+        file: 'tub-wallpaper-chandelier-7030.jpg',
+        alt: 'Branching metallic wallpaper above the wainscot behind the Aiken Homestead tub, the chandelier hanging close'
+      },
+      {
+        file: 'tub-vanity-wallpaper-7045.jpg',
+        alt: 'The Aiken Homestead tub seen past the vanity, brass floor-mounted filler and wallpapered wall behind'
+      },
+      {
+        file: 'tub-faucet-window-7026.jpg',
+        alt: 'Brass floor-mounted tub filler and hand shower at the Aiken Homestead tub, a shuttered window alongside'
+      },
+      {
+        file: 'tub-faucet-roses-detail-7043.jpg',
+        alt: 'The rim of the Aiken Homestead tub — brass filler, a cut-glass vase of white roses, and the metallic wallpaper behind'
+      },
+      {
+        file: 'tub-brass-faucet-dog-wide-009.jpg',
+        alt: 'The homeowners’ dog resting its paws on the rim of the freestanding tub in the Aiken Homestead primary bathroom',
+        aspect: 2150 / 1536
+      },
+      {
+        file: 'vanity-knee-space-linen-tower-7049.jpg',
+        alt: 'The Aiken Homestead vanity with its dedicated knee space and woven stool, a full-height linen tower alongside'
+      },
+      {
+        file: 'vanity-counter-tulips-sconce-7126.jpg',
+        alt: 'Brass faucet and a jar of white tulips on the Aiken Homestead vanity, a lucite and brass sconce on the mirror'
+      },
+      {
+        file: 'vanity-sconces-brass-tray-7129.jpg',
+        alt: 'Sconces, a brass tray and tulips along the stone counter of the Aiken Homestead vanity'
+      },
+      {
+        file: 'vanity-base-marble-floor-003.jpg',
+        alt: 'The base of the blue vanity in the Aiken Homestead primary bathroom meeting the custom marble floor pattern',
+        aspect: 2 / 3
+      },
+      {
+        file: 'cabinet-pulls-lucite-brass-7133.jpg',
+        alt: 'Lucite and brass pulls on the soft blue cabinet doors of the Aiken Homestead vanity'
+      },
+      {
+        file: 'cabinet-pulls-marble-floor-7135.jpg',
+        alt: 'Lucite and brass cabinet pulls on the Aiken Homestead vanity, the marble floor pattern below'
+      },
+      {
+        file: 'cabinet-pulls-vanity-run-7035.jpg',
+        alt: 'The run of the Aiken Homestead vanity falling away behind a single lucite and brass pull'
+      },
+      {
+        file: 'chandelier-crystals-wallpaper-7172.jpg',
+        alt: 'Crystal drops of the chandelier in the Aiken Homestead primary bathroom, against the branching metallic wallpaper'
+      }
+    ]
   },
   // Woodward
   {
@@ -538,167 +648,136 @@ const PROJECT_META: ProjectRecord[] = [
     updatedAt: '2026-09-11',
     // Display order, following the lede: kitchen, then the coffee bar and the pantry it hides, then the primary bath.
     // Unlike Two Mile House these file names carry the camera number, so a frame can be matched back to the
-    // photographer’s original from the bucket listing alone; `source` keeps the room label the number drops.
+    // photographer’s original from the bucket listing alone.
     // The single `feature` is the one landscape frame in the shoot — it splits the masonry into runs of 20 and 10,
     // both even, so each run’s two columns end level. `aspect` is set only where the frame is not the 3/4 default.
     gallery: [
       {
         file: 'kitchen-island-pendants-wide-6573.jpg',
-        source: 'Woodward - Kitchen 1 IMG_6573.jpg',
         alt: 'The Heathwood House kitchen in full — a black granite island centred beneath two lantern pendants, cream cabinetry carried around the walls',
         aspect: 1
       },
       {
         file: 'kitchen-island-range-wall-6504.jpg',
-        source: 'Woodward - Kitchen 2 IMG_6504.jpg',
         alt: 'The Heathwood House kitchen from the dining side, the island in line with the range wall and a window beyond'
       },
       {
         file: 'kitchen-wall-oven-island-6503.jpg',
-        source: 'Woodward - Kitchen 3 IMG_6503.jpg',
         alt: 'The Heathwood House kitchen looking toward the built-in wall oven, the island running the length of the room'
       },
       {
         file: 'kitchen-island-faucet-pendants-6488.jpg',
-        source: 'Woodward - Kitchen 1 IMG_6488.jpg',
         alt: 'Gooseneck faucet at the island in the Heathwood House kitchen, lantern pendants overhead and the range wall beyond'
       },
       {
         file: 'kitchen-pendants-olive-branch-6505.jpg',
-        source: 'Woodward - Kitchen 1 IMG_6505 Detail.jpg',
         alt: 'Lantern pendants over the black granite island in the Heathwood House kitchen, olive branches on the counter'
       },
       {
         file: 'kitchen-island-farmhouse-sink-6518.jpg',
-        source: 'Woodward - Kitchen 4 IMG_6518.jpg',
         alt: 'The farmhouse sink set into the island in the Heathwood House kitchen, microwave and cabinetry behind'
       },
       {
         file: 'kitchen-range-wall-pot-filler-6497.jpg',
-        source: 'Woodward - Kitchen 1 IMG_6497.jpg',
         alt: 'Range wall in the Heathwood House kitchen — stacked tile backsplash, a brushed-nickel pot filler, and tulips on the counter'
       },
       {
         file: 'kitchen-range-vent-hood-6517.jpg',
-        source: 'Woodward - Kitchen 1 IMG_6517.jpg',
         alt: 'The shaped vent hood and range in the Heathwood House kitchen, pot filler mounted on the tiled wall'
       },
       {
         file: 'kitchen-cooktop-brass-cruet-6495.jpg',
-        source: 'Woodward - Kitchen 2 IMG_6495.jpg',
         alt: 'Cooktop and vent hood in the Heathwood House kitchen, with a brass oil cruet and tulips alongside'
       },
       {
         file: 'kitchen-range-wall-from-island-6507.jpg',
-        source: 'Woodward - Kitchen 3 IMG_6507.jpg',
         alt: 'The range wall of the Heathwood House kitchen seen across the island, hood and pot filler centred'
       },
       {
         file: 'kitchen-backsplash-detail-6516.jpg',
-        source: 'Woodward - Kitchen 2 IMG_6516 Detail.jpg',
         alt: 'Stacked tile backsplash in the Heathwood House kitchen, a marble board and brass cruet on the black granite'
       },
       {
         file: 'kitchen-granite-counter-detail-6530.jpg',
-        source: 'Woodward - Kitchen 3 IMG_6530 Detail.jpg',
         alt: 'Veining in the black granite counter of the Heathwood House kitchen, an olive branch casting its shadow across it'
       },
       {
         file: 'coffee-bar-counter-6535.jpg',
-        source: 'Woodward - Kitchen 4 IMG_6535.jpg',
         alt: 'The coffee bar in the Heathwood House kitchen — glasses on a stone tray, drawers below and cabinetry above'
       },
       {
         file: 'coffee-bar-pantry-doors-closed-6538.jpg',
-        source: 'Woodward - Pantry 4 IMG_6538.jpg',
         alt: 'The coffee bar wall in the Heathwood House kitchen, the walk-in pantry’s full-height doors sitting flush beside it'
       },
       {
         file: 'pantry-doors-closed-6547.jpg',
-        source: 'Woodward - Pantry 1 IMG_6547.jpg',
         alt: 'Closed, the Heathwood House pantry reads as a bank of full-height cabinetry next to the coffee bar'
       },
       {
         file: 'pantry-doors-open-6548.jpg',
-        source: 'Woodward - Pantry 1 IMG_6548.jpg',
         alt: 'The same doors opened, revealing the Heathwood House walk-in pantry: a window, open shelving, and the original hardwood floor'
       },
       {
         file: 'pantry-doorway-open-6539.jpg',
-        source: 'Woodward - Pantry 4 IMG_6539.jpg',
         alt: 'The hidden pantry doorway standing open off the Heathwood House coffee bar'
       },
       {
         file: 'pantry-doorway-open-wide-6540.jpg',
-        source: 'Woodward - Pantry 4 IMG_6540.jpg',
         alt: 'Both pantry doors open at the Heathwood House coffee bar, the former dining room beyond'
       },
       {
         file: 'pantry-shelves-window-6546.jpg',
-        source: 'Woodward - Pantry 2 IMG_6546.jpg',
         alt: 'Inside the Heathwood House walk-in pantry, floating shelves running toward the window'
       },
       {
         file: 'pantry-shelving-run-6553.jpg',
-        source: 'Woodward - Pantry 2 IMG_6553.jpg',
         alt: 'The length of the Heathwood House walk-in pantry, open shelving stocked along one wall and the kitchen through the doorway'
       },
       {
         file: 'bath-tub-window-shower-6626.jpg',
         feature: true,
-        source: 'Woodward - Primary Bath IMG_6626.jpg',
         alt: 'A freestanding tub beneath the window in the Heathwood House primary bath, the glass shower alongside and a marble-look feature wall behind',
         aspect: 4 / 3
       },
       {
         file: 'bath-tub-vanity-wide-6580.jpg',
-        source: 'Woodward - Primary Bath IMG_6580.jpg',
         alt: 'The Heathwood House primary bath in full — freestanding tub and feature wall on one side, the double vanity on the other'
       },
       {
         file: 'bath-double-vanity-mirrors-6633.jpg',
-        source: 'Woodward - Primary Bath IMG_6633.jpg',
         alt: 'Double vanity in the Heathwood House primary bath, two black-framed mirrors above a quartz top'
       },
       {
         file: 'bath-double-vanity-head-on-6643.jpg',
-        source: 'Woodward - Primary Bath IMG_6643.jpg',
         alt: 'The double vanity head-on in the Heathwood House primary bath, the mirrors flanking an olive branch set between the basins',
         aspect: 2400 / 3427
       },
       {
         file: 'bath-vanity-run-6644.jpg',
-        source: 'Woodward - Primary Bath IMG_6644.jpg',
         alt: 'The vanity run in the Heathwood House primary bath, quartz carried the length of the cabinetry'
       },
       {
         file: 'bath-tub-past-vanity-6608.jpg',
-        source: 'Woodward - Primary Bath IMG_6608.jpg',
         alt: 'The freestanding tub in the Heathwood House primary bath, seen past the end of the vanity'
       },
       {
         file: 'bath-tub-marble-wall-6627.jpg',
-        source: 'Woodward - Primary Bath IMG_6627.jpg',
         alt: 'The slipper tub in the Heathwood House primary bath, set against the full-height marble-look wall'
       },
       {
         file: 'bath-tub-shower-glass-6594.jpg',
-        source: 'Woodward - Primary Bath IMG_6594.jpg',
         alt: 'Tub and glass shower together in the Heathwood House primary bath, a walnut side table alongside'
       },
       {
         file: 'bath-tub-shower-wide-6585.jpg',
-        source: 'Woodward - Primary Bath IMG_6585.jpg',
         alt: 'The Heathwood House primary bath across the tub toward the walk-in shower'
       },
       {
         file: 'bath-tub-filler-detail-6591.jpg',
-        source: 'Woodward - Primary Bath IMG_6591 Detail.jpg',
         alt: 'Floor-mounted tub filler in the Heathwood House primary bath, against the veining of the feature wall'
       },
       {
         file: 'bath-shower-bench-niche-6588.jpg',
-        source: 'Woodward - Primary Bath IMG_6588.jpg',
         alt: 'Inside the walk-in shower in the Heathwood House primary bath — a built-in bench, recessed niche, and hex mosaic floor'
       }
     ]
