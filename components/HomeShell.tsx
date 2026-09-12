@@ -6,7 +6,7 @@ import { useIsomorphicLayoutEffect } from '@/hooks/useIsomorphicLayoutEffect';
 import { useScrollTopOnLoad } from '@/hooks/useScrollTopOnLoad';
 import { PROJECTS, type Project } from '@/lib/projects';
 import { CoverPanel } from './CoverPanel';
-import { HeroGrid } from './HeroGrid';
+import { HeroGrid, HERO_PROJECT_COUNT } from './HeroGrid';
 import { StatementSection } from './StatementSection';
 import { ProjectStrip } from './ProjectStrip';
 import { TestimonialsGrid } from './testimonials/TestimonialsGrid';
@@ -19,6 +19,13 @@ import { TestimonialsGrid } from './testimonials/TestimonialsGrid';
  * visitor's splash state to the next.
  */
 let coverSeen = false;
+
+/**
+ * What the strip below the hero shows. The section is headed "More from the studio", so it starts where the hero
+ * stopped rather than restating the same four covers a screen further down. Empty when the hero has shown every
+ * published project, in which case there is nothing more and the section does not render at all.
+ */
+const STRIP_PROJECTS = PROJECTS.slice(HERO_PROJECT_COUNT);
 
 export function HomeShell() {
   const router = useRouter();
@@ -72,7 +79,7 @@ export function HomeShell() {
         {showCover && <CoverPanel onDismiss={dismissCover} />}
         <HeroGrid projects={PROJECTS} onOpen={openProject} pinnedLead coverStage={showCover} interlude={<StatementSection />} />
       </div>
-      <ProjectStrip projects={PROJECTS} onOpen={openProject} />
+      {STRIP_PROJECTS.length > 0 && <ProjectStrip projects={STRIP_PROJECTS} onOpen={openProject} />}
       <TestimonialsGrid />
     </>
   );

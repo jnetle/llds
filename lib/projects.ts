@@ -190,8 +190,10 @@ type ProjectRecord = {
   updatedAt?: string;
 };
 
-// The single ordering source for the Projects index, the home hero/strip, and detail-page prev/next.
-// Keep sorted by `year` descending.
+// The authored source for every project on the site. `PROJECTS` below is what the pages actually render — it drops
+// the records still on placeholder photography — and is the single ordering source for the Projects index, the home
+// hero/strip, and detail-page prev/next. Authored newest-first; `PROJECTS` below re-sorts by `year` descending, so a record dropped in the wrong place
+// still lands in the right year. Order *within* a year is this array's alone — nothing else expresses it.
 const PROJECT_META: ProjectRecord[] = [
   // Shuford
   {
@@ -1747,9 +1749,29 @@ const buildProject = (m: ProjectRecord, i: number): Project => {
   };
 };
 
-export const PROJECTS: Project[] = PROJECT_META.map(buildProject);
+/**
+ * Every authored record, newest first — placeholder projects included. Almost nothing should read this: it is here
+ * for data guards and for tooling that has to see work the site is not publishing yet. Render from `PROJECTS`.
+ *
+ * The sort is stable (ES2019), so projects sharing a `year` keep their authored `PROJECT_META` order — the only
+ * within-year ordering the data has. It runs *after* the map so the placeholder pool stays keyed to a record's
+ * authored index: sorting first would re-deal the stock photographs whenever a project is added.
+ */
+export const ALL_PROJECTS: Project[] = PROJECT_META.map(buildProject).sort((a, b) => Number(b.year) - Number(a.year));
 
-/** Lookup by slug. Slugs are hand-authored, never generated. */
+/**
+ * What the site publishes: projects whose photography is real. A record with no `gallery` is still on the shared
+ * Unsplash pool, so publishing it shows a stock interior under the studio's name and repeats the same photographs
+ * across every unfinished project — authoring the shoot is what reveals it, exactly as `hasRealAssets` already
+ * decided for structured data and alt text.
+ *
+ * Filtering here rather than per page is the point: this array is the single ordering source for the index, the home
+ * hero and strip, and detail-page prev/next, and `getProject` reads it too — so a hidden project is absent from the
+ * sitemap and `generateStaticParams`, and its URL 404s rather than serving an unlisted page full of stock photos.
+ */
+export const PROJECTS: Project[] = ALL_PROJECTS.filter(p => p.hasRealAssets);
+
+/** Lookup by slug, across published projects only — an unpublished slug is `undefined`, which the route turns into a 404. */
 export const getProject = (slug: string): Project | undefined => PROJECTS.find(p => p.slug === slug);
 
 /** `"Aiken, SC"` → `{ city: 'Aiken', region: 'SC' }`. Anything not in that shape degrades to the whole string as city. */

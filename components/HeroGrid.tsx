@@ -53,12 +53,22 @@ function HeroLead() {
   );
 }
 
+/** Two project rows sit beneath the lead image. */
+const HERO_ROW_SIZE = 2;
+
+/**
+ * How many projects this grid consumes off the top of the list. Exported because the section below it on the home
+ * page is called "More from the studio" — it hands itself the projects the hero did *not* show, and a literal `4`
+ * in two files would drift the first time a row changes width.
+ */
+export const HERO_PROJECT_COUNT = HERO_ROW_SIZE * 2;
+
 export function HeroGrid({ projects, onOpen, pinnedLead = false, coverStage = false, interlude }: HeroGridProps) {
   const isCompact = useCompact();
 
   // The lead shows HERO_IMAGE rather than a project, so the rows start from the top of the list.
-  const row2 = projects.slice(0, 2);
-  const row3 = projects.slice(2, 4);
+  const row2 = projects.slice(0, HERO_ROW_SIZE);
+  const row3 = projects.slice(HERO_ROW_SIZE, HERO_PROJECT_COUNT);
 
   const dividerColor = 'var(--divider-color)';
   const dividerThickness = 1;
