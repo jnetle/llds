@@ -607,20 +607,125 @@ a {
   }
 }
 
+/* ─────────────────────────────────────────────────────────────────────────────
+   PROJECT STRIP — "More from the studio" on the home page
+   (components/ProjectStrip.tsx)
+
+   A tall track with a sticky 100svh stage; scroll progress inside the pinned
+   range slides the rail left by exactly its own overflow, so the pass ends with
+   the last project whole against the right gutter.
+
+   It used to be a parallax drift keyed off the section's passage through the
+   viewport, which covered ~170px of a ~4000px overflow — the tail of the list
+   was unreachable at every width. The section is fed every project the hero did
+   not show, so that tail is most of it.
+
+   The geometry is all CSS, because the tiles are a fixed width: the row's
+   overflow is a function of the tile count (written inline as --strip-count) and
+   the viewport. JS writes one unitless number per frame, --strip-p.
+   ──────────────────────────────────────────────────────────────────────────── */
+
+.strip-track {
+  /* Overwritten inline from projects.length; the fallback keeps the calc below valid on its own. */
+  --strip-count: 1;
+  --strip-tile: min(460px, 74vw);
+  --strip-gap: 32px;
+  --strip-row: calc(var(--strip-count) * var(--strip-tile) + (var(--strip-count) - 1) * var(--strip-gap));
+  /* How far the rail must travel for its last tile to land inside the right gutter. 100vw counts the scrollbar and
+     the rail's box does not, so this rounds *up* by ~15px on a classic scrollbar — over-travel only widens the
+     trailing gutter, where under-travel would crop the tile this whole section exists to reach. */
+  --strip-travel: max(0px, calc(var(--strip-row) + 2 * var(--gutter) - 100vw));
+  /* One vertical pixel carries the row 1 / --strip-pace horizontal pixels. 1 would be a literal horizontal
+     scroller; a shade under it keeps eleven tiles from costing six viewports of page. */
+  --strip-pace: 0.72;
+  position: relative;
+  /* The row is held still for LEAD_IN + LEAD_OUT of the track (see ProjectStrip.tsx), so the scrubbed span is the
+     remaining 0.82 and the track has to be that much longer again than the travel it has to cover. */
+  height: calc(100svh + var(--strip-pace) * var(--strip-travel) / 0.82);
+}
+
+.strip-stage {
+  position: sticky;
+  top: 0;
+  height: 100svh;
+  /* `clip`, never `hidden` — hidden would make this a scroll container and kill sticky on every descendant. */
+  overflow: clip;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: clamp(28px, 5svh, 60px);
+  padding-block: 40px;
+}
+
+/* Rides along pinned, so the heading and the way out to /projects stay put for the whole pass. */
+.strip-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 20px;
+  flex-wrap: wrap;
+  padding-inline: var(--gutter);
+}
+
+.strip-rail {
+  display: flex;
+  gap: var(--strip-gap);
+  padding-inline: var(--gutter);
+  transform: translate3d(calc(-1 * var(--strip-p, 0) * var(--strip-travel)), 0, 0);
+  will-change: transform;
+}
+
+.strip-tile {
+  flex: 0 0 var(--strip-tile);
+  text-align: left;
+  cursor: pointer;
+}
+
 /* Project strip tile. Was two handlers writing currentTarget.style.filter — DOM mutations React did not know about,
    which never fired for keyboard users. */
-/* Stays a wrapper: it owns the 580px box, and `filter` on it applies to the image inside. `position: relative` is
+/* Stays a wrapper: it owns the media box, and `filter` on it applies to the image inside. `position: relative` is
    required — <button> is static, so without it the `fill` image escapes to <body>, which is itself positioned. */
 .strip-tile__media {
   position: relative;
   width: 100%;
-  height: 580px;
+  /* Was a flat 580px. The tile now has to fit its caption inside a pinned 100svh stage, and it narrows with the
+     viewport as well — so cap against both. 1.26 is the original 460 × 580 box. */
+  height: min(580px, 56svh, calc(var(--strip-tile) * 1.26));
   transition: filter var(--dur-med) ease;
 }
 
 .strip-tile:hover .strip-tile__media,
 .strip-tile:focus-visible .strip-tile__media {
   filter: brightness(1.05);
+}
+
+@media (max-width: 600px) {
+  .strip-track {
+    --strip-gap: 20px;
+  }
+}
+
+/* Nothing scrubs without JS, and pinning a page for 4000px of scroll is the thing reduced motion is asking you not
+   to do. Both get the same answer: an ordinary horizontal scroller the reader drives, which reaches the last tile
+   by other means. */
+@media (prefers-reduced-motion: reduce), (scripting: none) {
+  .strip-track {
+    height: auto;
+    padding-block: 60px 140px;
+  }
+
+  .strip-stage {
+    position: static;
+    height: auto;
+    overflow: visible;
+    padding-block: 0;
+  }
+
+  .strip-rail {
+    transform: none;
+    overflow-x: auto;
+    padding-bottom: 12px;
+  }
 }
 
 /* Services quick-links nav. Declared after .micro-sm so the tighter tracking wins. */
