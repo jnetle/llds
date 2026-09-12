@@ -126,12 +126,15 @@ export function Footer() {
             gap: 16
           }}>
           {/* All three carry `.micro-sm` so their line boxes match — an unclassed child would inherit the 16px body font
-              and sit off the shared baseline. */}
-          <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'baseline', gap: 10 }}>
-            <Eyebrow as="span" size="sm" opacity={0.5}>
+              and sit off the shared baseline. Below 601px the copyright alone fills the row, so the dot and Privacy
+              wrapped to a ragged second line anyway: stack them deliberately and drop the dot, which only reads as a
+              separator inside a shared row. Direction and gap are classes, not inline style — an inline `display`
+              would outrank the `sm:` variant. */}
+          <div className="flex flex-col items-start gap-[8px] sm:flex-row sm:flex-wrap sm:items-baseline sm:gap-[10px]">
+            <Eyebrow as="span" size="sm" opacity={0.5} className="footer-legal">
               ©{new Date().getFullYear()} {SITE.name} · All rights reserved
             </Eyebrow>
-            <span aria-hidden className="micro-sm" style={{ opacity: 0.35 }}>
+            <span aria-hidden className="micro-sm hidden sm:inline" style={{ opacity: 0.35 }}>
               ·
             </span>
             <Link
