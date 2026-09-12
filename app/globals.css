@@ -358,10 +358,12 @@ a {
   background: #1a1a1a;
 }
 
-/* Hover darkens the photo in place — no zoom. The media layer sits at exactly
-   `cover`, so any scale would resample the source upward and soften it. Copies
-   the studioashby.com home-page treatment: a flat scrim fading in over a still
-   image, timed to --dur-med so it moves with the caption below it. */
+/* Hover deepens the photo in place — no zoom. The media layer sits at exactly
+   `cover`, so any scale would resample the source upward and soften it. The scrim
+   is a bottom-anchored gradient, not a flat wash over the whole tile: it only has
+   to hold the caption against a bright photograph, and a full-tile darken was
+   dimming the image itself. It is timed to --dur-med so it moves with the caption,
+   and it stacks on top of the base gradient in GridCell.tsx. */
 /* A wrapper, not the <img>: the ::after below is the hover scrim, and pseudo-elements
    do not render on replaced elements. next/image's `fill` sits inside it — absolute
    positioning is a valid containing block, so this needs no `position: relative`. */
@@ -374,7 +376,7 @@ a {
   content: '';
   position: absolute;
   inset: 0;
-  background: rgba(0, 0, 0, 0.2);
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0) 45%, rgba(0, 0, 0, 0.12) 72%, rgba(0, 0, 0, 0.22) 100%);
   opacity: 0;
   transition: opacity var(--dur-med) ease;
 }
