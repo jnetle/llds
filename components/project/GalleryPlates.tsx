@@ -54,6 +54,7 @@ function Plate({ image, index, selected, onSelect, title }: PlateProps) {
           src={image.src}
           alt={image.alt}
           fill
+          loading="lazy"
           // 100vw rather than the ~84vw these occupy, so the srcset candidate matches the hero's and clicking a
           // plate swaps it straight from cache instead of fetching a near-identical width.
           sizes="100vw"
