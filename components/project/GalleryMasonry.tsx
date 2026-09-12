@@ -128,6 +128,7 @@ function MasonryTile({ image, column, feature = false }: TileProps) {
         src={image.src}
         alt={image.alt}
         fill
+        loading="lazy"
         // Column widths, not the hero's. A feature spans every column, so it needs its own hint or it loads a
         // half-width candidate and renders soft.
         sizes={feature ? '(max-width: 600px) 92vw, 84vw' : '(max-width: 600px) 46vw, 42vw'}
