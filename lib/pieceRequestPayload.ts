@@ -11,7 +11,8 @@ import { absoluteUrl } from '@/lib/site';
  * refactoring the inquiry to serve a form with six fields. `formatSubmittedAt` *is* generic, so it is imported.
  *
  * Answers are left unescaped, exactly as the inquiry's builders leave them: ClickUp renders this in a trusted
- * context. The confirmation email is the opposite case and does its own escaping — see lib/pieceEmail.ts.
+ * context. Anything that ever renders these into HTML a mail client parses must escape them itself, the way
+ * lib/inquiryEmail.ts does.
  */
 
 /** ClickUp rejects a longer task name outright. */

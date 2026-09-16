@@ -71,7 +71,10 @@ const honeypotStyle: CSSProperties = {
  * Nothing about pricing is collected or shown. The studio replies with a quote; see app/pieces/actions.ts.
  */
 export function PieceRequest({ slug, pieceName }: { slug: string; pieceName: string }) {
-  const [submitted, setSubmitted] = useState(false);
+  // The address the request was filed under, held so the success panel can read it back. Load-bearing now that no
+  // confirmation email goes out: a mistyped address used to bounce or simply not arrive, which told the visitor
+  // something was wrong. With nothing sent, this panel is their only chance to notice the studio cannot reach them.
+  const [submittedEmail, setSubmittedEmail] = useState<string | null>(null);
   const [serverError, setServerError] = useState<string | null>(null);
 
   const {
@@ -84,7 +87,7 @@ export function PieceRequest({ slug, pieceName }: { slug: string; pieceName: str
     defaultValues: { pieceSlug: slug, name: '', email: '', phone: '', quantity: '', deliverTo: '', notes: '', website: '' }
   });
 
-  if (submitted) {
+  if (submittedEmail) {
     return (
       <div role="status" aria-live="polite" style={{ maxWidth: 560 }}>
         <Eyebrow style={{ marginBottom: space[4] }}>— Thank You</Eyebrow>
@@ -92,7 +95,8 @@ export function PieceRequest({ slug, pieceName }: { slug: string; pieceName: str
           Your request is <span style={{ fontStyle: 'italic' }}>received</span>.
         </Heading>
         <p style={{ ...text.body, margin: 0 }}>
-          We will follow up shortly about the {pieceName} — availability, lead time and pricing. A confirmation is on its way to your inbox.
+          We will follow up shortly about the {pieceName} — availability, lead time and pricing. Our reply will come to{' '}
+          <span style={{ color: color.ink }}>{submittedEmail}</span>.
         </p>
       </div>
     );
@@ -108,7 +112,7 @@ export function PieceRequest({ slug, pieceName }: { slug: string; pieceName: str
           setServerError(null);
           const result = await requestPiece(values);
           if (result.ok) {
-            setSubmitted(true);
+            setSubmittedEmail(values.email);
           } else {
             setServerError(result.error);
           }
