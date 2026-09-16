@@ -7,6 +7,7 @@ import { fileURLToPath } from 'node:url';
 const here = dirname(fileURLToPath(import.meta.url));
 const root = resolve(here, '..');
 const projectsPath = resolve(root, 'lib', 'projects.ts');
+const piecesPath = resolve(root, 'lib', 'pieces.ts');
 
 const failures = [];
 
@@ -142,6 +143,140 @@ function checkProjects() {
   }
 }
 
+// ── Photo credits ───────────────────────────────────────────────────────────
+// `buildProject` drops a credit whose `piece` names nothing, deliberately: lib/projects.ts is imported by every page,
+// so throwing there would take the whole site down in dev over one typo. That makes the dangling slug invisible in
+// the derived data, and invisible to the vitest guards, which only ever see resolved credits. It is visible here, in
+// the authored source — so this is the check that catches it.
+
+function sourceFileFor(path) {
+  return ts.createSourceFile(path, readFileSync(path, 'utf8'), ts.ScriptTarget.ESNext, true, ts.ScriptKind.TS);
+}
+
+/** The array literal initialising a top-level `const <name> = [...]`, or null. */
+function findArrayDecl(sourceFile, name) {
+  let found = null;
+
+  function visit(node) {
+    if (found) return;
+    if (ts.isVariableDeclaration(node) && ts.isIdentifier(node.name) && node.name.text === name) {
+      if (node.initializer && ts.isArrayLiteralExpression(node.initializer)) found = node.initializer;
+      return;
+    }
+    ts.forEachChild(node, visit);
+  }
+
+  visit(sourceFile);
+  return found;
+}
+
+/** A string-valued property of an object literal, or undefined. */
+function stringProp(objectLiteral, key) {
+  for (const prop of objectLiteral.properties) {
+    if (!ts.isPropertyAssignment(prop)) continue;
+    if (!ts.isIdentifier(prop.name) && !ts.isStringLiteral(prop.name)) continue;
+    if (prop.name.text !== key) continue;
+    const value = prop.initializer;
+    if (ts.isStringLiteralLike(value) || ts.isNoSubstitutionTemplateLiteral(value)) return value.text;
+  }
+  return undefined;
+}
+
+/** An object-valued property of an object literal, or undefined. */
+function objectProp(objectLiteral, key) {
+  for (const prop of objectLiteral.properties) {
+    if (!ts.isPropertyAssignment(prop)) continue;
+    if (!ts.isIdentifier(prop.name) && !ts.isStringLiteral(prop.name)) continue;
+    if (prop.name.text !== key) continue;
+    if (ts.isObjectLiteralExpression(prop.initializer)) return prop.initializer;
+  }
+  return undefined;
+}
+
+/** An array-valued property of an object literal, or undefined. */
+function arrayProp(objectLiteral, key) {
+  for (const prop of objectLiteral.properties) {
+    if (!ts.isPropertyAssignment(prop)) continue;
+    if (!ts.isIdentifier(prop.name) && !ts.isStringLiteral(prop.name)) continue;
+    if (prop.name.text !== key) continue;
+    if (ts.isArrayLiteralExpression(prop.initializer)) return prop.initializer;
+  }
+  return undefined;
+}
+
+function parsePieceSlugs() {
+  const sf = sourceFileFor(piecesPath);
+  const decl = findArrayDecl(sf, 'PIECE_META');
+
+  if (!decl) {
+    fail('could not locate PIECE_META array in lib/pieces.ts');
+    return null;
+  }
+
+  const slugs = new Set();
+  for (const element of decl.elements) {
+    if (!ts.isObjectLiteralExpression(element)) continue;
+    const slug = stringProp(element, 'slug');
+    if (slug) slugs.add(slug);
+  }
+  return slugs;
+}
+
+function checkCredits() {
+  const pieceSlugs = parsePieceSlugs();
+  if (!pieceSlugs) return;
+
+  const sf = sourceFileFor(projectsPath);
+  const decl = findArrayDecl(sf, 'PROJECT_META');
+  if (!decl) return; // already reported by parseProjectsMeta
+
+  for (const [index, element] of decl.elements.entries()) {
+    if (!ts.isObjectLiteralExpression(element)) continue;
+
+    const slug = stringProp(element, 'slug') ?? `PROJECT_META[${index}]`;
+    const hero = stringProp(element, 'hero');
+    const gallery = arrayProp(element, 'gallery');
+    if (!gallery) continue;
+
+    for (const plate of gallery.elements) {
+      if (!ts.isObjectLiteralExpression(plate)) continue;
+
+      const credit = objectProp(plate, 'credit');
+      if (!credit) continue;
+
+      const file = stringProp(plate, 'file') ?? '(unknown file)';
+      const piece = stringProp(credit, 'piece');
+      const note = stringProp(credit, 'note');
+
+      if (!piece) {
+        fail('photo credit is missing `piece`', `  project: ${slug}`, `  file: ${file}`);
+      } else if (!pieceSlugs.has(piece)) {
+        fail(
+          'photo credit names a piece that does not exist in lib/pieces.ts',
+          `  project: ${slug}`,
+          `  file: ${file}`,
+          `  piece: ${piece}`,
+          '  The credit would be silently dropped and never render.'
+        );
+      }
+
+      if (!note || note.trim() === '') {
+        fail('photo credit has an empty `note`', `  project: ${slug}`, `  file: ${file}`);
+      }
+
+      // The detail page renders the gallery minus the hero frame, so a credit there can never appear.
+      if (hero && file === hero) {
+        fail(
+          'photo credit sits on the frame `hero` names',
+          `  project: ${slug}`,
+          `  file: ${file}`,
+          '  The detail page drops that frame from the gallery, so the caption would never render.'
+        );
+      }
+    }
+  }
+}
+
 function checkEnvUrl(name, { httpsOnly = false } = {}) {
   const raw = process.env[name];
   if (!raw) return;
@@ -161,6 +296,7 @@ function checkEnvUrl(name, { httpsOnly = false } = {}) {
 }
 
 checkProjects();
+checkCredits();
 checkEnvUrl('NEXT_PUBLIC_SITE_URL');
 checkEnvUrl('NEXT_PUBLIC_IMG_BASE', { httpsOnly: true });
 

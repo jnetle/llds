@@ -2,6 +2,7 @@ import Image from 'next/image';
 import { type CSSProperties } from 'react';
 import { useReveal } from '@/hooks/useReveal';
 import { FileBadge } from '@/components/project/FileBadge';
+import { PhotoCredit } from '@/components/pieces/PhotoCredit';
 import type { GalleryImage } from '@/lib/projects';
 import { brand } from '@/lib/tokens';
 
@@ -113,39 +114,58 @@ export function GalleryMasonry({ gallery }: Props) {
 type TileProps = { plate: Plate; column: number; feature?: boolean };
 
 function MasonryTile({ plate: { image, order }, column, feature = false }: TileProps) {
-  const [ref, seen] = useReveal<HTMLDivElement>();
+  const [ref, seen] = useReveal<HTMLElement>();
 
   return (
-    <div
+    // The <figure> is the tile, and it keeps `project-masonry__item` plus both custom properties. They cannot move to
+    // the aspect box below: on the phone tier `.project-masonry__col` is `display: contents`, so whatever carries
+    // `__item` is the run's grid item — and `order` only applies to a grid item. Wrapping the class instead of
+    // hoisting it would silently stop `--order` working and replay the shoot column-by-column, which is the exact
+    // failure the phone-tier comment in globals.css exists to prevent.
+    <figure
       ref={ref}
       className={`project-masonry__item reveal${seen ? ' is-in' : ''}`}
       style={
         {
-          position: 'relative',
-          // `aspect-ratio` from the data — the same number the packing above used, so the reserved box and the
-          // computed column height cannot disagree.
-          aspectRatio: image.aspect,
-          background: brand.modernTan,
+          margin: 0,
           // Both are read by globals.css, which decides per tier what to do with them: `--col` drives the stagger
           // where there are neighbouring columns, `--order` replays the authored sequence where there are not.
           '--col': column,
           '--order': order
         } as CSSProperties
       }>
-      {/* TEMPORARY — review aid, see components/project/FileBadge.tsx. */}
-      <FileBadge src={image.src} />
-      {/* Nothing wraps this any more, so the alt text is the only description of the photograph — it carries it. */}
-      <Image
-        src={image.src}
-        alt={image.alt}
-        fill
-        loading="lazy"
-        // Column widths, not the hero's. A feature spans every column, so it needs its own hint or it loads a
-        // half-width candidate and renders soft — and below 601px every tile is full width, feature or not.
-        sizes={feature ? '(max-width: 600px) 92vw, 84vw' : '(max-width: 600px) 92vw, 42vw'}
-        style={{ objectFit: 'cover' }}
-        draggable={false}
-      />
-    </div>
+      {/* The photograph's own box. Separate from the figure so a credit can sit outside it: the packing above models
+          a tile as exactly `1 / aspect` column-widths tall, and a caption inside this element would be cropped by the
+          aspect box while one measured into it would make the model viewport-dependent. Uncredited tiles — which is
+          nearly all of them — leave the figure exactly this tall, so the model stays exact. */}
+      <div
+        style={{
+          position: 'relative',
+          // `aspect-ratio` from the data — the same number the packing above used, so the reserved box and the
+          // computed column height cannot disagree.
+          aspectRatio: image.aspect,
+          background: brand.modernTan
+        }}>
+        {/* TEMPORARY — review aid, see components/project/FileBadge.tsx. */}
+        <FileBadge src={image.src} />
+        {/* Nothing wraps this any more, so the alt text is the only description of the photograph — it carries it. */}
+        <Image
+          src={image.src}
+          alt={image.alt}
+          fill
+          loading="lazy"
+          // Column widths, not the hero's. A feature spans every column, so it needs its own hint or it loads a
+          // half-width candidate and renders soft — and below 601px every tile is full width, feature or not.
+          sizes={feature ? '(max-width: 600px) 92vw, 84vw' : '(max-width: 600px) 92vw, 42vw'}
+          style={{ objectFit: 'cover' }}
+          draggable={false}
+        />
+      </div>
+
+      {/* Credit a `feature` frame where you can: a feature sits between packed runs, so its caption costs the packing
+          nothing. Beneath an ordinary tile the caption is real height the model does not know about, and leaves that
+          column roughly one caption longer than its neighbour. Authoring note on `GalleryPlate.credit`. */}
+      {image.credit && <PhotoCredit credit={image.credit} />}
+    </figure>
   );
 }

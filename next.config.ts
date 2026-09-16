@@ -14,7 +14,8 @@ const nextConfig: NextConfig = {
   outputFileTracingIncludes: {
     '/inquire': ['./lib/pdf/fonts/**', './public/logo-long-navy.png'],
     '/opengraph-image': ['./lib/pdf/fonts/**'],
-    '/projects/[slug]/opengraph-image': ['./lib/pdf/fonts/**']
+    '/projects/[slug]/opengraph-image': ['./lib/pdf/fonts/**'],
+    '/pieces/[slug]/opengraph-image': ['./lib/pdf/fonts/**']
   },
   serverExternalPackages: ['@react-pdf/renderer'],
   images: {

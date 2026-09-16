@@ -1,4 +1,5 @@
 import type { MetadataRoute } from 'next';
+import { PIECES } from '@/lib/pieces';
 import { PROJECTS } from '@/lib/projects';
 import { absoluteUrl } from '@/lib/site';
 
@@ -43,6 +44,19 @@ export default function sitemap(): MetadataRoute.Sitemap {
       lastModified: parseDate(p.updatedAt) ?? built,
       changeFrequency: 'yearly' as const,
       priority: 0.8
+    })),
+    // Pieces, and their index — both gated on there being any. `/pieces` is not in `ROUTES` above because listing it
+    // unconditionally would submit a page reading "nothing credited yet" for as long as the catalogue is empty.
+    // Low priority on purpose: a piece page exists to answer a reader who followed a credit, not to compete with the
+    // project it was credited in.
+    ...(PIECES.length > 0
+      ? [{ url: absoluteUrl('/pieces'), lastModified: built, changeFrequency: 'monthly' as const, priority: 0.4 }]
+      : []),
+    ...PIECES.map(p => ({
+      url: absoluteUrl(`/pieces/${p.slug}`),
+      lastModified: parseDate(p.updatedAt) ?? built,
+      changeFrequency: 'yearly' as const,
+      priority: 0.4
     }))
   ];
 }
