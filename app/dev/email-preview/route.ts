@@ -1,5 +1,5 @@
-import { confirmationHtml, confirmationSubject, confirmationText } from '@/lib/inquiryEmail';
 import { isProduction } from '@/lib/env';
+import { confirmationHtml, confirmationSubject, confirmationText } from '@/lib/inquiryEmail';
 
 /**
  * Local preview for the inquiry confirmation email — renders the same builders the server action uses, with hot
@@ -10,6 +10,8 @@ import { isProduction } from '@/lib/env';
  *   /dev/email-preview                    → the HTML version
  *   /dev/email-preview?format=text        → the plain-text version
  *   /dev/email-preview?name=D%27Angelo    → try a different greeting
+ *
+ * Piece requests (app/pieces/actions.ts) send no email, so there is nothing here to preview for them.
  */
 export async function GET(request: Request): Promise<Response> {
   if (isProduction) {

@@ -64,6 +64,26 @@ export const getClickUpConfig = (): { token: string; listId: string } | null => 
 };
 
 /**
+ * ClickUp config for piece requests, which track in their own list: a fixture someone wants quoted is a different
+ * piece of work from a whole-project inquiry, and mixing them means one set of statuses has to describe both.
+ *
+ * **Falls back to `CLICKUP_LIST_ID` when `CLICKUP_PIECES_LIST_ID` is unset, on purpose.** Losing a real lead is the
+ * worst outcome either form has, so an unset value files the request in the inquiry list — reachable, if untidy —
+ * rather than failing the submission. `dedicated` says which happened so the caller can log it once; a silent
+ * fallback would be indistinguishable from a working config.
+ */
+export const getPieceClickUpConfig = (): { token: string; listId: string; dedicated: boolean } | null => {
+  const token = clean(process.env.CLICKUP_API_TOKEN);
+  if (!token) return null;
+
+  const dedicatedListId = clean(process.env.CLICKUP_PIECES_LIST_ID);
+  const listId = dedicatedListId ?? clean(process.env.CLICKUP_LIST_ID);
+  if (!listId) return null;
+
+  return { token, listId, dedicated: Boolean(dedicatedListId) };
+};
+
+/**
  * Resend config for inquiry confirmation emails.
  * Returns null unless required values are present; replyTo is optional.
  */

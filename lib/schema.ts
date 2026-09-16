@@ -1,4 +1,5 @@
 import { SITE, absoluteUrl } from '@/lib/site';
+import type { Piece } from '@/lib/pieces';
 import { splitLocation, type Project } from '@/lib/projects';
 import { expandStateCode } from '@/lib/usStates';
 
@@ -120,5 +121,40 @@ export function projectSchema(project: Project): Node {
       ? { image: [...new Set([project.cover, project.hero, ...project.gallery].map(i => i.src))].slice(0, SCHEMA_IMAGE_LIMIT) }
       : {}),
     isPartOf: { '@id': WEBSITE_ID }
+  };
+}
+
+/**
+ * One credited piece. `Product` rather than the `CreativeWork` a project gets — this genuinely is a manufactured
+ * object with a maker, which is exactly the distinction the note above `projectSchema` draws.
+ *
+ * **No `offers`, and that is not an oversight.** An `offers` node asserts a price and an availability the page does
+ * not show and the studio has not published — the same class of false markup as the `Review` block this file refuses
+ * to emit for invented testimonials, and a documented manual-action trigger. If prices are ever published (see the
+ * note in lib/pieces.ts on why they are not), `offers` has to arrive in the same change, not before it and not after.
+ *
+ * `image` is passed in rather than read off the piece: the photographs belong to the project frames that credit it,
+ * and this module must not import lib/projects.ts to go looking for them.
+ */
+export function pieceSchema(piece: Piece, images: string[]): Node {
+  const url = absoluteUrl(`/pieces/${piece.slug}`);
+
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'Product',
+    '@id': `${url}#piece`,
+    name: piece.name,
+    description: piece.summary,
+    url,
+    category: piece.category,
+    brand: {
+      '@type': 'Brand',
+      name: piece.brand,
+      ...(piece.brandUrl ? { url: piece.brandUrl } : {})
+    },
+    ...(piece.materials ? { material: piece.materials } : {}),
+    // Deduped and capped for the same reason `projectSchema` caps its own: a piece credited across a whole shoot
+    // would otherwise restate a dozen near-identical URLs on every render.
+    ...(images.length ? { image: [...new Set(images)].slice(0, SCHEMA_IMAGE_LIMIT) } : {})
   };
 }

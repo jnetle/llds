@@ -1,5 +1,6 @@
 import Image from 'next/image';
 import { useReveal } from '@/hooks/useReveal';
+import { PhotoCredit } from '@/components/pieces/PhotoCredit';
 import type { GalleryImage } from '@/lib/projects';
 import { brand } from '@/lib/tokens';
 
@@ -38,34 +39,46 @@ function Plate({ image, index, selected, onSelect, title }: PlateProps) {
   const [ref, seen] = useReveal<HTMLDivElement>();
 
   return (
-    <button
-      onClick={onSelect}
-      aria-label={`View plate ${index + 1} of ${title}`}
-      aria-pressed={selected}
-      style={{ cursor: 'pointer', textAlign: 'left', padding: 0, background: 'none', border: 'none' }}>
-      {/* The second band is shorter on purpose — three equal bands read as a stack rather than a sequence. */}
-      {/* No `--reveal-delay`: a plate is a full-width band, so it enters view alone and has no neighbour to stagger
+    // A <figure> so the optional credit below can be its <figcaption>. The credit is a *sibling* of the button, never
+    // a child: it contains a link, and a link inside a button is invalid HTML and two overlapping click targets — the
+    // reader would promote the plate to the hero while trying to open the piece.
+    <figure style={{ margin: 0 }}>
+      <button
+        onClick={onSelect}
+        aria-label={`View plate ${index + 1} of ${title}`}
+        aria-pressed={selected}
+        // `display`/`width` are load-bearing now that the button is no longer a direct grid item: a default
+        // inline-block button shrink-wraps its content, and the band inside sets only a height, so every plate
+        // collapsed to zero width the moment the <figure> came between them.
+        style={{ display: 'block', width: '100%', cursor: 'pointer', textAlign: 'left', padding: 0, background: 'none', border: 'none' }}>
+        {/* The second band is shorter on purpose — three equal bands read as a stack rather than a sequence. */}
+        {/* No `--reveal-delay`: a plate is a full-width band, so it enters view alone and has no neighbour to stagger
           against. Delaying by index would just make the tenth band hang for the better part of a second. */}
-      {/* Heights are classes so the phone tier is right on the server. `svh` below 601px, not `vh`: a mobile browser
+        {/* Heights are classes so the phone tier is right on the server. `svh` below 601px, not `vh`: a mobile browser
           measures `vh` against the viewport with its chrome retracted, so an 80vh band overflowed the screen on load
           and then settled — and a band taller than the screen can never be seen whole. */}
-      <div
-        ref={ref}
-        className={`reveal${seen ? ' is-in' : ''} ${index === 1 ? 'h-[42svh] sm:h-[60vh]' : 'h-[56svh] sm:h-[80vh]'}`}
-        style={{ position: 'relative', background: brand.modernTan }}>
-        {/* The button's aria-label names the action, so the image inside is decorative. */}
-        <Image
-          src={image.src}
-          alt={image.alt}
-          fill
-          loading="lazy"
-          // 100vw rather than the ~84vw these occupy, so the srcset candidate matches the hero's and clicking a
-          // plate swaps it straight from cache instead of fetching a near-identical width.
-          sizes="100vw"
-          style={{ objectFit: 'cover' }}
-          draggable={false}
-        />
-      </div>
-    </button>
+        <div
+          ref={ref}
+          className={`reveal${seen ? ' is-in' : ''} ${index === 1 ? 'h-[42svh] sm:h-[60vh]' : 'h-[56svh] sm:h-[80vh]'}`}
+          style={{ position: 'relative', background: brand.modernTan }}>
+          {/* The button's aria-label names the action, so the image inside is decorative. */}
+          <Image
+            src={image.src}
+            alt={image.alt}
+            fill
+            loading="lazy"
+            // 100vw rather than the ~84vw these occupy, so the srcset candidate matches the hero's and clicking a
+            // plate swaps it straight from cache instead of fetching a near-identical width.
+            sizes="100vw"
+            style={{ objectFit: 'cover' }}
+            draggable={false}
+          />
+        </div>
+      </button>
+
+      {/* Absent on all but a handful of frames across the site. The band above has a fixed height in classes, so a
+          caption simply extends the stack — nothing here has layout math to disturb. */}
+      {image.credit && <PhotoCredit credit={image.credit} />}
+    </figure>
   );
 }

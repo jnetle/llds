@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { ALL_PROJECTS, PROJECTS, formatLocationLong, getProject, splitLocation } from '../projects';
+import { ALL_PROJECTS, PROJECTS, formatLocationLong, framesCreditingPiece, getProject, splitLocation } from '../projects';
 
 const KEBAB_KEY_RE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
@@ -203,5 +203,38 @@ describe('formatLocationLong', () => {
     expect(formatLocationLong('Augusta')).toBe('Augusta');
     expect(formatLocationLong('Aiken, South Carolina')).toBe('Aiken, South Carolina');
     expect(formatLocationLong('Paris, ZZ')).toBe('Paris, ZZ');
+  });
+});
+
+describe('photo credits', () => {
+  const credited = ALL_PROJECTS.flatMap(project => project.gallery.filter(image => image.credit).map(image => ({ project, image })));
+
+  it('gives every credit a brand and a non-empty note', () => {
+    for (const { image } of credited) {
+      expect(image.credit?.brand.trim()).not.toBe('');
+      // The note is the caption's whole sentence. An empty one renders a rule and a bare maker's name.
+      expect(image.credit?.note.trim()).not.toBe('');
+    }
+  });
+
+  it('never credits the frame the hero names', () => {
+    // `ProjectDetail` drops the hero frame from the rendered gallery, so a credit authored there has nowhere to
+    // appear — it would look authored and be invisible. The authoring rule is on `GalleryPlate.credit`.
+    for (const project of ALL_PROJECTS) {
+      const heroFrame = project.gallery.find(image => image.src === project.hero.src);
+      expect(heroFrame?.credit).toBeUndefined();
+    }
+  });
+
+  it('resolves a credited piece back to the frames that credit it', () => {
+    for (const { project, image } of credited) {
+      if (!project.hasRealAssets) continue;
+      const frames = framesCreditingPiece(image.credit!.slug);
+      expect(frames.some(frame => frame.image.src === image.src)).toBe(true);
+    }
+  });
+
+  it('returns no frames for a piece nothing credits', () => {
+    expect(framesCreditingPiece('definitely-not-a-piece')).toEqual([]);
   });
 });

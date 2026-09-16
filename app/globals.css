@@ -349,6 +349,30 @@ a {
   cursor: wait;
 }
 
+/* Photo credit link — components/pieces/PhotoCredit.tsx. The rule is a border rather than `text-decoration` so it
+   clears the descenders of a name like `Ayg`, and it lives here rather than inline because an inline
+   `border-bottom-color` would outrank the :hover rule, exactly as `.btn-primary`'s background would. Resting state is
+   a hairline: present enough to read as a link beside body copy, quiet enough not to compete with the photograph. */
+.photo-credit__link {
+  display: inline-block;
+  font-size: 15px;
+  font-style: italic;
+  color: var(--ink);
+  border-bottom: 1px solid var(--hairline);
+  padding-bottom: 2px;
+  transition: border-color var(--dur-fast) var(--ease-elegant);
+}
+
+.photo-credit__link:hover {
+  border-bottom-color: var(--ink);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .photo-credit__link {
+    transition: none;
+  }
+}
+
 /* Home hero tile. One parent :hover feeds all three descendants, which previously shared a useState that
    re-rendered the tile on every pointer cross and did nothing before hydration. */
 .grid-cell {

@@ -1,10 +1,34 @@
 import { img } from '@/lib/img';
+import { getPiece } from '@/lib/pieces';
 import { expandStateCode } from '@/lib/usStates';
 
 /** One rendered photograph. `alt` is always present; until real copy arrives it is derived — see `deriveAlt`. */
 export type ProjectImage = {
   src: string;
   alt: string;
+};
+
+/**
+ * A credit as authored on a plate: which piece the frame contains, and the sentence the caption prints.
+ *
+ * Rare by design — one object in one photograph, the way a magazine credits what the model is wearing. Nothing
+ * renders unless a plate names one, so the whole feature is inert on a project until someone writes a credit.
+ */
+export type PlateCredit = {
+  /** A slug into `PIECES` in lib/pieces.ts. An unresolvable one drops the credit — see `buildProject`. */
+  piece: string;
+  /** The caption's sentence, written for *this* frame. The brand name is printed by the component, not spliced in here. */
+  note: string;
+};
+
+/**
+ * A credit as the page renders it. Narrow on purpose: a gallery crosses the RSC boundary into client components, and
+ * embedding the whole `Piece` would ship every story paragraph to the browser to render two lines of caption.
+ */
+export type ResolvedCredit = {
+  slug: string;
+  brand: string;
+  note: string;
 };
 
 /**
@@ -16,6 +40,8 @@ export type GalleryImage = ProjectImage & {
   aspect: number;
   /** Spans every masonry column instead of sitting in one. */
   feature: boolean;
+  /** Resolved from the plate's authored `credit`. Absent on all but a handful of frames across the whole site. */
+  credit?: ResolvedCredit;
 };
 
 /**
@@ -39,6 +65,17 @@ export type GalleryPlate = {
    * Masonry only; the cropping templates ignore it.
    */
   feature?: boolean;
+  /**
+   * Credit one object in this photograph. Omitted on almost every plate.
+   *
+   * Two authoring rules, both from the layouts rather than from taste:
+   * - **Never credit the frame `hero` names.** `ProjectDetail` drops that frame from the rendered gallery, so the
+   *   caption would have nowhere to appear.
+   * - **In a `masonry` project, prefer a `feature` frame.** A feature spans the width and sits between packed runs,
+   *   so a caption beneath it costs the column packing nothing; beneath an ordinary tile it leaves that column
+   *   roughly one caption taller than its neighbour. See `components/project/GalleryMasonry.tsx`.
+   */
+  credit?: PlateCredit;
 };
 
 /**
@@ -1793,6 +1830,27 @@ const DEFAULT_ASPECT = 3 / 4;
 /** Only the folder is derived now; the leaf is authored, per the bucket layout in AGENTS.md. */
 const plateUrl = (assetKey: string, file: string): string => img(`projects/${assetKey}/${file}`);
 
+/**
+ * Look the credited piece up and keep only what a caption prints.
+ *
+ * An unresolvable slug drops the credit rather than throwing. Throwing would be the louder signal, but this module is
+ * imported by every page in the site, so one typo would take the whole thing down in dev — the same reasoning that
+ * makes `parseDate` in app/sitemap.ts degrade instead of crashing the build. The guards are what catch it:
+ * `lib/__tests__/projects.test.ts` asserts every authored slug resolves, and `scripts/check-content.mjs` runs under
+ * `npm run lint`.
+ */
+const resolveCredit = (credit: PlateCredit | undefined): ResolvedCredit | undefined => {
+  if (!credit) return undefined;
+
+  const piece = getPiece(credit.piece);
+  if (!piece) {
+    console.warn(`Dropped a photo credit: no piece named "${credit.piece}" in lib/pieces.ts.`);
+    return undefined;
+  }
+
+  return { slug: piece.slug, brand: piece.brand, note: credit.note };
+};
+
 const buildProject = (m: ProjectRecord, i: number): Project => {
   const intro = m.intro ?? deriveIntro(m);
   const plates = m.gallery;
@@ -1803,7 +1861,8 @@ const buildProject = (m: ProjectRecord, i: number): Project => {
         src: plateUrl(m.assetKey, plate.file),
         alt: plate.alt ?? deriveAlt(m, gi),
         aspect: plate.aspect ?? DEFAULT_ASPECT,
-        feature: plate.feature === true
+        feature: plate.feature === true,
+        credit: resolveCredit(plate.credit)
       }))
     : pool.gallery.map((src, gi) => ({ src, alt: deriveAlt(m, gi), aspect: DEFAULT_ASPECT, feature: false }));
 
@@ -1876,6 +1935,23 @@ export const PROJECTS: Project[] = ALL_PROJECTS.filter(p => p.hasRealAssets);
 
 /** Lookup by slug, across published projects only — an unpublished slug is `undefined`, which the route turns into a 404. */
 export const getProject = (slug: string): Project | undefined => PROJECTS.find(p => p.slug === slug);
+
+/**
+ * Every published frame that credits a piece, in project order.
+ *
+ * This is what lets a piece have no photography of its own: `/pieces/<slug>` shows the object where the studio
+ * actually installed it, which is a better photograph than any vendor's white-background shot and costs no new R2
+ * object. Lives here rather than in lib/pieces.ts because the import runs one way — `projects` may read `pieces`,
+ * never the reverse.
+ *
+ * Reads `PROJECTS`, not `ALL_PROJECTS`: a frame in an unpublished project is not on the site, so linking a piece page
+ * to it would point at a 404. It also drops the frame `hero` names, for the same reason the detail page does — that
+ * one is the banner and is not rendered in the gallery, so no caption of it exists to have been seen.
+ */
+export const framesCreditingPiece = (slug: string): { project: Project; image: GalleryImage }[] =>
+  PROJECTS.flatMap(project =>
+    project.gallery.filter(image => image.credit?.slug === slug && image.src !== project.hero.src).map(image => ({ project, image }))
+  );
 
 /** `"Aiken, SC"` → `{ city: 'Aiken', region: 'SC' }`. Anything not in that shape degrades to the whole string as city. */
 export const splitLocation = (location: string): { city: string; region?: string } => {
