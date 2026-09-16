@@ -28,7 +28,7 @@ export function ProjectDetail({ project }: Props) {
     return () => cancelAnimationFrame(raf);
   }, []);
 
-  const meta = [`${formatLocationLong(project.location)} · ${project.year}`, project.scope].filter(Boolean).join(' | ');
+  const meta = [formatLocationLong(project.location), project.scope].filter(Boolean).join(' | ');
 
   // The shoot as the gallery shows it: everything except the frame already standing at the top of the page. `hero`
   // normally names a plate (that is what lets it inherit the plate's alt text and cost no second object on R2), so
