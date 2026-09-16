@@ -44,7 +44,7 @@ export function GridCell({ project, onOpen }: GridCellProps) {
 
       <div className="grid-cell__caption" style={{ color: color.bg }}>
         <div className="micro-sm" style={{ opacity: 0.75, marginBottom: 10 }}>
-          {project.location} · {project.year}
+          {project.location}
         </div>
         <h2
           className="serif"

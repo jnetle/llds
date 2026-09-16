@@ -81,24 +81,14 @@ export function ProjectStrip({ projects, onOpen }: Props) {
                 />
               </div>
               <div
+                className="serif"
                 style={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'baseline',
+                  fontSize: 22,
+                  fontStyle: 'italic',
+                  fontWeight: 300,
                   marginTop: 18
                 }}>
-                <div
-                  className="serif"
-                  style={{
-                    fontSize: 22,
-                    fontStyle: 'italic',
-                    fontWeight: 300
-                  }}>
-                  {p.title}
-                </div>
-                <div className="micro-sm" style={{ opacity: 0.5 }}>
-                  {p.year}
-                </div>
+                {p.title}
               </div>
               <div className="micro-sm" style={{ marginTop: 6, opacity: 0.5 }}>
                 {p.location}
