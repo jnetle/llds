@@ -25,9 +25,16 @@ jobs:
   triage:
     if: github.event.pull_request.user.login == 'dependabot[bot]'
     runs-on: ubuntu-latest
+    env:
+      # No checkout here, so gh cannot infer the repo; `gh label create` fails without this.
+      GH_REPO: ${{ github.repository }}
     steps:
+      # fetch-metadata refuses a PR whose head commit Dependabot did not sign — e.g. after "Update branch → rebase" in
+      # the GitHub UI or a local rebase. That is the right call (the diff is no longer purely Dependabot's), but it
+      # must route the PR to review, not fail the job and leave it unlabelled.
       - id: meta
         uses: dependabot/fetch-metadata@v3
+        continue-on-error: true
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
@@ -38,8 +45,13 @@ jobs:
           ECOSYSTEM: ${{ steps.meta.outputs.package-ecosystem }}
           NAMES: ${{ steps.meta.outputs.dependency-names }}
           PREV: ${{ steps.meta.outputs.previous-version }}
+          META_OUTCOME: ${{ steps.meta.outcome }}
         run: |
           low=false; reason=""
+          if [[ "$META_OUTCOME" != "success" ]]; then
+            reason="the branch has commits Dependabot did not sign (it was rebased or edited outside Dependabot), so its metadata cannot be trusted — comment \`@dependabot recreate\` to make it eligible again"
+            echo "low=false" >> "$GITHUB_OUTPUT"; echo "reason=$reason" >> "$GITHUB_OUTPUT"; echo "$reason"; exit 0
+          fi
           # Grouped PRs report the highest update-type in the group and a comma-separated name list.
           framework=$(echo "$NAMES" | tr ',' '\n' | sed 's/^ *//' | grep -Ex 'next|@next/.*|eslint-config-next|react|react-dom|@react-pdf/renderer' || true)
           case "$UPDATE_TYPE" in
@@ -73,8 +85,10 @@ jobs:
           PR: ${{ github.event.pull_request.html_url }}
           REASON: ${{ steps.risk.outputs.reason }}
         run: |
-          gh label create needs-review --color D93F0B --description 'Not auto-merged; needs a human look' 2>/dev/null || true
+          gh label create needs-review --force --color D93F0B --description 'Not auto-merged; needs a human look'
+          # Comment once per PR, not on every push: skip if it already carries the label.
+          already=$(gh pr view "$PR" --json labels --jq '[.labels[].name] | index("needs-review") != null')
           gh pr edit "$PR" --add-label needs-review
-          if [[ "${{ github.event.action }}" == "opened" ]]; then
+          if [[ "$already" != "true" ]]; then
             gh pr comment "$PR" --body "Not auto-merged: $REASON. Review the changelog and merge manually once CI passes."
           fi
