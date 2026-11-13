@@ -1,0 +1,80 @@
+name: Dependabot auto-merge
+
+# Turns on GitHub auto-merge (squash) for LOW-RISK Dependabot PRs. Nothing here merges directly: auto-merge waits for
+# branch protection on `main`, which requires the `verify` job in ci.yml to pass AND the branch to be up to date with
+# main ("strict"). When one PR merges, Dependabot rebases the others onto the new main, CI re-runs against that code,
+# and only then do they merge — so every squash lands tested on top of the latest main.
+#
+# Low risk:
+#   - any patch bump, and minor bumps of dev dependencies or GitHub Actions
+#   - minor bumps of runtime dependencies, EXCEPT the framework (next, react) and @react-pdf/renderer, whose failures
+#     show up only on Vercel (see AGENTS.md § Inquiry form)
+#   - never a major bump, and never a minor bump of a 0.x package (semver allows breaking changes there)
+# Everything else is labelled `needs-review` and left for a human (or the dependabot-merger Claude agent, which
+# reports on them).
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  triage:
+    if: github.event.pull_request.user.login == 'dependabot[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - id: meta
+        uses: dependabot/fetch-metadata@v3
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - id: risk
+        env:
+          UPDATE_TYPE: ${{ steps.meta.outputs.update-type }}
+          DEP_TYPE: ${{ steps.meta.outputs.dependency-type }}
+          ECOSYSTEM: ${{ steps.meta.outputs.package-ecosystem }}
+          NAMES: ${{ steps.meta.outputs.dependency-names }}
+          PREV: ${{ steps.meta.outputs.previous-version }}
+        run: |
+          low=false; reason=""
+          # Grouped PRs report the highest update-type in the group and a comma-separated name list.
+          framework=$(echo "$NAMES" | tr ',' '\n' | sed 's/^ *//' | grep -Ex 'next|@next/.*|eslint-config-next|react|react-dom|@react-pdf/renderer' || true)
+          case "$UPDATE_TYPE" in
+            version-update:semver-patch)
+              low=true ;;
+            version-update:semver-minor)
+              if [[ "$PREV" == 0.* ]]; then reason="minor bump of a 0.x package"
+              elif [[ "$ECOSYSTEM" == "github_actions" || "$DEP_TYPE" == "direct:development" ]]; then low=true
+              elif [[ -n "$framework" ]]; then reason="minor bump of framework/PDF dependency: $framework"
+              else low=true; fi ;;
+            version-update:semver-major)
+              reason="major version bump" ;;
+            *)
+              reason="unknown update type '$UPDATE_TYPE'" ;;
+          esac
+          echo "low=$low" >> "$GITHUB_OUTPUT"
+          echo "reason=$reason" >> "$GITHUB_OUTPUT"
+          echo "Update: $NAMES ($UPDATE_TYPE, $DEP_TYPE) → low-risk=$low ${reason:+($reason)}"
+
+      - name: Enable auto-merge
+        if: steps.risk.outputs.low == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR: ${{ github.event.pull_request.html_url }}
+        run: gh pr merge "$PR" --auto --squash
+
+      - name: Flag for review
+        if: steps.risk.outputs.low != 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR: ${{ github.event.pull_request.html_url }}
+          REASON: ${{ steps.risk.outputs.reason }}
+        run: |
+          gh label create needs-review --color D93F0B --description 'Not auto-merged; needs a human look' 2>/dev/null || true
+          gh pr edit "$PR" --add-label needs-review
+          if [[ "${{ github.event.action }}" == "opened" ]]; then
+            gh pr comment "$PR" --body "Not auto-merged: $REASON. Review the changelog and merge manually once CI passes."
+          fi

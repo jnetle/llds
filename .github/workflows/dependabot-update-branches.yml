@@ -1,0 +1,54 @@
+name: Dependabot update branches
+
+# Backstop for the auto-merge chain in dependabot-auto-merge.yml. Branch protection requires a PR to be up to date
+# with main before it merges, but Dependabot only rebases its PRs when they CONFLICT, not when they are merely behind
+# — so after one bump merges, the rest would sit "behind" forever.
+#
+# Every run picks the oldest Dependabot PR that has auto-merge enabled and is behind main, merges main into it, and
+# dispatches CI on the result. One per run on purpose: updating them all at once just means each merge makes the
+# others stale again. The dispatch is required, not a nicety — a push made with GITHUB_TOKEN does not trigger
+# `pull_request` workflows, and workflow_dispatch is the documented exception. Its `verify` check lands on the PR's
+# new head commit, which is what branch protection looks at.
+
+on:
+  schedule:
+    - cron: '*/20 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+  actions: write
+
+concurrency:
+  group: dependabot-update-branches
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      GH_REPO: ${{ github.repository }}
+    steps:
+      - name: Update the oldest behind PR
+        run: |
+          prs=$(gh pr list --author 'app/dependabot' --state open --limit 50 \
+            --json number,headRefName,mergeStateStatus,autoMergeRequest,statusCheckRollup \
+            --jq '[.[] | select(.autoMergeRequest != null)] | sort_by(.number)')
+          echo "Auto-merge PRs: $(echo "$prs" | jq -c 'map({number, mergeStateStatus})')"
+
+          # A PR that is up to date with `verify` still running is about to merge — don't make it stale. (A PR whose
+          # `verify` FAILED is also BLOCKED, so test the check itself, or one red PR would stall the queue.)
+          if echo "$prs" | jq -e 'map(select(.mergeStateStatus != "BEHIND" and any(.statusCheckRollup[]?; .name == "verify" and .status != "COMPLETED"))) | length > 0' > /dev/null; then
+            echo "A PR is up to date and waiting on checks; nothing to do this run."
+            exit 0
+          fi
+
+          pr=$(echo "$prs" | jq -r 'map(select(.mergeStateStatus == "BEHIND")) | first | .number // empty')
+          [ -z "$pr" ] && { echo "Nothing behind."; exit 0; }
+          branch=$(echo "$prs" | jq -r --argjson n "$pr" '.[] | select(.number == $n) | .headRefName')
+
+          echo "Updating #$pr ($branch)"
+          gh pr update-branch "$pr"
+          gh workflow run ci.yml --ref "$branch"

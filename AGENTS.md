@@ -10,12 +10,34 @@ npm run build        # Production build (Turbopack by default)
 npm start            # Start production server
 npm run lint         # ESLint (--max-warnings=0) + scripts/check-css.mjs
 npm run check:css    # CSS guard alone (forbidden patterns in app/globals.css)
-npm run typecheck    # tsc --noEmit (no script runs this implicitly — run before opening a PR; reviewers can't catch type errors otherwise)
+npm run typecheck    # tsc --noEmit (no script runs this implicitly — CI does, but run it before opening a PR)
+npm test             # Vitest unit tests (lib/__tests__/)
+npm run smoke        # Smoke-test a running production server: `npm run build && npm start`, then this in another shell
 npm run format       # Format the repo with Prettier
 npm run format:check # Verify formatting without writing
 ```
 
-There are no tests configured yet.
+## CI and Dependabot
+
+`.github/workflows/ci.yml` runs on every PR and push to `main`. Its single job, `verify`, runs lint, format check,
+typecheck, `npm test`, `next build`, and then `scripts/smoke.mjs` against `next start`. The smoke test fetches
+every page in `/sitemap.xml` (expects 200 and an `<h1>`), every `og:image` those pages declare (expects a PNG), and
+a missing route (expects 404). The sitemap is the route list, so publishing a project adds it to the smoke test with
+no extra work. Branch protection on `main` requires `verify` and requires PR branches to be up to date. If you
+rename the job, update the protection rule too, or the branch silently loses its gate.
+
+`lib/__tests__/inquiry.test.ts` acts mostly as a dependency tripwire. The inquiry pipeline is the only code that runs
+zod and `@react-pdf/renderer` at request time, and a bump that breaks either would otherwise first show up on a real
+lead's submission.
+
+**Dependabot PRs merge themselves when they are low risk.** `dependabot-auto-merge.yml` classifies each PR and enables
+squash auto-merge for patch bumps, minor bumps of dev dependencies and Actions, and minor bumps of runtime
+dependencies other than `next`/`react`/`@react-pdf/renderer`. Majors, 0.x minors, and framework minors get a
+`needs-review` label instead. Dependabot rebases only conflicting PRs, not ones that are merely behind, so
+`dependabot-update-branches.yml` runs every 20 minutes and updates one behind PR at a time. It also dispatches CI
+itself, because a push made with `GITHUB_TOKEN` does not trigger `pull_request` workflows. For an on-demand run, or
+a report on what was skipped, ask Claude Code to use the `dependabot-merger` agent (`.claude/agents/`). It applies
+the same risk rules, which are written in both places, so change both together.
 
 ## Pre-commit hook
 
@@ -28,7 +50,7 @@ Fixed files are re-staged automatically. Husky installs via the `prepare` script
 
 **Bypassing**: `git commit --no-verify` skips the hook. Reserve for true WIP; the assumption is shared code passes lint.
 
-**Don't run full-repo lint in the hook.** Lint-staged is scoped on purpose — keep it fast so people don't reach for `--no-verify`. CI (when added) is the right place for full-repo `lint` / `format:check` / `typecheck`.
+**Don't run full-repo lint in the hook.** Lint-staged is scoped on purpose — keep it fast so people don't reach for `--no-verify`. CI (`.github/workflows/ci.yml`) is the right place for full-repo `lint` / `format:check` / `typecheck`.
 
 ## Linting
 
