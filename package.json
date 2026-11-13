@@ -17,7 +17,8 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
-    "prepare": "husky"
+    "prepare": "husky",
+    "smoke": "node scripts/smoke.mjs"
   },
   "lint-staged": {
     "*.{ts,tsx,js,mjs}": [
