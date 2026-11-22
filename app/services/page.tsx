@@ -165,35 +165,6 @@ const PROCESS: {
   }
 ];
 
-const WORKING: { h: string; p: string; note?: string }[] = [
-  {
-    h: 'Communication',
-    p: 'Project communication is coordinated through email and scheduled meetings. We work closely with your builder to streamline communication and reduce unnecessary back-and-forth.'
-  },
-  {
-    h: 'Meetings',
-    p: 'Design discussions take place during scheduled meetings, where selections are presented in a clear and organized format to support efficient decision-making.'
-  },
-  {
-    h: 'Response Time',
-    p: 'Responses are typically provided within 1–2 business days. Time-sensitive construction items are prioritized as needed.'
-  },
-  {
-    h: 'Site Visits',
-    p: 'Site visits are scheduled at key project milestones.',
-    note: 'Additional site visits requested outside of these milestones are billed separately.'
-  },
-  {
-    h: 'Revisions',
-    p: 'One round of revisions is included per phase and consists of refinements within the established design direction.',
-    note: 'Additional revisions, redesigns, or expanded scope will be billed separately.'
-  },
-  {
-    h: 'Project Flow',
-    p: 'Timely decisions and approvals are essential to maintaining the construction schedule. Delays in selections or changes after approval may impact overall project timelines.'
-  }
-];
-
 const DIFFERENCE_POINTS = [
   'Design decisions are made early, creating a more seamless and less overwhelming experience',
   'Each selection is thoughtfully layered to create a cohesive and timeless home',
@@ -206,7 +177,6 @@ const QUICK_LINKS: [string, string][] = [
   ['sec-scope', 'Scope'],
   ['sec-deliverables', 'Deliverables'],
   ['sec-process', 'Process'],
-  ['sec-working', 'Working Together'],
   ['sec-difference', 'The Difference'],
   ['sec-next', 'Next Steps']
 ];
@@ -760,82 +730,6 @@ export default function ServicesPage() {
             </article>
           ))}
           <div style={{ borderTop: `1px solid ${color.hairline}` }} />
-        </div>
-      </Section>
-
-      {/* Working Together */}
-      <Section id="sec-working" padY="sm" style={{ borderBottom: `1px solid ${color.hairline}`, scrollMarginTop: 70 }}>
-        <div style={{ marginBottom: 80 }}>
-          <Eyebrow style={{ marginBottom: 22 }}>— Working Together</Eyebrow>
-          <h2
-            className="serif"
-            style={{
-              fontSize: 'clamp(56px, 7vw, 130px)',
-              fontWeight: 300,
-              lineHeight: 0.95,
-              letterSpacing: '-0.018em',
-              textTransform: 'uppercase',
-              marginBottom: 38,
-              marginTop: 0,
-              maxWidth: '14ch',
-              textWrap: 'balance'
-            }}>
-            Working Together
-          </h2>
-          <p style={{ ...text.body, maxWidth: '58ch' }}>
-            A clear and structured approach allows the project to move forward efficiently while maintaining alignment between client,
-            builder, and design.
-          </p>
-        </div>
-
-        <div style={{ display: 'grid', gridTemplateColumns: cols('1.4fr 1fr'), gap: 90, alignItems: 'start' }}>
-          <div style={{ display: 'grid', gridTemplateColumns: cols('repeat(2, 1fr)'), gap: '0 60px' }}>
-            {WORKING.map((w, i) => (
-              <div
-                key={w.h}
-                style={{
-                  borderTop: `1px solid ${color.hairline}`,
-                  borderBottom: i >= WORKING.length - 2 ? `1px solid ${color.hairline}` : 'none',
-                  padding: '28px 0 32px'
-                }}>
-                <h3 className="micro" style={{ marginBottom: 16, marginTop: 0, letterSpacing: '0.22em' }}>
-                  {w.h}
-                </h3>
-                <p style={{ ...text.bodySm, lineHeight: 1.65 }}>{w.p}</p>
-                {w.note && (
-                  <p
-                    style={{
-                      marginTop: 12,
-                      fontSize: 14,
-                      fontWeight: 500,
-                      color: color.ink,
-                      lineHeight: 1.6
-                    }}>
-                    — {w.note}
-                  </p>
-                )}
-              </div>
-            ))}
-          </div>
-
-          <div style={{ display: 'grid', gap: 22, position: 'sticky', top: 120 }}>
-            <div
-              style={{
-                aspectRatio: '4/5',
-                backgroundImage: 'url("https://images.unsplash.com/photo-1581291518857-4e27b48ff24e?auto=format&fit=crop&w=1200&q=80")',
-                backgroundSize: 'cover',
-                backgroundPosition: 'center'
-              }}
-            />
-            <div
-              style={{
-                aspectRatio: '4/3',
-                backgroundImage: 'url("https://images.unsplash.com/photo-1620228885847-9eab2a1adddc?auto=format&fit=crop&w=1200&q=80")',
-                backgroundSize: 'cover',
-                backgroundPosition: 'center'
-              }}
-            />
-          </div>
         </div>
       </Section>
 

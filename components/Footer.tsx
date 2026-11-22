@@ -13,6 +13,7 @@ import { Wordmark } from './Wordmark';
 const STUDIO_LINKS: { label: string; href: string }[] = [
   { label: 'About', href: '/about' },
   { label: 'Services', href: '/services' },
+  { label: 'Working Together', href: '/working-together' },
   { label: 'Press', href: '/press' }
 ];
 

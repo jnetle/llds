@@ -7,6 +7,7 @@ import { LogoLong } from './LogoLong';
 const NAV = [
   { label: 'About', href: '/about' },
   { label: 'Services', href: '/services' },
+  { label: 'Working Together', href: '/working-together' },
   { label: 'Projects', href: '/projects' },
   { label: 'Press', href: '/press' }
 ];
